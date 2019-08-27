@@ -1,6 +1,5 @@
+rootdir <- paste0(maindir,"Raw Data/")	#maindir is set in calling function for figures. rootdir is where all rawdata originates
 
-rootdir <- "~/Desktop/Color_Variation/Raw Data/"
-setwd(rootdir)
 #The following datafiles are written in order of collection, including some notes for each session and specimens
 
 #For first several rounds of data collection, we used an integrating sphere. We did not change the setup
@@ -341,3 +340,8 @@ workingdir <- "non-ucsb/Pgra"
 setwd(paste0(rootdir,workingdir))
 raw <- read.table(file="Pg.txt");
 Pgra_huvard <- data.frame(wavelength = raw$V1, sum=raw$V2);
+
+
+#Set back to maindir
+setwd(maindir)
+

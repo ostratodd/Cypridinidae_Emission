@@ -23,13 +23,13 @@ table1
 #Supplemental Table -- all data
 alldata
 
-#Figure X - Box plot of all lmax of species
+#Figure 1 - Box plot of all lmax of species
 require(ggplot2)
 #a <- subset(alldata, error < 0.02 | replicate=="Cn" | replicate=="Pg")
 a <- subset(alldata, error < 0.02 | replicate=="Vhil_tsuji" | replicate=="Cnoc_ohmiya" | replicate=="Pgra_huvard")
 
-p <- qplot(abbreviation, sgMax, data=a, geom=c("boxplot", "jitter"))
-p
+fig1 <- qplot(abbreviation, sgMax, data=a, geom=c("boxplot", "jitter"))
+fig1
 
 
 #Figure X - Box plot of all fwhm of species

@@ -217,7 +217,7 @@ fullrow(abbreviation, species, "GPH8", GPH_8, sex, preservation, specloc) -> GPH
 rbind(GPH1f, GPH2f, GPH3f, GPH4f, GPH5f, GPH6f, GPH7f, GPH8f) -> allGPH
 
 species<-"WLU"
-abbreviation<-"WLU"
+abbreviation<-"P_WLU"
 sex<-"male"
 specloc <- "ucsb"
 preservation <- "live"
@@ -352,7 +352,7 @@ rbind(Pann1f,Pann2f,Pann3f) -> allPann
 
 #***********************************Previously published data
 species<-"Vargula_hilgendorfii"
-abbreviation<-"V_hil"
+abbreviation<-"V_hil_p"
 sex<-"unknown"
 specloc <- "published"
 preservation <- "unknown"
@@ -360,7 +360,7 @@ preservation <- "unknown"
 fullrow(abbreviation, species, "Vhil_tsuji", Vhil_tsuji, sex, preservation, specloc) -> Vhiltsujif
 
 species<-"Cypridina_noctiluca"
-abbreviation<-"C_noc"
+abbreviation<-"C_noc_p"
 sex<-"unknown"
 specloc <- "published"
 preservation <- "unknown"
@@ -368,7 +368,7 @@ preservation <- "unknown"
 fullrow(abbreviation, species, "Cnoc_ohmiya", Cnoc_ohmiya, sex, preservation, specloc) -> Cnocohmiyaf
 
 species<-"Photeros_gramminicola"
-abbreviation<-"P_gra"
+abbreviation<-"P_gra_p"
 sex<-"unknown"
 specloc <- "published"
 preservation <- "unknown"
