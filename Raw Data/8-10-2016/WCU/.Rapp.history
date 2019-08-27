@@ -1,0 +1,2067 @@
+# init#
+rm(list=ls())#
+#
+# opt parsing#
+suppressPackageStartupMessages(library(docopt))#
+#
+'Usage: consenTRAIT.r [options] <tree> <root> <trait>#
+#
+options:#
+  <tree>       Newick tree file (multitree).#
+  <root>       Name of root taxon.#
+  <trait>      Trait table (no headers).#
+  -b=<b>       Number trait bootstraps per bootstrap tree.#
+               [Default: 10]#
+  -s=<s>       Percent shared trait cutoff.#
+               [Default: 90]#
+  -c=<c>       Cluster size file name prefix.#
+               [Default: cluster_size]#
+  -d=<d>       Cluster distance file name prefix.#
+               [Default: cluster_dist]#
+  -t=<m>       Tau_D table name.#
+               [Default: Tau_D.txt]#
+  -u=<u>       Tau_D bootstrap table name.#
+               [Default: Tau_D_boot.txt]#
+  -x=<x>       Create a test tree & trait file with `x` taxa.#
+               Output files: "consentrait_TEST*"#
+  -r=<r>       Model rate parameters for the example traits.#
+               Lower values mean more conservatism.#
+               [Default: 0.5,1000]#
+  -n=<b>       Number of simulated trees to make.#
+               NOTE: this is only for the `x` option.#
+               [Default: 10]#
+  -p=<p>       Number of processors.#
+               [Default: 1]#
+  -h           Help#
+#
+description:#
+  The script requires two input files as arguments:#
+    1) a Newick Tree#
+    2) a tab delimited text file with names of#
+       each taxon in the first column and then 0 or 1#
+       values for each trait in the following columns#
+       (and no headers)#
+#
+  The newick tree file should consist of multiple bootstrap#
+  trees, one bootstrap tree per line in the file.#
+#
+  Tau_D is average consensus sequence distance (branch length)#
+  between trait values.#
+#
+  This version of consenTRAIT will conduct the non-parametric#
+  bootstrapping (in parallel) for calculating p-values.#
+#
+  The `x` option:#
+    You will still need to provide something for the `tree` `root` `trait`#
+    commands. Example: `consentrait.r -x 20 tmp tmp tmp`#
+#
+  Dependencies: data.table, adephylo, ape, docopt, parallel#
+  (if using >1 processor).#
+#
+  For more info: http://www.ess.uci.edu/group/amartiny/research/consentrait#
+#
+  OUTPUT:#
+    Many accessory tables are written during the run, but the main#
+    table with the tauD values for each trait are written to STDOUT.#
+    So, to save your table, redirect the output to a file.#
+#
+' -> doc#
+opts = docopt(doc)#
+opts[['-r']] = unlist(strsplit(opts[['-r']], split=','))#
+opts[['-r']] = sapply(opts[['-r']], as.numeric)#
+#
+# packages#
+pkgs <- c('data.table', 'adephylo', 'ape')#
+for(x in pkgs){#
+  suppressPackageStartupMessages(library(x, character.only=TRUE))#
+}#
+if(opts[['-p']] > 1){#
+  suppressPackageStartupMessages(library('parallel', character.only=TRUE))#
+}#
+#-- functions --##
+format.means = function(x, table){#
+  x = as.data.frame(t(x))#
+  col.n = sapply(1:(ncol(table)-1), function(x) paste(c('t', x), collapse=''))#
+  colnames(x) = col.n#
+  x$tree = 1:nrow(x)#
+  x = x[,c('tree', col.n)]#
+  return(x)#
+}#
+init_data_files = function(cluster_size_file, cluster_dist_file){#
+  cat(c("trait","tree","subtree", "distance","cluster_size"),#
+      '\n', file = cluster_size_file,#
+      sep = "\t", fill = FALSE, labels = NULL,append = FALSE)#
+  cat(c("trait","tree","subtree", "cluster","distance"),#
+      '\n', file = cluster_dist_file,#
+      sep = "\t", fill = FALSE, labels = NULL,append = FALSE)#
+}#
+#
+cons.trait = function(table, tree_all, opts, boot=FALSE){#
+  if(boot==TRUE){#
+    cat('Analyzing bootstrap replicate...\n', file = stderr())#
+  }#
+  # init#
+  n.trees = length(tree_all)#
+  Mean_all = matrix(nrow=ncol(table)-1,ncol=n.trees)#
+#
+  for (m in 1:length(tree_all)) {#
+    if(boot==FALSE){#
+      cat("Analyzing tree: ",m,"\n", file = stderr())#
+    }#
+#
+    # testing if table and tree contain the same entries - else drop tips#
+    tree = tree_all[[m]]#
+    z = subset(tree$tip.label,!(tree$tip.label %in% table[,1]))#
+    if (length(z) > 0) {#
+      cat("  WARNING: dropping tips\n", file = stderr())#
+      drop.tip(tree,z)#
+    }#
+#
+    #rooting tree with first taxon - change if different root#
+    tree = multi2di(tree)#
+    root_tree = root(tree,opts[['<root>']]) #,resolve.root=T)#
+    #replacing negative branch lengths - e.g., from PHYLIP#
+    root_tree$edge.length[root_tree$edge.length <= 0] =  0.000001#
+    subtree = subtrees(root_tree, wait=FALSE)#
+#
+    cluster_mean = numeric(length=0)#
+    # loop through all traits#
+    for (j in 2:ncol(table)) {#
+      if(boot==FALSE){#
+        cat("  Analyzing trait: ",j-1,"\n", file = stderr())#
+      }#
+      #Loading trait table#
+      table_tmp = table[,c(1,j)]#
+      colnames(table_tmp)[1] = "ID";#
+      colnames(table_tmp)[2] = "Trait";#
+#
+      # removing all entries not in tree#
+      table_tmp2 = data.table(table_tmp)#
+      setkey(table_tmp2,ID)#
+      table2 = table_tmp2[intersect(table_tmp2$ID,root_tree$tip.label)]#
+      setkey(table2,ID)#
+#
+      #initializing result vectors and file names#
+      positives = vector(mode="list",length=0)#
+      cluster_size = numeric(length=0)#
+      cluster_dist = numeric(length=0)#
+      # output files#
+      cluster_size_file = paste(opts[['-c']],'_t',j-1,".txt",sep="")#
+      cluster_dist_file = paste(opts[['-d']],'_t',j-1,".txt",sep="")#
+#
+      # Init cluster size & distance files#
+      if ((m == 1) & (boot == FALSE)){#
+        init_data_files(cluster_size_file, cluster_dist_file)#
+      }#
+#
+      #loop through all subtrees and determining if any subtrees have >P% positives#
+      for (i in 1:length(subtree)){#
+        tip_names = subtree[[i]]$tip.label#
+        # apply % shared cutoff#
+        if (mean(table2[tip_names][,Trait]) > perc.share.cutoff) {#
+          match_test = match(tip_names,positives)#
+          if (all(is.na(match_test))) {#
+            positives = c(positives,tip_names)#
+            cluster_dist = distRoot(subtree[[i]],tip_names, method=c("p"))#
+            cluster_size = append(cluster_size,mean(cluster_dist))#
+#
+            # printing to files, if not a bootstrap#
+            if(boot == FALSE){#
+              cat(j-1,m,i,mean(cluster_dist),length(cluster_dist),#
+                  '\n', file = cluster_size_file,#
+                  sep = "\t", fill = FALSE, labels = NULL,append = TRUE)#
+#
+              for(cdl in 1:length(cluster_dist)){#
+                cat(j-1,m,i,cdl,cluster_dist[cdl], '\n', file = cluster_dist_file,#
+                    sep = "\t", fill = FALSE, labels = NULL,append = TRUE)#
+              }#
+            }#
+          }#
+          else if (any(is.na(match_test))) {#
+            cat("Assertion error: NAs present\n", file = stderr())#
+          }#
+          else {#
+#
+          }#
+        }#
+      }#
+#
+      ##### find singletons #######
+      a = table2[table2$Trait == 1,][,ID]#
+      g = as.character(a)#
+#
+      singletons_names = setdiff(g,positives)#
+      if (length(singletons_names) > 0) {#
+        for (h in 1:length(singletons_names)){#
+          # weigh singletons with half#
+          we = which.edge(root_tree,singletons_names[h])#
+          singleton_edges = 0.5*root_tree$edge.length[we]#
+          cluster_size = append(cluster_size,singleton_edges)#
+#
+          if(boot == FALSE){#
+            cat(j-1,m,NA,singleton_edges,1, '\n', file=cluster_size_file,#
+                sep = "\t",fill = FALSE, labels = NULL,append = TRUE)#
+          }#
+        }#
+      }#
+    # means of cluster sizes#
+    Mean_all[j-1,m] = mean(cluster_size)#
+    }#
+  }#
+  return(Mean_all)#
+}#
+#
+sim_trait = function(phy, model, tries=1000){#
+  # simulating a binary trait.#
+  # phy = phylogeny, model = rate_model, tries=number of tries to have trait evolve at least once#
+  try_cnt = 1#
+  while(1==1){    #
+    trait = rTraitDisc(phy, model=model, states=c(0, 1), root.value=1)#
+    trait = ifelse(trait == 1, 0, 1)#
+    if(sum(trait)> 0){#
+      return(trait)#
+    }#
+    try_cnt = try_cnt + 1#
+    if(try_cnt > tries){#
+      stop('Exceeded tries to evolve the trait. Raise the rate parameter values')#
+    }#
+  }#
+}#
+#-- main --##
+# Test files#
+if(!is.null(opts[['-x']])){#
+  out.tree = 'consentrait_TEST.nwk'#
+  out.trait = 'consentrait_TEST.txt'#
+  out.tree.pic1 = 'consentrait_TEST_trait1.pdf'#
+  out.tree.pic2 = 'consentrait_TEST_trait2.pdf'#
+#
+  # tree(s)#
+  n.taxa = as.numeric(opts['-x'])#
+  tree = rcoal(n.taxa)#
+  write.tree(tree, out.tree)#
+#
+  ## traits#
+  taxa = tree$tip.label#
+  model1 = matrix(c(0,0,1,0), 2) * opts[['-r']][1]#
+  trait1 = sim_trait(tree, model1)#
+  model2 = matrix(c(1,1,1,1), 2) * opts[['-r']][2]#
+  trait2 = sim_trait(tree, model2)  #
+#
+  df = data.frame('taxa' = taxa,#
+    'trait1' = trait1,#
+    'trait2' = trait2)#
+  write.table(df, out.trait, sep='\t', quote=FALSE,#
+              row.names=FALSE, col.names=FALSE)#
+#
+  # plotting tree#
+  pdf(out.tree.pic1, bg='white')#
+  plot(tree, show.tip.label=FALSE, adj=1)#
+  trait1 = ifelse(trait1==0, 'blue', 'red')#
+  tiplabels(pch=22, col=NULL, bg=trait1)#
+  dev.off()#
+  pdf(out.tree.pic2, bg='white')#
+  plot(tree, show.tip.label=FALSE, adj=1)#
+  trait2 = ifelse(trait2==0, 'blue', 'red')#
+  tiplabels(pch=22, col=NULL, bg=trait2)#
+  dev.off()#
+#
+  # status#
+  msg = paste(c('Test files written: ', out.tree,#
+    out.trait, out.tree.pic1, out.tree.pic2), collapse='\n  ')#
+  cat(paste0(msg,'\n'), file = stderr())#
+#
+  opt <- options(show.error.messages=FALSE)#
+  on.exit(options(opt))#
+  stop()#
+}#
+#-- consenTRAIT run --##
+# Params#
+perc.share.cutoff = as.numeric(opts[['-s']])#
+stopifnot((perc.share.cutoff >= 0) &  (perc.share.cutoff <= 100))#
+perc.share.cutoff = perc.share.cutoff / 100#
+# Import#
+## Newick tree (multitree) - replace to read.nexus if using nexus tress#
+tree_all = read.tree(opts[['<tree>']],keep.multi = TRUE)#
+## Trait table w. no headers#
+table = read.table(opts[['<trait>']], sep = "\t", header=FALSE)#
+#
+# Tau_D for each bootstrap tree#
+Mean_all = cons.trait(table, tree_all, opts)#
+Mean_all = format.means(Mean_all, table)#
+## writting#
+write.table(Mean_all,opts[['-t']], sep = "\t", quote=FALSE, row.names=FALSE)#
+# non-paramtric bootstrapping#
+## making randomly arranged trait tables#
+#random.traits = function(df){#
+table.l = list()#
+for(i in 1:opts[['-b']]){#
+  df.rand = apply(as.data.frame(table[,2:ncol(table)]), 2,#
+    function(x) sample(c(0,1), length(x), replace=TRUE))#
+  df.rand = as.data.frame(df.rand)#
+  tmp = colnames(df.rand)#
+  df.rand$V1 = table[,1]#
+  df.rand = df.rand[,c('V1', tmp)]#
+  table.l[[i]] = df.rand#
+}#
+#
+## (parallel) calling of cons.trait#
+if(opts[['-p']] > 1){#
+  cat('Bootstrapping in parallel\n', file = stderr())#
+  cl1 = makeCluster(opts[['-p']], type='FORK')#
+  mean_boots = parLapply(cl1, table.l, cons.trait,#
+    tree_all=tree_all, opts=opts, boot=TRUE)#
+  stopCluster(cl1)#
+} else {#
+  mean_boots = lapply(table.l, cons.trait,#
+    tree_all=tree_all, opts=opts, boot=TRUE)#
+}#
+## formatting output#
+for(i in 1:length(mean_boots)){#
+  tmp = format.means(mean_boots[[i]], table)#
+  tmp$bootstrap = i#
+  mean_boots[[i]] = tmp#
+}#
+mean_boots = do.call(rbind, mean_boots)#
+write.table(mean_boots,opts[['-u']], sep = "\t", quote=FALSE, row.names=FALSE)#
+# calcalating p-value#
+## getting mean Tau_D of real data#
+mean_tauD = apply(as.data.frame(Mean_all[,2:ncol(Mean_all)]), 2, mean)#
+if(length(mean_tauD) == 1){#
+  names(mean_tauD) = c('t1')#
+}#
+## determine p-value#
+cat('Trait\ttau_D\tp-value', '\n')#
+for(n in names(mean_tauD)){#
+  tau_D = mean_tauD[n]#
+  boot_tauD = mean_boots[,n]#
+  p = 1 - sum(tau_D < boot_tauD) / length(boot_tauD)#
+  line = paste(c(n, tau_D, p), collapse='\t')#
+  cat(line, '\n')#
+}
+require(signal)#
+fullrow <- function(species, replicate, df, sex, preservation, source) {#
+	#This function creates a full data row adding all metadata#
+	#and calculating values from spectra, including lmax, fwhm, and error (signal:noise)#
+	sgsmooth <- 35 #This is the smoothing value for SG smoothing. Doesn't seem to affect results at all#
+	round(error(df,500),digits=4)->error#
+	sgfwhm(df,sgsmooth,FALSE)->fwhm#
+	sgMax(df, sgsmooth)-> lmax#
+	data.frame(species, replicate, sex, preservation, source, lmax,fwhm,error) -> t1#
+	#merge(round(error(df,500),digits=4), t4) -> t5#
+}#
+graphEmission <- function(datafile, backgroundfile, calibrationfile, cols, plot) {#
+	rawdata <- read.table(datafile);#
+	background <-  read.table(backgroundfile);#
+	calibration <- read.table(calibrationfile);#
+	#USAGE#
+	#To use this, call the function with datafile (raw), backgroundfile (this is any background, like dim lights etc), calibrationfile #
+	#(this is from the blackbody radiation used to standardize), plot (TRUE or FALSE whether to plot or just read data)#
+	#***********************Generally not needed, except for early data sets#
+	##In earlier setups, we learned we Need to extrapolate calibration wavelengths to data wavelengths#
+	##This is because black body radiation was done on a different day#
+	##than luminous data collection and the ccd was not aligned precisely the same#
+	##way each time. This leads to different specific wavelenghts being read#
+	##Fit high order polynomial to correction factor data. Then interpolate values for data collection wavelengths#
+	#p20 <- lm( calibration$V2~poly(calibration$V1,20) )#
+	#xx <- seq(min(calibration$V1),max(calibration$V1), length.out=1024)#
+	#intercalibration<-data.frame(wavelength=xx, cf=predict(p20, data.frame(x=xx)))#
+	##Put all data into single data frame#
+	#fulldata <- cbind(background$V2, intercalibration$cf, rawdata)#
+#
+	fulldata <- cbind(background$V2, calibration$V2, rawdata)#
+	colnames(fulldata) <- c("background", "calibration", "wavelength");#
+#
+	#Subtract background from each spectrum#
+	subtracted <- fulldata[4:(cols+3)]-fulldata$background;#
+	#Add up all the replicates	#
+	sumreplicates <- apply(subtracted[,c(1,cols)], 1, sum);#
+	#multiply by correction factor determined using black body radiator#
+	calibrated <- sumreplicates * fulldata$calibration#
+#
+	#Normalize to 1 #
+    sumreplicates <- sumreplicates/max(sumreplicates, na.rm=T)#
+    calibrated <- calibrated/max(calibrated, na.rm=T)#
+	uncalframe <- data.frame(wavelength = fulldata$wavelength, sum=sumreplicates);#
+	finalframe <- data.frame(wavelength = fulldata$wavelength, sum=calibrated);#
+	if(plot==TRUE){#
+		#Uncomment two lines below to plot uncalibrated data#
+		#plot(uncalframe, xlim=c(400,600), ylim=c(0,1));#
+		#par(new=TRUE);#
+		plot(finalframe, xlim=c(400,600), ylim=c(0,1), col="blue");#
+	}#
+	#return background-subtracted, summed (over sampling points), and calibrated (using black body radiator) values in data frame by wavelength#
+	return(finalframe);#
+#
+}#
+sgMax <- function(df, smooth) {#
+#This uses Sovitzky Golay smoothing to smooth sampling curve#
+#df is a data frame of the corrected data, read in with graphEmission#
+#smooth is the smoothing value of the SG function#
+#The function returns the lambda max#
+	sgdf <- sgolayfilt(df$sum, 3, smooth)#
+	df2 <- data.frame(wavelength=df$wavelength,sum=sgdf)#
+	return(data.frame(sgMax=mean(df2[which(df2$sum == max(df2$sum)), ]$wavelength)) )#
+}#
+sgfwhm <- function(df, smooth, plot) {#
+#This uses Sovitzky Golay smoothing to smooth sampling curve#
+#df is a data frame of the corrected data, read in with graphEmission#
+#smooth is the smoothing value of the SG function#
+#The function returns the full width half max#
+#
+	 sgdf <- sgolayfilt(df$sum, 3, smooth)#
+	 d <- data.frame(wavelength=df$wavelength,sum=sgdf)#
+#
+	xmax <- d$wavelength[d$sum==max(d$sum)]#
+#
+	x1 <- d$wavelength[d$wavelength < xmax][which.min(abs(d$sum[d$wavelength < xmax]-max(d$sum)/2))]#
+	x2 <- d$wavelength[d$wavelength > xmax][which.min(abs(d$sum[d$wavelength > xmax]-max(d$sum)/2))]#
+	if(plot==TRUE){#
+		plot(d, type="l") #Can plot with FWHM points#
+		points(c(x1, x2), c(d$sum[d$wavelength ==x1], d$sum[d$wavelength ==x2]), col="red")#
+	}#
+#
+	fwhm <- x2-x1#
+	data.frame(sgfwhm=fwhm) -> sgfwhm#
+	return(sgfwhm)#
+}#
+error <- function(df, rows) {#
+	#This is a metric of signal to noise#
+	#df is data frame with wavelength, sum#
+	#n is number of highest rows (by sum) to average for wavelength#
+	#the data are ordered, and the "rows" decides how many of the lowest datapoints represent error#
+	#averaging over them, instead of simply taking the lowest value as the background#
+	sd(head(df[order(df$sum, decreasing=F),], n=rows)$sum ) -> error#
+	return(error)#
+}
+rootdir <- "~/Desktop/Color_Variation/Raw Data/"#
+setwd(rootdir)#
+#
+#********************************************************************#
+#Dried species from Panama May 2017#
+#
+workingdir <- "5-30-2017/EGD"#
+#
+background <- "../baselinePanamaSeriesMay26.asc";#
+calibration <- "../panama species correction factor.txt"#
+#
+	#EGD-------------------------------------------------------------#
+setwd(paste0(rootdir,workingdir))#
+graphEmission("EGD_dried_male1_removeMaxed.txt", background, calibration,13,TRUE) -> EGD_1; #First 2 maxed, so deleted#
+#graphEmission("EGD_dried_male2.asc", background, calibration, 15, TRUE) -> EGD_2; #no light#
+graphEmission("EGD_dried_male3.asc", background, calibration,15,TRUE) -> EGD_3;#
+graphEmission("EGD_dried_male4.asc", background, calibration,15,TRUE) -> EGD_4; #check 2 strange outliers#
+graphEmission("EGD_dried_male5.asc", background, calibration,15,TRUE) -> EGD_5;#
+#
+	#Contragula------------------------------------------------------#
+workingdir <- "5-30-2017/CONT"#
+setwd(paste0(rootdir,workingdir))#
+	#removed first 3 scans for Cont_bocas_1 that maxed out#
+graphEmission("CONT_Panama_dried_male1_removeMaxed.txt", background, calibration,12,TRUE) -> Cont_bocas_1;#
+graphEmission("CONT_Panama_dried_male2.asc", background, calibration,15,TRUE) -> Cont_bocas_2;#
+graphEmission("CONT_Panama_dried_male3.asc", background, calibration,15,TRUE) -> Cont_bocas_3;#
+#
+	#LLL-------------------------------------------------------------#
+workingdir <- "5-30-2017/LLL"#
+setwd(paste0(rootdir,workingdir))#
+graphEmission("LLL_dried_male1.asc", background, calibration,15,TRUE) -> LLL_1;#
+graphEmission("LLL_dried_male2.asc", background, calibration,15,TRUE) -> LLL_2;#
+graphEmission("LLL_dried_male3.asc", background, calibration,15,TRUE) -> LLL_3;#
+graphEmission("LLL_dried_male4.asc", background, calibration,15,TRUE) -> LLL_4;#
+graphEmission("LLL_dried_male5.asc", background, calibration,15,TRUE) -> LLL_5;#
+#
+	#MFU-------------------------------------------------------------#
+workingdir <- "5-30-2017/MFU"#
+setwd(paste0(rootdir,workingdir))#
+graphEmission("MFU_male1_remax.txt", background, calibration,14,TRUE) -> MFU_1; #First sample is maxed, so deleted#
+graphEmission("MFU_dried_male2.asc", background, calibration,15,TRUE) -> MFU_2;#
+graphEmission("MFU_dried_male3.asc", background, calibration,15,TRUE) -> MFU_3;#
+graphEmission("MFU_male4_remax.txt", background, calibration,12,TRUE) -> MFU_4; #First 3samples maxed, so deleted#
+graphEmission("MFU_dried_male5.asc", background, calibration,15,TRUE) -> MFU_5;#
+#
+	#SFM-------------------------------------------------------------#
+workingdir <- "5-30-2017/SFM"#
+setwd(paste0(rootdir,workingdir))#
+graphEmission("SFM_dried_male1.asc", background, calibration,15,TRUE) -> SFM_1;#
+graphEmission("SFM_dried_male2.asc", background, calibration,15,TRUE) -> SFM_2;#
+graphEmission("SFM_dried_male3.asc", background, calibration,15,TRUE) -> SFM_3;#
+graphEmission("SFM_dried_male4.asc", background, calibration,15,TRUE) -> SFM_4;#
+graphEmission("SFM_dried_male5.asc", background, calibration,15,TRUE) -> SFM_5;#
+#
+	#SMU-------------------------------------------------------------#
+workingdir <- "5-30-2017/SMU"#
+setwd(paste0(rootdir,workingdir))#
+graphEmission("SMU_dried_male1.asc", background, calibration,15,TRUE) -> SMU_1;#
+graphEmission("SMU_dried_male2.asc", background, calibration,15,TRUE) -> SMU_2;#
+graphEmission("SMU_dried_male3.asc", background, calibration,15,TRUE) -> SMU_3;#
+graphEmission("SMU_male4_remax.txt", background, calibration,11,TRUE) -> SMU_4; #last 4 maxed to deleted#
+graphEmission("SMU_dried_male5.asc", background, calibration,15,TRUE) -> SMU_5;#
+#
+#********************************************************************#
+#####Belize data 1-23-17 sent by Gretchen Gerrish to UCSB. Dried.#
+#
+background <- "../1-23-17background.asc";#
+calibration <- "../correction factor.txt";#
+	#Khastingsi-------------------------------------------------------------#
+workingdir <- "1-23-2017/Khastingsi"#
+setwd(paste0(rootdir,workingdir))#
+graphEmission(  "KhastingsiDry.asc", background, calibration,20,TRUE) -> Khas_1;#
+graphEmission("KhastingsiLive1.asc", background, calibration,20,TRUE) -> Khas_2;#
+graphEmission("KhastingsiLive2.asc", background, calibration,20,TRUE) -> Khas_3;#
+#
+	#MSH-------------------------------------------------------------#
+workingdir <- "1-23-2017/MSH"#
+setwd(paste0(rootdir,workingdir))#
+graphEmission(  "MSHlive1.asc", background, calibration,20,TRUE) -> MSH_1;#
+graphEmission(  "MSHlive2.asc", background, calibration,20,TRUE) -> MSH_2;#
+graphEmission(  "MSHlive3.asc", background, calibration,20,TRUE) -> MSH_3;#
+graphEmission(  "MSHlive4.asc", background, calibration,20,TRUE) -> MSH_4;#
+graphEmission(  "MSHlive5.asc", background, calibration,20,TRUE) -> MSH_5;#
+#
+	#Pmor-------------------------------------------------------------#
+workingdir <- "1-23-2017/Pmorini"#
+setwd(paste0(rootdir,workingdir))#
+graphEmission(  "PmoriniLive1.asc", background, calibration,20,TRUE) -> Pmor_1;#
+graphEmission(  "PmoriniLive2.asc", background, calibration,20,TRUE) -> Pmor_2;#
+graphEmission(  "PmoriniLive3.asc", background, calibration,20,TRUE) -> Pmor_3;#
+graphEmission(  "PmoriniLive4.asc", background, calibration,20,TRUE) -> Pmor_4;#
+graphEmission(  "Pmorini5remax.txt", background, calibration,17,TRUE) -> Pmor_5; #first 3 maxed sensor, removed#
+#
+	#SVD-------------------------------------------------------------#
+workingdir <- "1-23-2017/SVD"#
+setwd(paste0(rootdir,workingdir))#
+graphEmission(  "SVDLive1.asc", background, calibration,20,TRUE) -> SVD_1;#
+graphEmission(  "SVDLive2.asc", background, calibration,20,TRUE) -> SVD_2;#
+graphEmission(  "SVDLive3.asc", background, calibration,20,TRUE) -> SVD_3;#
+graphEmission(  "SVDLive4.asc", background, calibration,20,TRUE) -> SVD_4;#
+graphEmission(  "SVDLive5.asc", background, calibration,20,TRUE) -> SVD_5;#
+#
+	#SVU-------------------------------------------------------------#
+workingdir <- "1-23-2017/SVU"#
+setwd(paste0(rootdir,workingdir))#
+graphEmission(  "SVULive1.asc", background, calibration,20,TRUE) -> SVU_1;#
+graphEmission(  "SVULive2.asc", background, calibration,20,TRUE) -> SVU_2;#
+graphEmission(  "SVULive3.asc", background, calibration,20,TRUE) -> SVU_3;#
+graphEmission(  "SVULive4.asc", background, calibration,20,TRUE) -> SVU_4;#
+graphEmission(  "SVUremax5.txt", background, calibration,16,TRUE) -> SVU_5;	#first 4 maxed sensor, removed#
+#
+	#Vargula hilgendorfii control-------------------------------------------------------------#
+workingdir <- "1-23-2017/Vhil_standard"#
+setwd(paste0(rootdir,workingdir))#
+graphEmission(  "VhilgendorfiiDry.asc", background, calibration,20,TRUE) -> Vhil012317_1;#
+graphEmission(  "VhilgendorfiiDry2.asc", background, calibration,20,TRUE) -> Vhil012317_2;#
+graphEmission(  "VhilgendorfiiDry3.asc", background, calibration,20,TRUE) -> Vhil012317_3;
+#First execute functions#
+#
+#Next read in data#
+#Here, calculate parameters and add metadata#
+#***********************************EGD#
+species<-"Photeros_EGD"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "dried"#
+#
+fullrow(species, "EGD1", EGD_1, sex, preservation, specloc) -> EGD1f#
+fullrow(species, "EGD3", EGD_3, sex, preservation, specloc) -> EGD3f#
+fullrow(species, "EGD4", EGD_4, sex, preservation, specloc) -> EGD4f#
+fullrow(species, "EGD5", EGD_5, sex, preservation, specloc) -> EGD5f#
+#
+#Now bind all samples together into one large data frame#
+rbind(EGD1f, EGD3f, EGD4f, EGD5f) -> allEGD#
+#
+#***********************************EGD#
+species<-"contragula"#
+sex<-"male"#
+specloc <- "ucsb"#
+#
+fullrow(species, "cont1", Cont_bocas_1, sex, preservation, specloc) -> cont1f#
+fullrow(species, "cont2", Cont_bocas_2, sex, preservation, specloc) -> cont2f#
+fullrow(species, "cont3", Cont_bocas_3, sex, preservation, specloc) -> cont3f#
+#
+#Now bind all samples together into one large data frame#
+rbind(cont1f, cont2f, cont3f) -> allcont#
+#
+#***********************************LLL#
+species<-"LLL"#
+sex<-"male"#
+specloc <- "ucsb"#
+#
+fullrow(species, "LLL1", LLL_1, sex, preservation, specloc) -> LLL1f#
+fullrow(species, "LLL2", LLL_2, sex, preservation, specloc) -> LLL2f#
+fullrow(species, "LLL3", LLL_3, sex, preservation, specloc) -> LLL3f#
+fullrow(species, "LLL4", LLL_4, sex, preservation, specloc) -> LLL4f#
+fullrow(species, "LLL5", LLL_5, sex, preservation, specloc) -> LLL5f#
+#
+rbind(LLL1f, LLL2f, LLL3f, LLL4f, LLL5f) -> allLLL#
+#***********************************MFU#
+species<-"MFU"#
+sex<-"male"#
+specloc <- "ucsb"#
+#
+fullrow(species, "MFU1", MFU_1, sex, preservation, specloc) -> MFU1f#
+fullrow(species, "MFU2", MFU_2, sex, preservation, specloc) -> MFU2f#
+fullrow(species, "MFU3", MFU_3, sex, preservation, specloc) -> MFU3f#
+fullrow(species, "MFU4", MFU_4, sex, preservation, specloc) -> MFU4f#
+fullrow(species, "MFU5", MFU_5, sex, preservation, specloc) -> MFU5f#
+#
+rbind(MFU1f, MFU2f, MFU3f, MFU4f, MFU5f) -> allMFU#
+#
+#***********************************SFM#
+species<-"SFM"#
+sex<-"male"#
+specloc <- "ucsb"#
+#
+fullrow(species, "SFM1", SFM_1, sex, preservation, specloc) -> SFM1f#
+fullrow(species, "SFM2", SFM_2, sex, preservation, specloc) -> SFM2f#
+fullrow(species, "SFM3", SFM_3, sex, preservation, specloc) -> SFM3f#
+fullrow(species, "SFM4", SFM_4, sex, preservation, specloc) -> SFM4f#
+fullrow(species, "SFM5", SFM_5, sex, preservation, specloc) -> SFM5f#
+#
+rbind(SFM1f, SFM2f, SFM3f, SFM4f, SFM5f) -> allSFM#
+#
+#***********************************SFM#
+species<-"SMU"#
+sex<-"male"#
+specloc <- "ucsb"#
+#
+fullrow(species, "SMU1", SMU_1, sex, preservation, specloc) -> SMU1f#
+fullrow(species, "SMU2", SMU_2, sex, preservation, specloc) -> SMU2f#
+fullrow(species, "SMU3", SMU_3, sex, preservation, specloc) -> SMU3f#
+fullrow(species, "SMU4", SMU_4, sex, preservation, specloc) -> SMU4f#
+fullrow(species, "SMU5", SMU_5, sex, preservation, specloc) -> SMU5f#
+#
+rbind(SMU1f, SMU2f, SMU3f, SMU4f, SMU5f) -> allSMU#
+#***********************************Kornickeria hastingsi#
+species<-"Kornickeria_hastingsi"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "dried"#
+fullrow(species, "Khas1", Khas_1, sex, preservation, specloc) -> Khas1f#
+preservation <- "live"#
+fullrow(species, "Khas2", Khas_2, sex, preservation, specloc) -> Khas2f#
+fullrow(species, "Khas3", Khas_3, sex, preservation, specloc) -> Khas3f#
+#
+rbind(Khas1f,Khas2f,Khas3f) -> allKhas#
+#
+#***********************************Maristella chicoi#
+species<-"Maristella_chicoi"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+fullrow(species, "MSH1", MSH_1, sex, preservation, specloc) -> MSH1f#
+fullrow(species, "MSH2", MSH_2, sex, preservation, specloc) -> MSH2f#
+fullrow(species, "MSH3", MSH_3, sex, preservation, specloc) -> MSH3f#
+fullrow(species, "MSH4", MSH_4, sex, preservation, specloc) -> MSH4f#
+fullrow(species, "MSH5", MSH_5, sex, preservation, specloc) -> MSH5f#
+#
+rbind(MSH1f,MSH2f,MSH3f,MSH4f,MSH5f) -> allMSH#
+#
+#***********************************Photeros morini#
+species<-"Photeros_morini"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+fullrow(species, "Pmor1", Pmor_1, sex, preservation, specloc) -> Pmor1f#
+fullrow(species, "Pmor2", Pmor_2, sex, preservation, specloc) -> Pmor2f#
+fullrow(species, "Pmor3", Pmor_3, sex, preservation, specloc) -> Pmor3f#
+fullrow(species, "Pmor4", Pmor_4, sex, preservation, specloc) -> Pmor4f#
+fullrow(species, "Pmor5", Pmor_5, sex, preservation, specloc) -> Pmor5f#
+#
+rbind(Pmor1f,Pmor2f,Pmor3f,Pmor4f,Pmor5f) -> allPmor#
+#
+#***********************************SVD#
+species<-"Maristella_SVD"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+fullrow(species, "SVD1", SVD_1, sex, preservation, specloc) -> SVD1f#
+fullrow(species, "SVD2", SVD_2, sex, preservation, specloc) -> SVD2f#
+fullrow(species, "SVD3", SVD_3, sex, preservation, specloc) -> SVD3f#
+fullrow(species, "SVD4", SVD_4, sex, preservation, specloc) -> SVD4f#
+fullrow(species, "SVD5", SVD_5, sex, preservation, specloc) -> SVD5f#
+#
+rbind(SVD1f,SVD2f,SVD3f,SVD4f,SVD5f) -> allSVD#
+#
+#***********************************SVD#
+species<-"Maristella_SVU"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+fullrow(species, "SVU1", SVU_1, sex, preservation, specloc) -> SVU1f#
+fullrow(species, "SVU2", SVU_2, sex, preservation, specloc) -> SVU2f#
+fullrow(species, "SVU3", SVU_3, sex, preservation, specloc) -> SVU3f#
+fullrow(species, "SVU4", SVU_4, sex, preservation, specloc) -> SVU4f#
+fullrow(species, "SVU5", SVU_5, sex, preservation, specloc) -> SVU5f#
+#
+rbind(SVU1f,SVU2f,SVU3f,SVU4f,SVU5f) -> allSVU#
+#
+#***********************************Vargula hilgendorfii#
+species<-"Vargula_hilgendorfii"#
+sex<-"unknown"#
+specloc <- "ucsb"#
+preservation <- "dried"#
+fullrow(species, "Vhil0123171", Vhil012317_1, sex, preservation, specloc) -> Vhil0123171f#
+fullrow(species, "Vhil0123172", Vhil012317_2, sex, preservation, specloc) -> Vhil0123172f#
+fullrow(species, "Vhil0123173", Vhil012317_3, sex, preservation, specloc) -> Vhil0123173f#
+#
+rbind(Vhil0123171f, Vhil0123172f, Vhil0123173f) -> allVhil012317#
+#
+#***********************************GPH#
+species<-"Photeros_GPH"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+#
+fullrow(species, "GPH1", GPH_1, sex, preservation, specloc) -> GPH1f#
+fullrow(species, "GPH2", GPH_2, sex, preservation, specloc) -> GPH2f#
+fullrow(species, "GPH3", GPH_3, sex, preservation, specloc) -> GPH3f#
+fullrow(species, "GPH4", GPH_4, sex, preservation, specloc) -> GPH4f#
+fullrow(species, "GPH5", GPH_5, sex, preservation, specloc) -> GPH5f#
+fullrow(species, "GPH6", GPH_6, sex, preservation, specloc) -> GPH6f#
+fullrow(species, "GPH7", GPH_7, sex, preservation, specloc) -> GPH7f#
+fullrow(species, "GPH8", GPH_8, sex, preservation, specloc) -> GPH8f#
+#
+rbind(GPH1f, GPH2f, GPH3f, GPH4f, GPH5f, GPH6f, GPH7f, GPH8f) -> allGPH#
+#onering#
+rbind(allEGD,allcont,allLLL, allMFU, allSFM, allSMU, allKhas, allMSH, allPmor, allSVD, allSVU, allVhil012317, allGPH) -> alldata#
+alldata
+graphEmission("GPH_1_05sec_x10x1sp_live_sig.asc", "GPH_1_05sec_x10x1sp_live_bgd.asc", calibration,10,TRUE) -> GPH_1;
+workingdir <- "6-08-2016/GPH"
+calibration <- "correction factor.txt"
+graphEmission("GPH_1_05sec_x10x1sp_live_sig.asc", "GPH_1_05sec_x10x1sp_live_bgd.asc", calibration,10,TRUE) -> GPH_1;
+setwd(paste0(rootdir,workingdir))
+graphEmission("GPH_1_05sec_x10x1sp_live_sig.asc", "GPH_1_05sec_x10x1sp_live_bgd.asc", calibration,10,TRUE) -> GPH_1;
+calibration <- "../correction factor.txt"
+setwd(paste0(rootdir,workingdir))
+graphEmission("GPH_1_05sec_x10x1sp_live_sig.asc", "GPH_1_05sec_x10x1sp_live_bgd.asc", calibration,10,TRUE) -> GPH_1;
+graphEmission("GPH_2_05sec_x10x1sp_live_sig.asc", "GPH_2_05sec_x10x1sp_live_bgd.asc", calibration,10,TRUE) -> GPH_2;
+background #all different backgrounds, so specified in call to graphEmission#
+calibration <- "../correction factor.txt"#
+setwd(paste0(rootdir,workingdir))#
+graphEmission("GPH_1_05sec_x10x1sp_live_sig.asc", "GPH_1_05sec_x10x1sp_live_bgd.asc", calibration,10,TRUE) -> GPH_1;#
+graphEmission("GPH_2_05sec_x10x1sp_live_sig.asc", "GPH_2_05sec_x10x1sp_live_bgd.asc", calibration,10,TRUE) -> GPH_2;#
+graphEmission("GPH_3_05sec_x10x1sp_live_sig.asc", "GPH_3_05sec_x10x1sp_live_bgd.asc", calibration,10,TRUE) -> GPH_3;#
+graphEmission("GPH_4_05sec_x10x1sp_live_sig.asc", "GPH_4_05sec_x10x1sp_live_bgd.asc", calibration,10,TRUE) -> GPH_4;#
+graphEmission("GPH_5_05sec_x10x1sp_live_sig.asc", "GPH_5_05sec_x10x1sp_live_bgd.asc", calibration,10,TRUE) -> GPH_5;#
+graphEmission("GPH_6_05sec_x10x1sp_live_sig.asc", "GPH_6_05sec_x10x1sp_live_bgd.asc", calibration,10,TRUE) -> GPH_6;#
+graphEmission("GPH_7_05sec_x10x1sp_live_sig.asc", "GPH_7_05sec_x10x1sp_live_bgd.asc", calibration,10,TRUE) -> GPH_7;#
+graphEmission("GPH_8_05sec_x10x1sp_live_sig.asc", "GPH_8_05sec_x10x1sp_live_bgd.asc", calibration,10,TRUE) -> GPH_8;
+#***********************************GPH#
+species<-"Photeros_GPH"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+#
+fullrow(species, "GPH1", GPH_1, sex, preservation, specloc) -> GPH1f#
+fullrow(species, "GPH2", GPH_2, sex, preservation, specloc) -> GPH2f#
+fullrow(species, "GPH3", GPH_3, sex, preservation, specloc) -> GPH3f#
+fullrow(species, "GPH4", GPH_4, sex, preservation, specloc) -> GPH4f#
+fullrow(species, "GPH5", GPH_5, sex, preservation, specloc) -> GPH5f#
+fullrow(species, "GPH6", GPH_6, sex, preservation, specloc) -> GPH6f#
+fullrow(species, "GPH7", GPH_7, sex, preservation, specloc) -> GPH7f#
+fullrow(species, "GPH8", GPH_8, sex, preservation, specloc) -> GPH8f#
+#
+rbind(GPH1f, GPH2f, GPH3f, GPH4f, GPH5f, GPH6f, GPH7f, GPH8f) -> allGPH#
+#onering#
+rbind(allEGD,allcont,allLLL, allMFU, allSFM, allSMU, allKhas, allMSH, allPmor, allSVD, allSVU, allVhil012317, allGPH) -> alldata#
+alldata
+#Table 1 - lmax and fwhm for all species studied#
+#
+#First remove runs where signal:noise is too low#
+#a <- subset(alldata, x < 0.02 | replicate=="Cn" | replicate=="Pg")#
+a <- subset(alldata, error < 0.02 )#
+aggregate(a[, 6:7], list(a$species), mean) -> means#
+means
+#Figure X - Box plot of all lmax of species#
+require(ggplot2)#
+#a <- subset(alldata, error < 0.02 | replicate=="Cn" | replicate=="Pg")#
+a <- subset(alldata, error < 0.02)#
+#
+p <- qplot(species, sgMax, data=a, geom=c("boxplot", "jitter"))#
+p
+graphEmission5("WLU_1_05sec_x5x1sp_sig.asc", "WLU_1_05sec_x5x1sp_bgd.asc", calibration,10,TRUE) -> WLU_1;
+workingdir <- "6-08-2016/WLU"#
+background #all different backgrounds, so specified in call to graphEmission#
+calibration <- "../correction factor.txt"#
+setwd(paste0(rootdir,workingdir))#
+graphEmission5("WLU_1_05sec_x5x1sp_sig.asc", "WLU_1_05sec_x5x1sp_bgd.asc", calibration,10,TRUE) -> WLU_1;#
+g
+calibration <- "../correction factor.txt"#
+setwd(paste0(rootdir,workingdir))#
+graphEmission("WLU_1_05sec_x5x1sp_sig.asc", "WLU_1_05sec_x5x1sp_bgd.asc", calibration,5,TRUE) -> WLU_1;
+graphEmission("WLU_2_05sec_x5x1sp_sig.asc", "WLU_2_05sec_x5x1sp_bgd.asc", calibration,5,TRUE) -> WLU_2;
+graphEmission("WLU_3_05sec_x5x1sp_sig.asc", "WLU_3_05sec_x5x1sp_bgd.asc", calibration,5,TRUE) -> WLU_3;
+graphEmission("WLU_4_05sec_x5x1sp_sig.asc", "WLU_4_05sec_x5x1sp_bgd.asc", calibration,5,TRUE) -> WLU_4;
+graphEmission("WLU_5_05sec_x5x1sp_sig.asc", "WLU_5_05sec_x5x1sp_bgd.asc", calibration,5,TRUE) -> WLU_5;
+graphEmission("WLU_6_05sec_x5x1sp_sig.asc", "WLU_6_05sec_x5x1sp_bgd.asc", calibration,5,TRUE) -> WLU_6;
+graphEmission("WLU_7_05sec_x10x1sp_dry_sig.asc", "WLU_7_05sec_x10x1sp_dry_bgd.asc", calibration,10,TRUE) -> WLU_7;
+graphEmission("WLU_8_05sec_x10x3sp_dry_sig.asc", "WLU_8_05sec_x10x3sp_dry_bgd.asc", calibration,10,TRUE) -> WLU_8;
+graphEmission("WLU_10_05sec_x10x3sp_dry_sig.asc", "WLU_10_05sec_x10x3sp_dry_bgd.asc", calibration,10,TRUE) -> WLU_10;
+##############WLU#
+workingdir <- "6-08-2016/WLU"#
+background #all different backgrounds, so specified in call to graphEmission#
+calibration <- "../correction factor.txt"#
+setwd(paste0(rootdir,workingdir))#
+graphEmission("WLU_1_05sec_x5x1sp_sig.asc", "WLU_1_05sec_x5x1sp_bgd.asc", calibration,5,TRUE) -> WLU_1;#
+graphEmission("WLU_2_05sec_x5x1sp_sig.asc", "WLU_2_05sec_x5x1sp_bgd.asc", calibration,5,TRUE) -> WLU_2;#
+graphEmission("WLU_3_05sec_x5x1sp_sig.asc", "WLU_3_05sec_x5x1sp_bgd.asc", calibration,5,TRUE) -> WLU_3;#
+graphEmission("WLU_4_05sec_x5x1sp_sig.asc", "WLU_4_05sec_x5x1sp_bgd.asc", calibration,5,TRUE) -> WLU_4;#
+graphEmission("WLU_5_05sec_x5x1sp_sig.asc", "WLU_5_05sec_x5x1sp_bgd.asc", calibration,5,TRUE) -> WLU_5;#
+graphEmission("WLU_6_05sec_x5x1sp_sig.asc", "WLU_6_05sec_x5x1sp_bgd.asc", calibration,5,TRUE) -> WLU_6;#
+#graphEmission("WLU_7_05sec_x10x1sp_dry_sig.asc", "WLU_7_05sec_x10x1sp_dry_bgd.asc", calibration,10,TRUE) -> WLU_7; NO signal here#
+graphEmission("WLU_8_05sec_x10x3sp_dry_sig.asc", "WLU_8_05sec_x10x3sp_dry_bgd.asc", calibration,10,TRUE) -> WLU_8;#
+graphEmission("WLU_10_05sec_x10x3sp_dry_sig.asc", "WLU_10_05sec_x10x3sp_dry_bgd.asc", calibration,10,TRUE) -> WLU_10;
+workingdir <- "6-08-2016/LSD"#
+background #all different backgrounds, so specified in call to graphEmission#
+calibration <- "../correction factor.txt"#
+graphEmission("LSD1.txt", "background.txt", calibration,10,TRUE) -> LSD_1;#
+graphEmission("LSD2.txt", "background.txt", calibration,10,TRUE) -> LSD_2;
+workingdir <- "6-08-2016/LSD"#
+setwd(paste0(rootdir,workingdir))#
+background #all different backgrounds, so specified in call to graphEmission#
+calibration <- "../correction factor.txt"#
+graphEmission("LSD1.txt", "background.txt", calibration,10,TRUE) -> LSD_1;
+graphEmission("LSD2.txt", "background.txt", calibration,10,TRUE) -> LSD_2;
+workingdir <- "6-08-2016/IR"#
+setwd(paste0(rootdir,workingdir))#
+background #all different backgrounds, so specified in call to graphEmission#
+calibration <- "../correction factor.txt"#
+graphEmission("IR_1_05sec_x5x1sp_dead_sig.asc", "IR_1_05sec_x5x1sp_dead_bgd.asc", calibration,10,TRUE) -> IR_1;
+graphEmission("IR_2_05sec_x5x1sp_dead_sig.asc", "IR_2_05sec_x5x1sp_dead_bgd.asc", calibration,10,TRUE) -> IR_2;
+graphEmission("IR_3_05sec_x5x1sp_live_sig.asc", "IR_3_05sec_x5x1sp_live_bgd.asc", calibration,10,TRUE) -> IR_3;
+graphEmission("IR_4_05sec_x5x1sp_dead_sig.asc", "IR_4_05sec_x5x1sp_dead_bgd.asc", calibration,10,TRUE) -> IR_4;
+graphEmission("IR_5_05sec_x5x1sp_dead_sig.asc", "IR_5_05sec_x5x1sp_dead_bgd.asc", calibration,10,TRUE) -> IR_5;
+graphEmission("IR_6_05sec_x5x1sp_dead_sig.asc", "IR_6_05sec_x5x1sp_dead_bgd.asc", calibration,10,TRUE) -> IR_6;
+workingdir <- "6-08-2016/RD"#
+setwd(paste0(rootdir,workingdir))#
+background #all different backgrounds, so specified in call to graphEmission#
+calibration <- "../correction factor.txt"#
+#
+graphEmission("RD_1_05sec_x5x1sp_dead_sig.asc", "RD_1_05sec_x5x1sp_dead_bgd.asc", calibration,5,TRUE) -> RD_1;
+graphEmission("RD_2_05sec_x5x1sp_dead_sig.asc", "RD_2_05sec_x5x1sp_dead_bgd.asc", calibration,5,TRUE) -> RD_2;
+graphEmission("RD_3_05sec_x5x1sp_dead_sig.asc", "RD_3_05sec_x5x1sp_dead_bgd.asc", calibration,5,TRUE) -> RD_3;
+graphEmission("RD_4_05sec_x5x1sp_dead_sig.asc", "RD_4_05sec_x5x1sp_dead_bgd.asc", calibration,5,TRUE) -> RD_4;
+graphEmission("RD_5_05sec_x5x1sp_dead_sig.asc", "RD_5_05sec_x5x1sp_dead_bgd.asc", calibration,5,TRUE) -> RD_5;
+species<-"WLUWLU"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+fullrow(species, "WLU1", WLU_1, sex, preservation, specloc) -> WLU1f#
+fullrow(species, "WLU2", WLU_2, sex, preservation, specloc) -> WLU2f#
+fullrow(species, "WLU3", WLU_3, sex, preservation, specloc) -> WLU3f#
+fullrow(species, "WLU4", WLU_4, sex, preservation, specloc) -> WLU4f#
+fullrow(species, "WLU5", WLU_5, sex, preservation, specloc) -> WLU5f#
+fullrow(species, "WLU6", WLU_6, sex, preservation, specloc) -> WLU6f#
+preservation <- "dried"#
+fullrow(species, "WLU7", WLU_7, sex, preservation, specloc) -> WLU8f#
+fullrow(species, "WLU8", WLU_8, sex, preservation, specloc) -> WLU10f#
+#
+rbind(WLU1f, WLU2f, WLU3f, WLU4f, WLU5f, WLU6f, WLU8f, WLU10f) -> allWLU
+species<-"WLUWLU"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+fullrow(species, "WLU1", WLU_1, sex, preservation, specloc) -> WLU1f#
+fullrow(species, "WLU2", WLU_2, sex, preservation, specloc) -> WLU2f#
+fullrow(species, "WLU3", WLU_3, sex, preservation, specloc) -> WLU3f#
+fullrow(species, "WLU4", WLU_4, sex, preservation, specloc) -> WLU4f#
+fullrow(species, "WLU5", WLU_5, sex, preservation, specloc) -> WLU5f#
+fullrow(species, "WLU6", WLU_6, sex, preservation, specloc) -> WLU6f#
+preservation <- "dried"#
+fullrow(species, "WLU7", WLU_8, sex, preservation, specloc) -> WLU8f#
+fullrow(species, "WLU8", WLU_10, sex, preservation, specloc) -> WLU10f#
+#
+rbind(WLU1f, WLU2f, WLU3f, WLU4f, WLU5f, WLU6f, WLU8f, WLU10f) -> allWLU
+#First remove runs where signal:noise is too low#
+#a <- subset(alldata, x < 0.02 | replicate=="Cn" | replicate=="Pg")#
+a <- subset(alldata, error < 0.02 )#
+aggregate(a[, 6:7], list(a$species), mean) -> means#
+means
+#onering#
+rbind(allEGD,allcont,allLLL, allMFU, allSFM, allSMU, allKhas, allMSH, allPmor, allSVD, allSVU, allVhil012317, allGPH, allWLU) -> alldata#
+alldata
+species<-"WLU"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+fullrow(species, "WLU1", WLU_1, sex, preservation, specloc) -> WLU1f#
+fullrow(species, "WLU2", WLU_2, sex, preservation, specloc) -> WLU2f#
+fullrow(species, "WLU3", WLU_3, sex, preservation, specloc) -> WLU3f#
+fullrow(species, "WLU4", WLU_4, sex, preservation, specloc) -> WLU4f#
+fullrow(species, "WLU5", WLU_5, sex, preservation, specloc) -> WLU5f#
+fullrow(species, "WLU6", WLU_6, sex, preservation, specloc) -> WLU6f#
+preservation <- "dried"#
+fullrow(species, "WLU7", WLU_8, sex, preservation, specloc) -> WLU8f#
+fullrow(species, "WLU8", WLU_10, sex, preservation, specloc) -> WLU10f#
+#
+rbind(WLU1f, WLU2f, WLU3f, WLU4f, WLU5f, WLU6f, WLU8f, WLU10f) -> allWLU#
+#onering#
+rbind(allEGD,allcont,allLLL, allMFU, allSFM, allSMU, allKhas, allMSH, allPmor, allSVD, allSVU, allVhil012317, allGPH, allWLU) -> alldata#
+alldata
+#First remove runs where signal:noise is too low#
+#a <- subset(alldata, x < 0.02 | replicate=="Cn" | replicate=="Pg")#
+a <- subset(alldata, error < 0.02 )#
+aggregate(a[, 6:7], list(a$species), mean) -> means#
+means
+#Figure X - Box plot of all lmax of species#
+require(ggplot2)#
+#a <- subset(alldata, error < 0.02 | replicate=="Cn" | replicate=="Pg")#
+a <- subset(alldata, error < 0.02)#
+#
+p <- qplot(species, sgMax, data=a, geom=c("boxplot", "jitter"))#
+p
+species<-"LSD"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+fullrow(species, "LSD1", LSD_1, sex, preservation, specloc) -> LSD1f#
+fullrow(species, "LSD2", LSD_2, sex, preservation, specloc) -> LSD2f#
+#
+rbind(LSD1f, LSD2f) -> allLSD#
+#onering#
+rbind(allEGD,allcont,allLLL, allMFU, allSFM, allSMU, allKhas, allMSH, allPmor, allSVD, allSVU, allVhil012317, allGPH, allWLU, allLSD) -> alldata#
+alldata
+species<-"IR"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "dead"#
+#
+fullrow(species, "IR1", IR_1, sex, preservation, specloc) -> IR1f#
+fullrow(species, "IR2", IR_2, sex, preservation, specloc) -> IR2f#
+preservation <- "live"#
+fullrow(species, "IR3", IR_3, sex, preservation, specloc) -> IR3f#
+preservation <- "dead"#
+fullrow(species, "IR4", IR_4, sex, preservation, specloc) -> IR4f#
+fullrow(species, "IR5", IR_5, sex, preservation, specloc) -> IR5f#
+fullrow(species, "IR6", IR_6, sex, preservation, specloc) -> IR6f#
+#
+rbind(IR1f, IR2f, IR3f, IR4f, IR5f, IR6f) -> allIR
+allIR
+#onering#
+rbind(allEGD,allcont,allLLL, allMFU, allSFM, allSMU, allKhas, allMSH, allPmor, allSVD, allSVU, allVhil012317, allGPH, allWLU, allLSD, allIR) -> alldata#
+alldata
+#Figure X - Box plot of all lmax of species#
+require(ggplot2)#
+#a <- subset(alldata, error < 0.02 | replicate=="Cn" | replicate=="Pg")#
+a <- subset(alldata, error < 0.02)#
+#
+p <- qplot(species, sgMax, data=a, geom=c("boxplot", "jitter"))#
+p
+species<-"RD"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "dead"#
+fullrow(species, "RD1", RD_1, sex, preservation, specloc) -> RD1f#
+fullrow(species, "RD2", RD_2, sex, preservation, specloc) -> RD2f#
+fullrow(species, "RD3", RD_3, sex, preservation, specloc) -> RD3f#
+fullrow(species, "RD4", RD_4, sex, preservation, specloc) -> RD4f#
+fullrow(species, "RD5", RD_5, sex, preservation, specloc) -> RD5f#
+#
+rbind(RD1f, RD2f, RD3f, RD4f, RD5f) -> allRD
+#onering#
+rbind(allEGD,allcont,allLLL, allMFU, allSFM, allSMU, allKhas, allMSH, allPmor, allSVD, allSVU, allVhil012317, allGPH, allWLU, allLSD, allIR, allRD) -> alldata#
+alldata
+#Figure X - Box plot of all lmax of species#
+require(ggplot2)#
+#a <- subset(alldata, error < 0.02 | replicate=="Cn" | replicate=="Pg")#
+a <- subset(alldata, error < 0.02)#
+#
+p <- qplot(species, sgMax, data=a, geom=c("boxplot", "jitter"))#
+p
+#Figure X - Box plot of all lmax of species#
+require(ggplot2)#
+#a <- subset(alldata, error < 0.02 | replicate=="Cn" | replicate=="Pg")#
+a <- subset(alldata, error < 0.02)#
+#
+p <- qplot(species, sgMax, data=a, geom=c("boxplot", "jitter"))#
+p
+#Here, calculate parameters and add metadata#
+#***********************************EGD#
+species<-"Photeros_EGD"#
+abbreviation <- "P_EGD"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "dried"#
+#
+fullrow(abbreviation, abbreviation, species, "EGD1", EGD_1, sex, preservation, specloc) -> EGD1f#
+fullrow(abbreviation, abbreviation, species, "EGD3", EGD_3, sex, preservation, specloc) -> EGD3f#
+fullrow(abbreviation, abbreviation, species, "EGD4", EGD_4, sex, preservation, specloc) -> EGD4f#
+fullrow(abbreviation, species, "EGD5", EGD_5, sex, preservation, specloc) -> EGD5f#
+#
+#Now bind all samples together into one large data frame#
+rbind(EGD1f, EGD3f, EGD4f, EGD5f) -> allEGD#
+#
+#***********************************EGD#
+species<-"contragula"#
+sex<-"male"#
+specloc <- "ucsb"#
+#
+fullrow(abbreviation, species, "cont1", Cont_bocas_1, sex, preservation, specloc) -> cont1f#
+fullrow(abbreviation, species, "cont2", Cont_bocas_2, sex, preservation, specloc) -> cont2f#
+fullrow(abbreviation, species, "cont3", Cont_bocas_3, sex, preservation, specloc) -> cont3f#
+#
+#Now bind all samples together into one large data frame#
+rbind(cont1f, cont2f, cont3f) -> allcont#
+#
+#***********************************LLL#
+species<-"LLL"#
+sex<-"male"#
+specloc <- "ucsb"#
+#
+fullrow(abbreviation, species, "LLL1", LLL_1, sex, preservation, specloc) -> LLL1f#
+fullrow(abbreviation, species, "LLL2", LLL_2, sex, preservation, specloc) -> LLL2f#
+fullrow(abbreviation, species, "LLL3", LLL_3, sex, preservation, specloc) -> LLL3f#
+fullrow(abbreviation, species, "LLL4", LLL_4, sex, preservation, specloc) -> LLL4f#
+fullrow(abbreviation, species, "LLL5", LLL_5, sex, preservation, specloc) -> LLL5f#
+#
+rbind(LLL1f, LLL2f, LLL3f, LLL4f, LLL5f) -> allLLL#
+#***********************************MFU#
+species<-"MFU"#
+sex<-"male"#
+specloc <- "ucsb"#
+#
+fullrow(abbreviation, species, "MFU1", MFU_1, sex, preservation, specloc) -> MFU1f#
+fullrow(abbreviation, species, "MFU2", MFU_2, sex, preservation, specloc) -> MFU2f#
+fullrow(abbreviation, species, "MFU3", MFU_3, sex, preservation, specloc) -> MFU3f#
+fullrow(abbreviation, species, "MFU4", MFU_4, sex, preservation, specloc) -> MFU4f#
+fullrow(abbreviation, species, "MFU5", MFU_5, sex, preservation, specloc) -> MFU5f#
+#
+rbind(MFU1f, MFU2f, MFU3f, MFU4f, MFU5f) -> allMFU#
+#
+#***********************************SFM#
+species<-"SFM"#
+sex<-"male"#
+specloc <- "ucsb"#
+#
+fullrow(abbreviation, species, "SFM1", SFM_1, sex, preservation, specloc) -> SFM1f#
+fullrow(abbreviation, species, "SFM2", SFM_2, sex, preservation, specloc) -> SFM2f#
+fullrow(abbreviation, species, "SFM3", SFM_3, sex, preservation, specloc) -> SFM3f#
+fullrow(abbreviation, species, "SFM4", SFM_4, sex, preservation, specloc) -> SFM4f#
+fullrow(abbreviation, species, "SFM5", SFM_5, sex, preservation, specloc) -> SFM5f#
+#
+rbind(SFM1f, SFM2f, SFM3f, SFM4f, SFM5f) -> allSFM#
+#
+#***********************************SFM#
+species<-"SMU"#
+sex<-"male"#
+specloc <- "ucsb"#
+#
+fullrow(abbreviation, species, "SMU1", SMU_1, sex, preservation, specloc) -> SMU1f#
+fullrow(abbreviation, species, "SMU2", SMU_2, sex, preservation, specloc) -> SMU2f#
+fullrow(abbreviation, species, "SMU3", SMU_3, sex, preservation, specloc) -> SMU3f#
+fullrow(abbreviation, species, "SMU4", SMU_4, sex, preservation, specloc) -> SMU4f#
+fullrow(abbreviation, species, "SMU5", SMU_5, sex, preservation, specloc) -> SMU5f#
+#
+rbind(SMU1f, SMU2f, SMU3f, SMU4f, SMU5f) -> allSMU#
+#***********************************Kornickeria hastingsi#
+species<-"Kornickeria_hastingsi"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "dried"#
+fullrow(abbreviation, species, "Khas1", Khas_1, sex, preservation, specloc) -> Khas1f#
+preservation <- "live"#
+fullrow(abbreviation, species, "Khas2", Khas_2, sex, preservation, specloc) -> Khas2f#
+fullrow(abbreviation, species, "Khas3", Khas_3, sex, preservation, specloc) -> Khas3f#
+#
+rbind(Khas1f,Khas2f,Khas3f) -> allKhas#
+#
+#***********************************Maristella chicoi#
+species<-"Maristella_chicoi"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+fullrow(abbreviation, species, "MSH1", MSH_1, sex, preservation, specloc) -> MSH1f#
+fullrow(abbreviation, species, "MSH2", MSH_2, sex, preservation, specloc) -> MSH2f#
+fullrow(abbreviation, species, "MSH3", MSH_3, sex, preservation, specloc) -> MSH3f#
+fullrow(abbreviation, species, "MSH4", MSH_4, sex, preservation, specloc) -> MSH4f#
+fullrow(abbreviation, species, "MSH5", MSH_5, sex, preservation, specloc) -> MSH5f#
+#
+rbind(MSH1f,MSH2f,MSH3f,MSH4f,MSH5f) -> allMSH#
+#
+#***********************************Photeros morini#
+species<-"Photeros_morini"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+fullrow(abbreviation, species, "Pmor1", Pmor_1, sex, preservation, specloc) -> Pmor1f#
+fullrow(abbreviation, species, "Pmor2", Pmor_2, sex, preservation, specloc) -> Pmor2f#
+fullrow(abbreviation, species, "Pmor3", Pmor_3, sex, preservation, specloc) -> Pmor3f#
+fullrow(abbreviation, species, "Pmor4", Pmor_4, sex, preservation, specloc) -> Pmor4f#
+fullrow(abbreviation, species, "Pmor5", Pmor_5, sex, preservation, specloc) -> Pmor5f#
+#
+rbind(Pmor1f,Pmor2f,Pmor3f,Pmor4f,Pmor5f) -> allPmor#
+#
+#***********************************SVD#
+species<-"Maristella_SVD"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+fullrow(abbreviation, species, "SVD1", SVD_1, sex, preservation, specloc) -> SVD1f#
+fullrow(abbreviation, species, "SVD2", SVD_2, sex, preservation, specloc) -> SVD2f#
+fullrow(abbreviation, species, "SVD3", SVD_3, sex, preservation, specloc) -> SVD3f#
+fullrow(abbreviation, species, "SVD4", SVD_4, sex, preservation, specloc) -> SVD4f#
+fullrow(abbreviation, species, "SVD5", SVD_5, sex, preservation, specloc) -> SVD5f#
+#
+rbind(SVD1f,SVD2f,SVD3f,SVD4f,SVD5f) -> allSVD#
+#
+#***********************************SVD#
+species<-"Maristella_SVU"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+fullrow(abbreviation, species, "SVU1", SVU_1, sex, preservation, specloc) -> SVU1f#
+fullrow(abbreviation, species, "SVU2", SVU_2, sex, preservation, specloc) -> SVU2f#
+fullrow(abbreviation, species, "SVU3", SVU_3, sex, preservation, specloc) -> SVU3f#
+fullrow(abbreviation, species, "SVU4", SVU_4, sex, preservation, specloc) -> SVU4f#
+fullrow(abbreviation, species, "SVU5", SVU_5, sex, preservation, specloc) -> SVU5f#
+#
+rbind(SVU1f,SVU2f,SVU3f,SVU4f,SVU5f) -> allSVU#
+#
+#***********************************Vargula hilgendorfii#
+species<-"Vargula_hilgendorfii"#
+sex<-"unknown"#
+specloc <- "ucsb"#
+preservation <- "dried"#
+fullrow(abbreviation, species, "Vhil0123171", Vhil012317_1, sex, preservation, specloc) -> Vhil0123171f#
+fullrow(abbreviation, species, "Vhil0123172", Vhil012317_2, sex, preservation, specloc) -> Vhil0123172f#
+fullrow(abbreviation, species, "Vhil0123173", Vhil012317_3, sex, preservation, specloc) -> Vhil0123173f#
+#
+rbind(Vhil0123171f, Vhil0123172f, Vhil0123173f) -> allVhil012317#
+#
+#***********************************GPH#
+species<-"Photeros_GPH"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+#
+fullrow(abbreviation, species, "GPH1", GPH_1, sex, preservation, specloc) -> GPH1f#
+fullrow(abbreviation, species, "GPH2", GPH_2, sex, preservation, specloc) -> GPH2f#
+fullrow(abbreviation, species, "GPH3", GPH_3, sex, preservation, specloc) -> GPH3f#
+fullrow(abbreviation, species, "GPH4", GPH_4, sex, preservation, specloc) -> GPH4f#
+fullrow(abbreviation, species, "GPH5", GPH_5, sex, preservation, specloc) -> GPH5f#
+fullrow(abbreviation, species, "GPH6", GPH_6, sex, preservation, specloc) -> GPH6f#
+fullrow(abbreviation, species, "GPH7", GPH_7, sex, preservation, specloc) -> GPH7f#
+fullrow(abbreviation, species, "GPH8", GPH_8, sex, preservation, specloc) -> GPH8f#
+#
+rbind(GPH1f, GPH2f, GPH3f, GPH4f, GPH5f, GPH6f, GPH7f, GPH8f) -> allGPH#
+#
+species<-"WLU"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+fullrow(abbreviation, species, "WLU1", WLU_1, sex, preservation, specloc) -> WLU1f#
+fullrow(abbreviation, species, "WLU2", WLU_2, sex, preservation, specloc) -> WLU2f#
+fullrow(abbreviation, species, "WLU3", WLU_3, sex, preservation, specloc) -> WLU3f#
+fullrow(abbreviation, species, "WLU4", WLU_4, sex, preservation, specloc) -> WLU4f#
+fullrow(abbreviation, species, "WLU5", WLU_5, sex, preservation, specloc) -> WLU5f#
+fullrow(abbreviation, species, "WLU6", WLU_6, sex, preservation, specloc) -> WLU6f#
+preservation <- "dried"#
+fullrow(abbreviation, species, "WLU7", WLU_8, sex, preservation, specloc) -> WLU8f#
+fullrow(abbreviation, species, "WLU8", WLU_10, sex, preservation, specloc) -> WLU10f#
+#
+rbind(WLU1f, WLU2f, WLU3f, WLU4f, WLU5f, WLU6f, WLU8f, WLU10f) -> allWLU#
+#
+species<-"LSD"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+fullrow(abbreviation, species, "LSD1", LSD_1, sex, preservation, specloc) -> LSD1f#
+fullrow(abbreviation, species, "LSD2", LSD_2, sex, preservation, specloc) -> LSD2f#
+#
+rbind(LSD1f, LSD2f) -> allLSD#
+#
+#***********************************GPH#
+species<-"IR"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "dead"#
+#
+fullrow(abbreviation, species, "IR1", IR_1, sex, preservation, specloc) -> IR1f#
+fullrow(abbreviation, species, "IR2", IR_2, sex, preservation, specloc) -> IR2f#
+preservation <- "live"#
+fullrow(abbreviation, species, "IR3", IR_3, sex, preservation, specloc) -> IR3f#
+preservation <- "dead"#
+fullrow(abbreviation, species, "IR4", IR_4, sex, preservation, specloc) -> IR4f#
+fullrow(abbreviation, species, "IR5", IR_5, sex, preservation, specloc) -> IR5f#
+fullrow(abbreviation, species, "IR6", IR_6, sex, preservation, specloc) -> IR6f#
+#
+rbind(IR1f, IR2f, IR3f, IR4f, IR5f, IR6f) -> allIR#
+#
+species<-"RD"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "dead"#
+fullrow(abbreviation, species, "RD1", RD_1, sex, preservation, specloc) -> RD1f#
+fullrow(abbreviation, species, "RD2", RD_2, sex, preservation, specloc) -> RD2f#
+fullrow(abbreviation, species, "RD3", RD_3, sex, preservation, specloc) -> RD3f#
+fullrow(abbreviation, species, "RD4", RD_4, sex, preservation, specloc) -> RD4f#
+fullrow(abbreviation, species, "RD5", RD_5, sex, preservation, specloc) -> RD5f#
+#
+rbind(RD1f, RD2f, RD3f, RD4f, RD5f) -> allRD#
+#
+#onering#
+rbind(allEGD,allcont,allLLL, allMFU, allSFM, allSMU, allKhas, allMSH, allPmor, allSVD, allSVU, allVhil012317, allGPH, allWLU, allLSD, allIR, allRD) -> alldata#
+alldata
+fullrow <- function(abbreviation, species, replicate, df, sex, preservation, source) {#
+	#This function creates a full data row adding all metadata#
+	#and calculating values from spectra, including lmax, fwhm, and error (signal:noise)#
+	sgsmooth <- 35 #This is the smoothing value for SG smoothing. Doesn't seem to affect results at all#
+	round(error(df,500),digits=4)->error#
+	sgfwhm(df,sgsmooth,FALSE)->fwhm#
+	sgMax(df, sgsmooth)-> lmax#
+	data.frame(abbreviation, species, replicate, sex, preservation, source, lmax,fwhm,error) -> t1#
+	#merge(round(error(df,500),digits=4), t4) -> t5#
+}
+#First execute functions#
+#
+#Next read in data#
+#Here, calculate parameters and add metadata#
+#***********************************EGD#
+species<-"Photeros_EGD"#
+abbreviation <- "P_EGD"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "dried"#
+#
+fullrow(abbreviation, abbreviation, species, "EGD1", EGD_1, sex, preservation, specloc) -> EGD1f#
+fullrow(abbreviation, abbreviation, species, "EGD3", EGD_3, sex, preservation, specloc) -> EGD3f#
+fullrow(abbreviation, abbreviation, species, "EGD4", EGD_4, sex, preservation, specloc) -> EGD4f#
+fullrow(abbreviation, species, "EGD5", EGD_5, sex, preservation, specloc) -> EGD5f#
+#
+#Now bind all samples together into one large data frame#
+rbind(EGD1f, EGD3f, EGD4f, EGD5f) -> allEGD#
+#
+#***********************************EGD#
+species<-"contragula"#
+sex<-"male"#
+specloc <- "ucsb"#
+#
+fullrow(abbreviation, species, "cont1", Cont_bocas_1, sex, preservation, specloc) -> cont1f#
+fullrow(abbreviation, species, "cont2", Cont_bocas_2, sex, preservation, specloc) -> cont2f#
+fullrow(abbreviation, species, "cont3", Cont_bocas_3, sex, preservation, specloc) -> cont3f#
+#
+#Now bind all samples together into one large data frame#
+rbind(cont1f, cont2f, cont3f) -> allcont#
+#
+#***********************************LLL#
+species<-"LLL"#
+sex<-"male"#
+specloc <- "ucsb"#
+#
+fullrow(abbreviation, species, "LLL1", LLL_1, sex, preservation, specloc) -> LLL1f#
+fullrow(abbreviation, species, "LLL2", LLL_2, sex, preservation, specloc) -> LLL2f#
+fullrow(abbreviation, species, "LLL3", LLL_3, sex, preservation, specloc) -> LLL3f#
+fullrow(abbreviation, species, "LLL4", LLL_4, sex, preservation, specloc) -> LLL4f#
+fullrow(abbreviation, species, "LLL5", LLL_5, sex, preservation, specloc) -> LLL5f#
+#
+rbind(LLL1f, LLL2f, LLL3f, LLL4f, LLL5f) -> allLLL#
+#***********************************MFU#
+species<-"MFU"#
+sex<-"male"#
+specloc <- "ucsb"#
+#
+fullrow(abbreviation, species, "MFU1", MFU_1, sex, preservation, specloc) -> MFU1f#
+fullrow(abbreviation, species, "MFU2", MFU_2, sex, preservation, specloc) -> MFU2f#
+fullrow(abbreviation, species, "MFU3", MFU_3, sex, preservation, specloc) -> MFU3f#
+fullrow(abbreviation, species, "MFU4", MFU_4, sex, preservation, specloc) -> MFU4f#
+fullrow(abbreviation, species, "MFU5", MFU_5, sex, preservation, specloc) -> MFU5f#
+#
+rbind(MFU1f, MFU2f, MFU3f, MFU4f, MFU5f) -> allMFU#
+#
+#***********************************SFM#
+species<-"SFM"#
+sex<-"male"#
+specloc <- "ucsb"#
+#
+fullrow(abbreviation, species, "SFM1", SFM_1, sex, preservation, specloc) -> SFM1f#
+fullrow(abbreviation, species, "SFM2", SFM_2, sex, preservation, specloc) -> SFM2f#
+fullrow(abbreviation, species, "SFM3", SFM_3, sex, preservation, specloc) -> SFM3f#
+fullrow(abbreviation, species, "SFM4", SFM_4, sex, preservation, specloc) -> SFM4f#
+fullrow(abbreviation, species, "SFM5", SFM_5, sex, preservation, specloc) -> SFM5f#
+#
+rbind(SFM1f, SFM2f, SFM3f, SFM4f, SFM5f) -> allSFM#
+#
+#***********************************SFM#
+species<-"SMU"#
+sex<-"male"#
+specloc <- "ucsb"#
+#
+fullrow(abbreviation, species, "SMU1", SMU_1, sex, preservation, specloc) -> SMU1f#
+fullrow(abbreviation, species, "SMU2", SMU_2, sex, preservation, specloc) -> SMU2f#
+fullrow(abbreviation, species, "SMU3", SMU_3, sex, preservation, specloc) -> SMU3f#
+fullrow(abbreviation, species, "SMU4", SMU_4, sex, preservation, specloc) -> SMU4f#
+fullrow(abbreviation, species, "SMU5", SMU_5, sex, preservation, specloc) -> SMU5f#
+#
+rbind(SMU1f, SMU2f, SMU3f, SMU4f, SMU5f) -> allSMU#
+#***********************************Kornickeria hastingsi#
+species<-"Kornickeria_hastingsi"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "dried"#
+fullrow(abbreviation, species, "Khas1", Khas_1, sex, preservation, specloc) -> Khas1f#
+preservation <- "live"#
+fullrow(abbreviation, species, "Khas2", Khas_2, sex, preservation, specloc) -> Khas2f#
+fullrow(abbreviation, species, "Khas3", Khas_3, sex, preservation, specloc) -> Khas3f#
+#
+rbind(Khas1f,Khas2f,Khas3f) -> allKhas#
+#
+#***********************************Maristella chicoi#
+species<-"Maristella_chicoi"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+fullrow(abbreviation, species, "MSH1", MSH_1, sex, preservation, specloc) -> MSH1f#
+fullrow(abbreviation, species, "MSH2", MSH_2, sex, preservation, specloc) -> MSH2f#
+fullrow(abbreviation, species, "MSH3", MSH_3, sex, preservation, specloc) -> MSH3f#
+fullrow(abbreviation, species, "MSH4", MSH_4, sex, preservation, specloc) -> MSH4f#
+fullrow(abbreviation, species, "MSH5", MSH_5, sex, preservation, specloc) -> MSH5f#
+#
+rbind(MSH1f,MSH2f,MSH3f,MSH4f,MSH5f) -> allMSH#
+#
+#***********************************Photeros morini#
+species<-"Photeros_morini"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+fullrow(abbreviation, species, "Pmor1", Pmor_1, sex, preservation, specloc) -> Pmor1f#
+fullrow(abbreviation, species, "Pmor2", Pmor_2, sex, preservation, specloc) -> Pmor2f#
+fullrow(abbreviation, species, "Pmor3", Pmor_3, sex, preservation, specloc) -> Pmor3f#
+fullrow(abbreviation, species, "Pmor4", Pmor_4, sex, preservation, specloc) -> Pmor4f#
+fullrow(abbreviation, species, "Pmor5", Pmor_5, sex, preservation, specloc) -> Pmor5f#
+#
+rbind(Pmor1f,Pmor2f,Pmor3f,Pmor4f,Pmor5f) -> allPmor#
+#
+#***********************************SVD#
+species<-"Maristella_SVD"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+fullrow(abbreviation, species, "SVD1", SVD_1, sex, preservation, specloc) -> SVD1f#
+fullrow(abbreviation, species, "SVD2", SVD_2, sex, preservation, specloc) -> SVD2f#
+fullrow(abbreviation, species, "SVD3", SVD_3, sex, preservation, specloc) -> SVD3f#
+fullrow(abbreviation, species, "SVD4", SVD_4, sex, preservation, specloc) -> SVD4f#
+fullrow(abbreviation, species, "SVD5", SVD_5, sex, preservation, specloc) -> SVD5f#
+#
+rbind(SVD1f,SVD2f,SVD3f,SVD4f,SVD5f) -> allSVD#
+#
+#***********************************SVD#
+species<-"Maristella_SVU"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+fullrow(abbreviation, species, "SVU1", SVU_1, sex, preservation, specloc) -> SVU1f#
+fullrow(abbreviation, species, "SVU2", SVU_2, sex, preservation, specloc) -> SVU2f#
+fullrow(abbreviation, species, "SVU3", SVU_3, sex, preservation, specloc) -> SVU3f#
+fullrow(abbreviation, species, "SVU4", SVU_4, sex, preservation, specloc) -> SVU4f#
+fullrow(abbreviation, species, "SVU5", SVU_5, sex, preservation, specloc) -> SVU5f#
+#
+rbind(SVU1f,SVU2f,SVU3f,SVU4f,SVU5f) -> allSVU#
+#
+#***********************************Vargula hilgendorfii#
+species<-"Vargula_hilgendorfii"#
+sex<-"unknown"#
+specloc <- "ucsb"#
+preservation <- "dried"#
+fullrow(abbreviation, species, "Vhil0123171", Vhil012317_1, sex, preservation, specloc) -> Vhil0123171f#
+fullrow(abbreviation, species, "Vhil0123172", Vhil012317_2, sex, preservation, specloc) -> Vhil0123172f#
+fullrow(abbreviation, species, "Vhil0123173", Vhil012317_3, sex, preservation, specloc) -> Vhil0123173f#
+#
+rbind(Vhil0123171f, Vhil0123172f, Vhil0123173f) -> allVhil012317#
+#
+#***********************************GPH#
+species<-"Photeros_GPH"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+#
+fullrow(abbreviation, species, "GPH1", GPH_1, sex, preservation, specloc) -> GPH1f#
+fullrow(abbreviation, species, "GPH2", GPH_2, sex, preservation, specloc) -> GPH2f#
+fullrow(abbreviation, species, "GPH3", GPH_3, sex, preservation, specloc) -> GPH3f#
+fullrow(abbreviation, species, "GPH4", GPH_4, sex, preservation, specloc) -> GPH4f#
+fullrow(abbreviation, species, "GPH5", GPH_5, sex, preservation, specloc) -> GPH5f#
+fullrow(abbreviation, species, "GPH6", GPH_6, sex, preservation, specloc) -> GPH6f#
+fullrow(abbreviation, species, "GPH7", GPH_7, sex, preservation, specloc) -> GPH7f#
+fullrow(abbreviation, species, "GPH8", GPH_8, sex, preservation, specloc) -> GPH8f#
+#
+rbind(GPH1f, GPH2f, GPH3f, GPH4f, GPH5f, GPH6f, GPH7f, GPH8f) -> allGPH#
+#
+species<-"WLU"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+fullrow(abbreviation, species, "WLU1", WLU_1, sex, preservation, specloc) -> WLU1f#
+fullrow(abbreviation, species, "WLU2", WLU_2, sex, preservation, specloc) -> WLU2f#
+fullrow(abbreviation, species, "WLU3", WLU_3, sex, preservation, specloc) -> WLU3f#
+fullrow(abbreviation, species, "WLU4", WLU_4, sex, preservation, specloc) -> WLU4f#
+fullrow(abbreviation, species, "WLU5", WLU_5, sex, preservation, specloc) -> WLU5f#
+fullrow(abbreviation, species, "WLU6", WLU_6, sex, preservation, specloc) -> WLU6f#
+preservation <- "dried"#
+fullrow(abbreviation, species, "WLU7", WLU_8, sex, preservation, specloc) -> WLU8f#
+fullrow(abbreviation, species, "WLU8", WLU_10, sex, preservation, specloc) -> WLU10f#
+#
+rbind(WLU1f, WLU2f, WLU3f, WLU4f, WLU5f, WLU6f, WLU8f, WLU10f) -> allWLU#
+#
+species<-"LSD"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+fullrow(abbreviation, species, "LSD1", LSD_1, sex, preservation, specloc) -> LSD1f#
+fullrow(abbreviation, species, "LSD2", LSD_2, sex, preservation, specloc) -> LSD2f#
+#
+rbind(LSD1f, LSD2f) -> allLSD#
+#
+#***********************************GPH#
+species<-"IR"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "dead"#
+#
+fullrow(abbreviation, species, "IR1", IR_1, sex, preservation, specloc) -> IR1f#
+fullrow(abbreviation, species, "IR2", IR_2, sex, preservation, specloc) -> IR2f#
+preservation <- "live"#
+fullrow(abbreviation, species, "IR3", IR_3, sex, preservation, specloc) -> IR3f#
+preservation <- "dead"#
+fullrow(abbreviation, species, "IR4", IR_4, sex, preservation, specloc) -> IR4f#
+fullrow(abbreviation, species, "IR5", IR_5, sex, preservation, specloc) -> IR5f#
+fullrow(abbreviation, species, "IR6", IR_6, sex, preservation, specloc) -> IR6f#
+#
+rbind(IR1f, IR2f, IR3f, IR4f, IR5f, IR6f) -> allIR#
+#
+species<-"RD"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "dead"#
+fullrow(abbreviation, species, "RD1", RD_1, sex, preservation, specloc) -> RD1f#
+fullrow(abbreviation, species, "RD2", RD_2, sex, preservation, specloc) -> RD2f#
+fullrow(abbreviation, species, "RD3", RD_3, sex, preservation, specloc) -> RD3f#
+fullrow(abbreviation, species, "RD4", RD_4, sex, preservation, specloc) -> RD4f#
+fullrow(abbreviation, species, "RD5", RD_5, sex, preservation, specloc) -> RD5f#
+#
+rbind(RD1f, RD2f, RD3f, RD4f, RD5f) -> allRD#
+#
+#onering#
+rbind(allEGD,allcont,allLLL, allMFU, allSFM, allSMU, allKhas, allMSH, allPmor, allSVD, allSVU, allVhil012317, allGPH, allWLU, allLSD, allIR, allRD) -> alldata#
+alldata
+fullrow(abbreviation, abbreviation, species, "EGD1", EGD_1, sex, preservation, specloc) -> EGD1f
+fullrow(abbreviation, species, "EGD4", EGD_4, sex, preservation, specloc) -> EGD4f
+#Here, calculate parameters and add metadata#
+#***********************************EGD#
+species<-"Photeros_EGD"#
+abbreviation <- "P_EGD"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "dried"#
+#
+fullrow(abbreviation, species, "EGD1", EGD_1, sex, preservation, specloc) -> EGD1f#
+fullrow(abbreviation, species, "EGD3", EGD_3, sex, preservation, specloc) -> EGD3f#
+fullrow(abbreviation, species, "EGD4", EGD_4, sex, preservation, specloc) -> EGD4f#
+fullrow(abbreviation, species, "EGD5", EGD_5, sex, preservation, specloc) -> EGD5f#
+#
+#Now bind all samples together into one large data frame#
+rbind(EGD1f, EGD3f, EGD4f, EGD5f) -> allEGD
+#First execute functions#
+#
+#Next read in data#
+#Here, calculate parameters and add metadata#
+#***********************************EGD#
+species<-"Photeros_EGD"#
+abbreviation <- "P_EGD"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "dried"#
+#
+fullrow(abbreviation, species, "EGD1", EGD_1, sex, preservation, specloc) -> EGD1f#
+fullrow(abbreviation, species, "EGD3", EGD_3, sex, preservation, specloc) -> EGD3f#
+fullrow(abbreviation, species, "EGD4", EGD_4, sex, preservation, specloc) -> EGD4f#
+fullrow(abbreviation, species, "EGD5", EGD_5, sex, preservation, specloc) -> EGD5f#
+#
+#Now bind all samples together into one large data frame#
+rbind(EGD1f, EGD3f, EGD4f, EGD5f) -> allEGD#
+#
+#***********************************EGD#
+species<-"contragula"#
+sex<-"male"#
+specloc <- "ucsb"#
+#
+fullrow(abbreviation, species, "cont1", Cont_bocas_1, sex, preservation, specloc) -> cont1f#
+fullrow(abbreviation, species, "cont2", Cont_bocas_2, sex, preservation, specloc) -> cont2f#
+fullrow(abbreviation, species, "cont3", Cont_bocas_3, sex, preservation, specloc) -> cont3f#
+#
+#Now bind all samples together into one large data frame#
+rbind(cont1f, cont2f, cont3f) -> allcont#
+#
+#***********************************LLL#
+species<-"LLL"#
+sex<-"male"#
+specloc <- "ucsb"#
+#
+fullrow(abbreviation, species, "LLL1", LLL_1, sex, preservation, specloc) -> LLL1f#
+fullrow(abbreviation, species, "LLL2", LLL_2, sex, preservation, specloc) -> LLL2f#
+fullrow(abbreviation, species, "LLL3", LLL_3, sex, preservation, specloc) -> LLL3f#
+fullrow(abbreviation, species, "LLL4", LLL_4, sex, preservation, specloc) -> LLL4f#
+fullrow(abbreviation, species, "LLL5", LLL_5, sex, preservation, specloc) -> LLL5f#
+#
+rbind(LLL1f, LLL2f, LLL3f, LLL4f, LLL5f) -> allLLL#
+#***********************************MFU#
+species<-"MFU"#
+sex<-"male"#
+specloc <- "ucsb"#
+#
+fullrow(abbreviation, species, "MFU1", MFU_1, sex, preservation, specloc) -> MFU1f#
+fullrow(abbreviation, species, "MFU2", MFU_2, sex, preservation, specloc) -> MFU2f#
+fullrow(abbreviation, species, "MFU3", MFU_3, sex, preservation, specloc) -> MFU3f#
+fullrow(abbreviation, species, "MFU4", MFU_4, sex, preservation, specloc) -> MFU4f#
+fullrow(abbreviation, species, "MFU5", MFU_5, sex, preservation, specloc) -> MFU5f#
+#
+rbind(MFU1f, MFU2f, MFU3f, MFU4f, MFU5f) -> allMFU#
+#
+#***********************************SFM#
+species<-"SFM"#
+sex<-"male"#
+specloc <- "ucsb"#
+#
+fullrow(abbreviation, species, "SFM1", SFM_1, sex, preservation, specloc) -> SFM1f#
+fullrow(abbreviation, species, "SFM2", SFM_2, sex, preservation, specloc) -> SFM2f#
+fullrow(abbreviation, species, "SFM3", SFM_3, sex, preservation, specloc) -> SFM3f#
+fullrow(abbreviation, species, "SFM4", SFM_4, sex, preservation, specloc) -> SFM4f#
+fullrow(abbreviation, species, "SFM5", SFM_5, sex, preservation, specloc) -> SFM5f#
+#
+rbind(SFM1f, SFM2f, SFM3f, SFM4f, SFM5f) -> allSFM#
+#
+#***********************************SFM#
+species<-"SMU"#
+sex<-"male"#
+specloc <- "ucsb"#
+#
+fullrow(abbreviation, species, "SMU1", SMU_1, sex, preservation, specloc) -> SMU1f#
+fullrow(abbreviation, species, "SMU2", SMU_2, sex, preservation, specloc) -> SMU2f#
+fullrow(abbreviation, species, "SMU3", SMU_3, sex, preservation, specloc) -> SMU3f#
+fullrow(abbreviation, species, "SMU4", SMU_4, sex, preservation, specloc) -> SMU4f#
+fullrow(abbreviation, species, "SMU5", SMU_5, sex, preservation, specloc) -> SMU5f#
+#
+rbind(SMU1f, SMU2f, SMU3f, SMU4f, SMU5f) -> allSMU#
+#***********************************Kornickeria hastingsi#
+species<-"Kornickeria_hastingsi"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "dried"#
+fullrow(abbreviation, species, "Khas1", Khas_1, sex, preservation, specloc) -> Khas1f#
+preservation <- "live"#
+fullrow(abbreviation, species, "Khas2", Khas_2, sex, preservation, specloc) -> Khas2f#
+fullrow(abbreviation, species, "Khas3", Khas_3, sex, preservation, specloc) -> Khas3f#
+#
+rbind(Khas1f,Khas2f,Khas3f) -> allKhas#
+#
+#***********************************Maristella chicoi#
+species<-"Maristella_chicoi"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+fullrow(abbreviation, species, "MSH1", MSH_1, sex, preservation, specloc) -> MSH1f#
+fullrow(abbreviation, species, "MSH2", MSH_2, sex, preservation, specloc) -> MSH2f#
+fullrow(abbreviation, species, "MSH3", MSH_3, sex, preservation, specloc) -> MSH3f#
+fullrow(abbreviation, species, "MSH4", MSH_4, sex, preservation, specloc) -> MSH4f#
+fullrow(abbreviation, species, "MSH5", MSH_5, sex, preservation, specloc) -> MSH5f#
+#
+rbind(MSH1f,MSH2f,MSH3f,MSH4f,MSH5f) -> allMSH#
+#
+#***********************************Photeros morini#
+species<-"Photeros_morini"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+fullrow(abbreviation, species, "Pmor1", Pmor_1, sex, preservation, specloc) -> Pmor1f#
+fullrow(abbreviation, species, "Pmor2", Pmor_2, sex, preservation, specloc) -> Pmor2f#
+fullrow(abbreviation, species, "Pmor3", Pmor_3, sex, preservation, specloc) -> Pmor3f#
+fullrow(abbreviation, species, "Pmor4", Pmor_4, sex, preservation, specloc) -> Pmor4f#
+fullrow(abbreviation, species, "Pmor5", Pmor_5, sex, preservation, specloc) -> Pmor5f#
+#
+rbind(Pmor1f,Pmor2f,Pmor3f,Pmor4f,Pmor5f) -> allPmor#
+#
+#***********************************SVD#
+species<-"Maristella_SVD"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+fullrow(abbreviation, species, "SVD1", SVD_1, sex, preservation, specloc) -> SVD1f#
+fullrow(abbreviation, species, "SVD2", SVD_2, sex, preservation, specloc) -> SVD2f#
+fullrow(abbreviation, species, "SVD3", SVD_3, sex, preservation, specloc) -> SVD3f#
+fullrow(abbreviation, species, "SVD4", SVD_4, sex, preservation, specloc) -> SVD4f#
+fullrow(abbreviation, species, "SVD5", SVD_5, sex, preservation, specloc) -> SVD5f#
+#
+rbind(SVD1f,SVD2f,SVD3f,SVD4f,SVD5f) -> allSVD#
+#
+#***********************************SVD#
+species<-"Maristella_SVU"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+fullrow(abbreviation, species, "SVU1", SVU_1, sex, preservation, specloc) -> SVU1f#
+fullrow(abbreviation, species, "SVU2", SVU_2, sex, preservation, specloc) -> SVU2f#
+fullrow(abbreviation, species, "SVU3", SVU_3, sex, preservation, specloc) -> SVU3f#
+fullrow(abbreviation, species, "SVU4", SVU_4, sex, preservation, specloc) -> SVU4f#
+fullrow(abbreviation, species, "SVU5", SVU_5, sex, preservation, specloc) -> SVU5f#
+#
+rbind(SVU1f,SVU2f,SVU3f,SVU4f,SVU5f) -> allSVU#
+#
+#***********************************Vargula hilgendorfii#
+species<-"Vargula_hilgendorfii"#
+sex<-"unknown"#
+specloc <- "ucsb"#
+preservation <- "dried"#
+fullrow(abbreviation, species, "Vhil0123171", Vhil012317_1, sex, preservation, specloc) -> Vhil0123171f#
+fullrow(abbreviation, species, "Vhil0123172", Vhil012317_2, sex, preservation, specloc) -> Vhil0123172f#
+fullrow(abbreviation, species, "Vhil0123173", Vhil012317_3, sex, preservation, specloc) -> Vhil0123173f#
+#
+rbind(Vhil0123171f, Vhil0123172f, Vhil0123173f) -> allVhil012317#
+#
+#***********************************GPH#
+species<-"Photeros_GPH"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+#
+fullrow(abbreviation, species, "GPH1", GPH_1, sex, preservation, specloc) -> GPH1f#
+fullrow(abbreviation, species, "GPH2", GPH_2, sex, preservation, specloc) -> GPH2f#
+fullrow(abbreviation, species, "GPH3", GPH_3, sex, preservation, specloc) -> GPH3f#
+fullrow(abbreviation, species, "GPH4", GPH_4, sex, preservation, specloc) -> GPH4f#
+fullrow(abbreviation, species, "GPH5", GPH_5, sex, preservation, specloc) -> GPH5f#
+fullrow(abbreviation, species, "GPH6", GPH_6, sex, preservation, specloc) -> GPH6f#
+fullrow(abbreviation, species, "GPH7", GPH_7, sex, preservation, specloc) -> GPH7f#
+fullrow(abbreviation, species, "GPH8", GPH_8, sex, preservation, specloc) -> GPH8f#
+#
+rbind(GPH1f, GPH2f, GPH3f, GPH4f, GPH5f, GPH6f, GPH7f, GPH8f) -> allGPH#
+#
+species<-"WLU"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+fullrow(abbreviation, species, "WLU1", WLU_1, sex, preservation, specloc) -> WLU1f#
+fullrow(abbreviation, species, "WLU2", WLU_2, sex, preservation, specloc) -> WLU2f#
+fullrow(abbreviation, species, "WLU3", WLU_3, sex, preservation, specloc) -> WLU3f#
+fullrow(abbreviation, species, "WLU4", WLU_4, sex, preservation, specloc) -> WLU4f#
+fullrow(abbreviation, species, "WLU5", WLU_5, sex, preservation, specloc) -> WLU5f#
+fullrow(abbreviation, species, "WLU6", WLU_6, sex, preservation, specloc) -> WLU6f#
+preservation <- "dried"#
+fullrow(abbreviation, species, "WLU7", WLU_8, sex, preservation, specloc) -> WLU8f#
+fullrow(abbreviation, species, "WLU8", WLU_10, sex, preservation, specloc) -> WLU10f#
+#
+rbind(WLU1f, WLU2f, WLU3f, WLU4f, WLU5f, WLU6f, WLU8f, WLU10f) -> allWLU#
+#
+species<-"LSD"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+fullrow(abbreviation, species, "LSD1", LSD_1, sex, preservation, specloc) -> LSD1f#
+fullrow(abbreviation, species, "LSD2", LSD_2, sex, preservation, specloc) -> LSD2f#
+#
+rbind(LSD1f, LSD2f) -> allLSD#
+#
+#***********************************GPH#
+species<-"IR"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "dead"#
+#
+fullrow(abbreviation, species, "IR1", IR_1, sex, preservation, specloc) -> IR1f#
+fullrow(abbreviation, species, "IR2", IR_2, sex, preservation, specloc) -> IR2f#
+preservation <- "live"#
+fullrow(abbreviation, species, "IR3", IR_3, sex, preservation, specloc) -> IR3f#
+preservation <- "dead"#
+fullrow(abbreviation, species, "IR4", IR_4, sex, preservation, specloc) -> IR4f#
+fullrow(abbreviation, species, "IR5", IR_5, sex, preservation, specloc) -> IR5f#
+fullrow(abbreviation, species, "IR6", IR_6, sex, preservation, specloc) -> IR6f#
+#
+rbind(IR1f, IR2f, IR3f, IR4f, IR5f, IR6f) -> allIR#
+#
+species<-"RD"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "dead"#
+fullrow(abbreviation, species, "RD1", RD_1, sex, preservation, specloc) -> RD1f#
+fullrow(abbreviation, species, "RD2", RD_2, sex, preservation, specloc) -> RD2f#
+fullrow(abbreviation, species, "RD3", RD_3, sex, preservation, specloc) -> RD3f#
+fullrow(abbreviation, species, "RD4", RD_4, sex, preservation, specloc) -> RD4f#
+fullrow(abbreviation, species, "RD5", RD_5, sex, preservation, specloc) -> RD5f#
+#
+rbind(RD1f, RD2f, RD3f, RD4f, RD5f) -> allRD#
+#
+#onering#
+rbind(allEGD,allcont,allLLL, allMFU, allSFM, allSMU, allKhas, allMSH, allPmor, allSVD, allSVU, allVhil012317, allGPH, allWLU, allLSD, allIR, allRD) -> alldata#
+alldata
+#First execute functions#
+#
+#Next read in data#
+#Here, calculate parameters and add metadata#
+#***********************************EGD#
+species<-"Photeros_EGD"#
+abbreviation <- "P_EGD"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "dried"#
+#
+fullrow(abbreviation, species, "EGD1", EGD_1, sex, preservation, specloc) -> EGD1f#
+fullrow(abbreviation, species, "EGD3", EGD_3, sex, preservation, specloc) -> EGD3f#
+fullrow(abbreviation, species, "EGD4", EGD_4, sex, preservation, specloc) -> EGD4f#
+fullrow(abbreviation, species, "EGD5", EGD_5, sex, preservation, specloc) -> EGD5f#
+#
+#Now bind all samples together into one large data frame#
+rbind(EGD1f, EGD3f, EGD4f, EGD5f) -> allEGD#
+#
+#***********************************EGD#
+species<-"contragula"#
+abbreviation<-"CONT"#
+sex<-"male"#
+specloc <- "ucsb"#
+#
+fullrow(abbreviation, species, "cont1", Cont_bocas_1, sex, preservation, specloc) -> cont1f#
+fullrow(abbreviation, species, "cont2", Cont_bocas_2, sex, preservation, specloc) -> cont2f#
+fullrow(abbreviation, species, "cont3", Cont_bocas_3, sex, preservation, specloc) -> cont3f#
+#
+#Now bind all samples together into one large data frame#
+rbind(cont1f, cont2f, cont3f) -> allcont#
+#
+#***********************************LLL#
+species<-"LLL"#
+abbreviation<-"LLL"#
+sex<-"male"#
+specloc <- "ucsb"#
+#
+fullrow(abbreviation, species, "LLL1", LLL_1, sex, preservation, specloc) -> LLL1f#
+fullrow(abbreviation, species, "LLL2", LLL_2, sex, preservation, specloc) -> LLL2f#
+fullrow(abbreviation, species, "LLL3", LLL_3, sex, preservation, specloc) -> LLL3f#
+fullrow(abbreviation, species, "LLL4", LLL_4, sex, preservation, specloc) -> LLL4f#
+fullrow(abbreviation, species, "LLL5", LLL_5, sex, preservation, specloc) -> LLL5f#
+#
+rbind(LLL1f, LLL2f, LLL3f, LLL4f, LLL5f) -> allLLL#
+#***********************************MFU#
+species<-"MFU"#
+abbreviation<-"MFU"#
+sex<-"male"#
+specloc <- "ucsb"#
+#
+fullrow(abbreviation, species, "MFU1", MFU_1, sex, preservation, specloc) -> MFU1f#
+fullrow(abbreviation, species, "MFU2", MFU_2, sex, preservation, specloc) -> MFU2f#
+fullrow(abbreviation, species, "MFU3", MFU_3, sex, preservation, specloc) -> MFU3f#
+fullrow(abbreviation, species, "MFU4", MFU_4, sex, preservation, specloc) -> MFU4f#
+fullrow(abbreviation, species, "MFU5", MFU_5, sex, preservation, specloc) -> MFU5f#
+#
+rbind(MFU1f, MFU2f, MFU3f, MFU4f, MFU5f) -> allMFU#
+#
+#***********************************SFM#
+species<-"SFM"#
+abbreviation<-"SFM"#
+sex<-"male"#
+specloc <- "ucsb"#
+#
+fullrow(abbreviation, species, "SFM1", SFM_1, sex, preservation, specloc) -> SFM1f#
+fullrow(abbreviation, species, "SFM2", SFM_2, sex, preservation, specloc) -> SFM2f#
+fullrow(abbreviation, species, "SFM3", SFM_3, sex, preservation, specloc) -> SFM3f#
+fullrow(abbreviation, species, "SFM4", SFM_4, sex, preservation, specloc) -> SFM4f#
+fullrow(abbreviation, species, "SFM5", SFM_5, sex, preservation, specloc) -> SFM5f#
+#
+rbind(SFM1f, SFM2f, SFM3f, SFM4f, SFM5f) -> allSFM#
+#
+#***********************************SFM#
+species<-"SMU"#
+abbreviation<-"SMU"#
+sex<-"male"#
+specloc <- "ucsb"#
+#
+fullrow(abbreviation, species, "SMU1", SMU_1, sex, preservation, specloc) -> SMU1f#
+fullrow(abbreviation, species, "SMU2", SMU_2, sex, preservation, specloc) -> SMU2f#
+fullrow(abbreviation, species, "SMU3", SMU_3, sex, preservation, specloc) -> SMU3f#
+fullrow(abbreviation, species, "SMU4", SMU_4, sex, preservation, specloc) -> SMU4f#
+fullrow(abbreviation, species, "SMU5", SMU_5, sex, preservation, specloc) -> SMU5f#
+#
+rbind(SMU1f, SMU2f, SMU3f, SMU4f, SMU5f) -> allSMU#
+#***********************************Kornickeria hastingsi#
+species<-"Kornickeria_hastingsi"#
+abbreviation<-"K_has"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "dried"#
+fullrow(abbreviation, species, "Khas1", Khas_1, sex, preservation, specloc) -> Khas1f#
+preservation <- "live"#
+fullrow(abbreviation, species, "Khas2", Khas_2, sex, preservation, specloc) -> Khas2f#
+fullrow(abbreviation, species, "Khas3", Khas_3, sex, preservation, specloc) -> Khas3f#
+#
+rbind(Khas1f,Khas2f,Khas3f) -> allKhas#
+#
+#***********************************Maristella chicoi#
+species<-"Maristella_chicoi"#
+abbreviation<-"M_chi"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+fullrow(abbreviation, species, "MSH1", MSH_1, sex, preservation, specloc) -> MSH1f#
+fullrow(abbreviation, species, "MSH2", MSH_2, sex, preservation, specloc) -> MSH2f#
+fullrow(abbreviation, species, "MSH3", MSH_3, sex, preservation, specloc) -> MSH3f#
+fullrow(abbreviation, species, "MSH4", MSH_4, sex, preservation, specloc) -> MSH4f#
+fullrow(abbreviation, species, "MSH5", MSH_5, sex, preservation, specloc) -> MSH5f#
+#
+rbind(MSH1f,MSH2f,MSH3f,MSH4f,MSH5f) -> allMSH#
+#
+#***********************************Photeros morini#
+species<-"Photeros_morini"#
+abbreviation<-"P_mor"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+fullrow(abbreviation, species, "Pmor1", Pmor_1, sex, preservation, specloc) -> Pmor1f#
+fullrow(abbreviation, species, "Pmor2", Pmor_2, sex, preservation, specloc) -> Pmor2f#
+fullrow(abbreviation, species, "Pmor3", Pmor_3, sex, preservation, specloc) -> Pmor3f#
+fullrow(abbreviation, species, "Pmor4", Pmor_4, sex, preservation, specloc) -> Pmor4f#
+fullrow(abbreviation, species, "Pmor5", Pmor_5, sex, preservation, specloc) -> Pmor5f#
+#
+rbind(Pmor1f,Pmor2f,Pmor3f,Pmor4f,Pmor5f) -> allPmor#
+#
+#***********************************SVD#
+species<-"Maristella_SVD"#
+abbreviation<-"M_SFU"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+fullrow(abbreviation, species, "SVD1", SVD_1, sex, preservation, specloc) -> SVD1f#
+fullrow(abbreviation, species, "SVD2", SVD_2, sex, preservation, specloc) -> SVD2f#
+fullrow(abbreviation, species, "SVD3", SVD_3, sex, preservation, specloc) -> SVD3f#
+fullrow(abbreviation, species, "SVD4", SVD_4, sex, preservation, specloc) -> SVD4f#
+fullrow(abbreviation, species, "SVD5", SVD_5, sex, preservation, specloc) -> SVD5f#
+#
+rbind(SVD1f,SVD2f,SVD3f,SVD4f,SVD5f) -> allSVD#
+#
+#***********************************SVD#
+species<-"Maristella_SVU"#
+abbreviation<-"M_SVU"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+fullrow(abbreviation, species, "SVU1", SVU_1, sex, preservation, specloc) -> SVU1f#
+fullrow(abbreviation, species, "SVU2", SVU_2, sex, preservation, specloc) -> SVU2f#
+fullrow(abbreviation, species, "SVU3", SVU_3, sex, preservation, specloc) -> SVU3f#
+fullrow(abbreviation, species, "SVU4", SVU_4, sex, preservation, specloc) -> SVU4f#
+fullrow(abbreviation, species, "SVU5", SVU_5, sex, preservation, specloc) -> SVU5f#
+#
+rbind(SVU1f,SVU2f,SVU3f,SVU4f,SVU5f) -> allSVU#
+#
+#***********************************Vargula hilgendorfii#
+species<-"Vargula_hilgendorfii"#
+abbreviation<-"V_hil"#
+sex<-"unknown"#
+specloc <- "ucsb"#
+preservation <- "dried"#
+fullrow(abbreviation, species, "Vhil0123171", Vhil012317_1, sex, preservation, specloc) -> Vhil0123171f#
+fullrow(abbreviation, species, "Vhil0123172", Vhil012317_2, sex, preservation, specloc) -> Vhil0123172f#
+fullrow(abbreviation, species, "Vhil0123173", Vhil012317_3, sex, preservation, specloc) -> Vhil0123173f#
+#
+rbind(Vhil0123171f, Vhil0123172f, Vhil0123173f) -> allVhil012317#
+#
+#***********************************GPH#
+species<-"Photeros_GPH"#
+abbreviation<-"P_GPH"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+#
+fullrow(abbreviation, species, "GPH1", GPH_1, sex, preservation, specloc) -> GPH1f#
+fullrow(abbreviation, species, "GPH2", GPH_2, sex, preservation, specloc) -> GPH2f#
+fullrow(abbreviation, species, "GPH3", GPH_3, sex, preservation, specloc) -> GPH3f#
+fullrow(abbreviation, species, "GPH4", GPH_4, sex, preservation, specloc) -> GPH4f#
+fullrow(abbreviation, species, "GPH5", GPH_5, sex, preservation, specloc) -> GPH5f#
+fullrow(abbreviation, species, "GPH6", GPH_6, sex, preservation, specloc) -> GPH6f#
+fullrow(abbreviation, species, "GPH7", GPH_7, sex, preservation, specloc) -> GPH7f#
+fullrow(abbreviation, species, "GPH8", GPH_8, sex, preservation, specloc) -> GPH8f#
+#
+rbind(GPH1f, GPH2f, GPH3f, GPH4f, GPH5f, GPH6f, GPH7f, GPH8f) -> allGPH#
+#
+species<-"WLU"#
+abbreviation<-"WLU"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+fullrow(abbreviation, species, "WLU1", WLU_1, sex, preservation, specloc) -> WLU1f#
+fullrow(abbreviation, species, "WLU2", WLU_2, sex, preservation, specloc) -> WLU2f#
+fullrow(abbreviation, species, "WLU3", WLU_3, sex, preservation, specloc) -> WLU3f#
+fullrow(abbreviation, species, "WLU4", WLU_4, sex, preservation, specloc) -> WLU4f#
+fullrow(abbreviation, species, "WLU5", WLU_5, sex, preservation, specloc) -> WLU5f#
+fullrow(abbreviation, species, "WLU6", WLU_6, sex, preservation, specloc) -> WLU6f#
+preservation <- "dried"#
+fullrow(abbreviation, species, "WLU7", WLU_8, sex, preservation, specloc) -> WLU8f#
+fullrow(abbreviation, species, "WLU8", WLU_10, sex, preservation, specloc) -> WLU10f#
+#
+rbind(WLU1f, WLU2f, WLU3f, WLU4f, WLU5f, WLU6f, WLU8f, WLU10f) -> allWLU#
+#
+species<-"LSD"#
+abbreviation<-"LSD"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+fullrow(abbreviation, species, "LSD1", LSD_1, sex, preservation, specloc) -> LSD1f#
+fullrow(abbreviation, species, "LSD2", LSD_2, sex, preservation, specloc) -> LSD2f#
+#
+rbind(LSD1f, LSD2f) -> allLSD#
+#
+#***********************************GPH#
+species<-"IR"#
+abbreviation<-"IR"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "dead"#
+#
+fullrow(abbreviation, species, "IR1", IR_1, sex, preservation, specloc) -> IR1f#
+fullrow(abbreviation, species, "IR2", IR_2, sex, preservation, specloc) -> IR2f#
+preservation <- "live"#
+fullrow(abbreviation, species, "IR3", IR_3, sex, preservation, specloc) -> IR3f#
+preservation <- "dead"#
+fullrow(abbreviation, species, "IR4", IR_4, sex, preservation, specloc) -> IR4f#
+fullrow(abbreviation, species, "IR5", IR_5, sex, preservation, specloc) -> IR5f#
+fullrow(abbreviation, species, "IR6", IR_6, sex, preservation, specloc) -> IR6f#
+#
+rbind(IR1f, IR2f, IR3f, IR4f, IR5f, IR6f) -> allIR#
+#
+species<-"RD"#
+abbreviation<-"RD"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "dead"#
+fullrow(abbreviation, species, "RD1", RD_1, sex, preservation, specloc) -> RD1f#
+fullrow(abbreviation, species, "RD2", RD_2, sex, preservation, specloc) -> RD2f#
+fullrow(abbreviation, species, "RD3", RD_3, sex, preservation, specloc) -> RD3f#
+fullrow(abbreviation, species, "RD4", RD_4, sex, preservation, specloc) -> RD4f#
+fullrow(abbreviation, species, "RD5", RD_5, sex, preservation, specloc) -> RD5f#
+#
+rbind(RD1f, RD2f, RD3f, RD4f, RD5f) -> allRD#
+#
+#onering#
+rbind(allEGD,allcont,allLLL, allMFU, allSFM, allSMU, allKhas, allMSH, allPmor, allSVD, allSVU, allVhil012317, allGPH, allWLU, allLSD, allIR, allRD) -> alldata#
+alldata
+#Figure X - Box plot of all lmax of species#
+require(ggplot2)#
+#a <- subset(alldata, error < 0.02 | replicate=="Cn" | replicate=="Pg")#
+a <- subset(alldata, error < 0.02)#
+#
+p <- qplot(abbreviation, sgMax, data=a, geom=c("boxplot", "jitter"))#
+p
+workingdir <- "6-08-2016/DU"
+setwd(paste0(rootdir,workingdir))
+workingdir <- "6-08-2016/DU"
+setwd(paste0(rootdir,workingdir))
+calibration <- "../correction factor.txt"
+graphEmission("DU_1_05sec_x10x1sp_live_sig.asc", "DU_1_05sec_x10x1sp_live_bgd.asc", calibration,10,TRUE) -> DU1;
+graphEmission("DU_2_05sec_x10x1sp_live_sig.asc", "DU_2_05sec_x10x1sp_live_bgd.asc", calibration,10,TRUE) -> DU2;
+graphEmission("DU_3_05sec_x10x1sp_live_sig.asc", "DU_3_05sec_x10x1sp_live_bgd.asc", calibration,10,TRUE) -> DU3;
+graphEmission("DU_4_05sec_x10x1sp_live_sig.asc", "DU_4_05sec_x10x1sp_live_bgd.asc", calibration,10,TRUE) -> DU4;
+graphEmission("DU_5_05sec_x10x1sp_live_sig.asc", "DU_5_05sec_x10x1sp_live_bgd.asc", calibration,10,TRUE) -> DU5;
+###############DU#
+workingdir <- "6-08-2016/DU"#
+setwd(paste0(rootdir,workingdir))#
+background #all different backgrounds, so specified in call to graphEmission#
+calibration <- "../correction factor.txt"#
+#
+graphEmission("DU_1_05sec_x10x1sp_live_sig.asc", "DU_1_05sec_x10x1sp_live_bgd.asc", calibration,10,TRUE) -> DU1;#
+graphEmission("DU_2_05sec_x10x1sp_live_sig.asc", "DU_2_05sec_x10x1sp_live_bgd.asc", calibration,10,TRUE) -> DU2;#
+graphEmission("DU_3_05sec_x10x1sp_live_sig.asc", "DU_3_05sec_x10x1sp_live_bgd.asc", calibration,10,TRUE) -> DU3;#
+graphEmission("DU_4_05sec_x10x1sp_live_sig.asc", "DU_4_05sec_x10x1sp_live_bgd.asc", calibration,10,TRUE) -> DU4;#
+graphEmission("DU_5_05sec_x10x1sp_live_sig.asc", "DU_5_05sec_x10x1sp_live_bgd.asc", calibration,10,TRUE) -> DU5;
+species<-"DU"#
+abbreviation<-"DU"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "dead"#
+fullrow(abbreviation, species, "DU1", DU_1, sex, preservation, specloc) -> DU1f#
+fullrow(abbreviation, species, "DU2", DU_2, sex, preservation, specloc) -> DU2f#
+fullrow(abbreviation, species, "DU3", DU_3, sex, preservation, specloc) -> DU3f#
+fullrow(abbreviation, species, "DU4", DU_4, sex, preservation, specloc) -> DU4f#
+fullrow(abbreviation, species, "DU5", DU_5, sex, preservation, specloc) -> DU5f#
+#
+rbind(DU1f, DU2f, DU3f, DU4f, DU5f) -> allDU#
+#onering#
+rbind(allEGD,allcont,allLLL, allMFU, allSFM, allSMU, allKhas, allMSH, allPmor, allSVD, allSVU, allVhil012317, allGPH, allWLU, allLSD, allIR, allRD, allDU) -> alldata#
+alldata
+species<-"DU"#
+abbreviation<-"DU"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+fullrow(abbreviation, species, "DU1", DU_1, sex, preservation, specloc) -> DU1f#
+fullrow(abbreviation, species, "DU2", DU_2, sex, preservation, specloc) -> DU2f#
+fullrow(abbreviation, species, "DU3", DU_3, sex, preservation, specloc) -> DU3f#
+fullrow(abbreviation, species, "DU4", DU_4, sex, preservation, specloc) -> DU4f#
+fullrow(abbreviation, species, "DU5", DU_5, sex, preservation, specloc) -> DU5f#
+#
+rbind(DU1f, DU2f, DU3f, DU4f, DU5f) -> allDU
+workingdir <- "6-08-2016/DU"#
+setwd(paste0(rootdir,workingdir))#
+background #all different backgrounds, so specified in call to graphEmission#
+calibration <- "../correction factor.txt"#
+#
+graphEmission("DU_1_05sec_x10x1sp_live_sig.asc", "DU_1_05sec_x10x1sp_live_bgd.asc", calibration,10,TRUE) -> DU_1;#
+graphEmission("DU_2_05sec_x10x1sp_live_sig.asc", "DU_2_05sec_x10x1sp_live_bgd.asc", calibration,10,TRUE) -> DU_2;#
+graphEmission("DU_3_05sec_x10x1sp_live_sig.asc", "DU_3_05sec_x10x1sp_live_bgd.asc", calibration,10,TRUE) -> DU_3;#
+graphEmission("DU_4_05sec_x10x1sp_live_sig.asc", "DU_4_05sec_x10x1sp_live_bgd.asc", calibration,10,TRUE) -> DU_4;#
+graphEmission("DU_5_05sec_x10x1sp_live_sig.asc", "DU_5_05sec_x10x1sp_live_bgd.asc", calibration,10,TRUE) -> DU_5;
+species<-"DU"#
+abbreviation<-"DU"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+fullrow(abbreviation, species, "DU1", DU_1, sex, preservation, specloc) -> DU1f#
+fullrow(abbreviation, species, "DU2", DU_2, sex, preservation, specloc) -> DU2f#
+fullrow(abbreviation, species, "DU3", DU_3, sex, preservation, specloc) -> DU3f#
+fullrow(abbreviation, species, "DU4", DU_4, sex, preservation, specloc) -> DU4f#
+fullrow(abbreviation, species, "DU5", DU_5, sex, preservation, specloc) -> DU5f#
+#
+rbind(DU1f, DU2f, DU3f, DU4f, DU5f) -> allDU#
+#onering#
+rbind(allEGD,allcont,allLLL, allMFU, allSFM, allSMU, allKhas, allMSH, allPmor, allSVD, allSVU, allVhil012317, allGPH, allWLU, allLSD, allIR, allRD, allDU) -> alldata#
+alldata
+#Figure X - Box plot of all lmax of species#
+require(ggplot2)#
+#a <- subset(alldata, error < 0.02 | replicate=="Cn" | replicate=="Pg")#
+a <- subset(alldata, error < 0.02)#
+#
+p <- qplot(abbreviation, sgMax, data=a, geom=c("boxplot", "jitter"))#
+p
+#Table 1 - lmax and fwhm for all species studied#
+#
+#First remove runs where signal:noise is too low#
+#a <- subset(alldata, x < 0.02 | replicate=="Cn" | replicate=="Pg")#
+a <- subset(alldata, error < 0.02 )#
+aggregate(a[, 6:7], list(a$species), mean) -> means#
+means
+aggregate(a[, 6:7], list(a$abbreviation), mean) -> means
+warndings()
+warnings()
+aggregate(a[, 7:8], list(a$abbreviation), mean) -> means
+means
+#Figure X - Box plot of all fwhm of species#
+require(ggplot2)#
+#a <- subset(alldata, error < 0.02 | replicate=="Cn" | replicate=="Pg")#
+a <- subset(alldata, error < 0.02)#
+#
+p <- qplot(abbreviation, sgfwhm, data=a, geom=c("boxplot", "jitter"))#
+p
+workingdir <- "8-10-2016/WCU"
+setwd(paste0(rootdir,workingdir))
+background <- "background.asc"
+calibration <- "../correction factor.txt"
+graphEmission("WCU1.txt", "background.txt", calibration,10,TRUE) -> WCU_1;
+workingdir <- "8-10-2016/WCU"#
+setwd(paste0(rootdir,workingdir))#
+background <- "background.asc"#
+calibration <- "../correction factor.txt"#
+#
+graphEmission("WCU1.txt", "background.txt", calibration,10,TRUE) -> WCU_1;
+graphEmission("WCU2.txt", "background.txt", calibration,10,TRUE) -> WCU_2;
+graphEmission("WCU3.txt", "background.txt", calibration,10,TRUE) -> WCU_3;
+graphEmission("WCU4.txt", "background.txt", calibration,10,TRUE) -> WCU4; #WCU3 and WCU4 are the same data files
+graphEmission("WCU5.txt", "background.txt", calibration,10,TRUE) -> WCU_5;
+graphEmission("WCU1.asc", "background.txt", calibration,10,TRUE) -> WCU_1;
+graphEmission("WCU1.asc", background, calibration,10,TRUE) -> WCU_1;
+graphEmission("WCU1.txt", background, calibration,10,TRUE) -> WCU_1;
+background <- "background.txt"
+graphEmission("WCU1.txt", background, calibration,10,TRUE) -> WCU_1;
+graphEmission("WCU1.txt", background, calibration,10,TRUE) -> WCU_1;#
+graphEmission("WCU2.txt", "background.txt", calibration,10,TRUE) -> WCU_2;#
+graphEmission("WCU3.txt", "background.txt", calibration,10,TRUE) -> WCU_3;#
+#graphEmission("WCU4.txt", "background.txt", calibration,10,TRUE) -> WCU4; #WCU3 and WCU4 are the same data files#
+graphEmission("WCU5.txt", "background.txt", calibration,10,TRUE) -> WCU_5;

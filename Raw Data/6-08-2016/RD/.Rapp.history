@@ -1,0 +1,976 @@
+#First execute functions#
+#
+#Next read in data#
+#Here, calculate parameters and add metadata#
+#***********************************EGD#
+species<-"Photeros_EGD"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "dried"#
+#
+fullrow(species, "EGD1", EGD_1, sex, preservation, specloc) -> EGD1f#
+fullrow(species, "EGD3", EGD_3, sex, preservation, specloc) -> EGD3f#
+fullrow(species, "EGD4", EGD_4, sex, preservation, specloc) -> EGD4f#
+fullrow(species, "EGD5", EGD_5, sex, preservation, specloc) -> EGD5f#
+#
+#Now bind all samples together into one large data frame#
+rbind(EGD1f, EGD3f, EGD4f, EGD5f) -> allEGD#
+#
+#***********************************EGD#
+species<-"contragula"#
+sex<-"male"#
+specloc <- "ucsb"#
+#
+fullrow(species, "cont1", Cont_bocas_1, sex, preservation, specloc) -> cont1f#
+fullrow(species, "cont2", Cont_bocas_2, sex, preservation, specloc) -> cont2f#
+fullrow(species, "cont3", Cont_bocas_3, sex, preservation, specloc) -> cont3f#
+#
+#Now bind all samples together into one large data frame#
+rbind(cont1f, cont2f, cont3f) -> allcont#
+#
+#***********************************LLL#
+species<-"LLL"#
+sex<-"male"#
+specloc <- "ucsb"#
+#
+fullrow(species, "LLL1", LLL_1, sex, preservation, specloc) -> LLL1f#
+fullrow(species, "LLL2", LLL_2, sex, preservation, specloc) -> LLL2f#
+fullrow(species, "LLL3", LLL_3, sex, preservation, specloc) -> LLL3f#
+fullrow(species, "LLL4", LLL_4, sex, preservation, specloc) -> LLL4f#
+fullrow(species, "LLL5", LLL_5, sex, preservation, specloc) -> LLL5f#
+#
+rbind(LLL1f, LLL2f, LLL3f, LLL4f, LLL5f) -> allLLL#
+#***********************************MFU#
+species<-"MFU"#
+sex<-"male"#
+specloc <- "ucsb"#
+#
+fullrow(species, "MFU1", MFU_1, sex, preservation, specloc) -> MFU1f#
+fullrow(species, "MFU2", MFU_2, sex, preservation, specloc) -> MFU2f#
+fullrow(species, "MFU3", MFU_3, sex, preservation, specloc) -> MFU3f#
+fullrow(species, "MFU4", MFU_4, sex, preservation, specloc) -> MFU4f#
+fullrow(species, "MFU5", MFU_5, sex, preservation, specloc) -> MFU5f#
+#
+rbind(MFU1f, MFU2f, MFU3f, MFU4f, MFU5f) -> allMFU#
+#
+#***********************************SFM#
+species<-"SFM"#
+sex<-"male"#
+specloc <- "ucsb"#
+#
+fullrow(species, "SFM1", SFM_1, sex, preservation, specloc) -> SFM1f#
+fullrow(species, "SFM2", SFM_2, sex, preservation, specloc) -> SFM2f#
+fullrow(species, "SFM3", SFM_3, sex, preservation, specloc) -> SFM3f#
+fullrow(species, "SFM4", SFM_4, sex, preservation, specloc) -> SFM4f#
+fullrow(species, "SFM5", SFM_5, sex, preservation, specloc) -> SFM5f#
+#
+rbind(SFM1f, SFM2f, SFM3f, SFM4f, SFM5f) -> allSFM#
+#
+#***********************************SFM#
+species<-"SMU"#
+sex<-"male"#
+specloc <- "ucsb"#
+#
+fullrow(species, "SMU1", SMU_1, sex, preservation, specloc) -> SMU1f#
+fullrow(species, "SMU2", SMU_2, sex, preservation, specloc) -> SMU2f#
+fullrow(species, "SMU3", SMU_3, sex, preservation, specloc) -> SMU3f#
+fullrow(species, "SMU4", SMU_4, sex, preservation, specloc) -> SMU4f#
+fullrow(species, "SMU5", SMU_5, sex, preservation, specloc) -> SMU5f#
+#
+rbind(SMU1f, SMU2f, SMU3f, SMU4f, SMU5f) -> allSMU#
+#***********************************SFM#
+species<-"Kornickeria_hastingsi"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "dried"#
+fullrow(species, "Khas1", Khas1, sex, preservation, specloc) -> Khas1f#
+preservation <- "live"#
+fullrow(species, "Khas2", Khas2, sex, preservation, specloc) -> Khas2f#
+fullrow(species, "Khas3", Khas3, sex, preservation, specloc) -> Khas3f#
+#
+rbind(Khas1f,Khas2f,Khas3f) -> allKhas#
+#onering#
+rbind(allEGD,allcont,allLLL, allMFU, allSFM, allSMU, allKhas) -> alldata#
+alldata
+workingdir <- "1-23-2017/MSH"#
+setwd(paste0(rootdir,workingdir))#
+graphEmission(  "MSHlive1.asc", background, calibration,20,TRUE) -> MSH_1;#
+graphEmission(  "MSHlive2.asc", background, calibration,20,TRUE) -> MSH_2;#
+graphEmission(  "MSHlive3.asc", background, calibration,20,TRUE) -> MSH_3;#
+graphEmission(  "MSHlive4.asc", background, calibration,20,TRUE) -> MSH_4;#
+graphEmission(  "MSHlive5.asc", background, calibration,20,TRUE) -> MSH_5;
+graphEmission(  "MSHlive1.asc", background, calibration,20,TRUE) -> MSH_1;
+graphEmission(  "MSHlive2.asc", background, calibration,20,TRUE) -> MSH_2;
+graphEmission(  "MSHlive3.asc", background, calibration,20,TRUE) -> MSH_3;
+graphEmission(  "MSHlive4.asc", background, calibration,20,TRUE) -> MSH_4;
+graphEmission(  "MSHlive5.asc", background, calibration,20,TRUE) -> MSH_5;
+#***********************************Maristella chicoi#
+species<-"Maristella_chicoi"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+fullrow(species, "MSH1", MSH1, sex, preservation, specloc) -> MSH1f#
+fullrow(species, "MSH2", MSH2, sex, preservation, specloc) -> MSH2f#
+fullrow(species, "MSH3", MSH3, sex, preservation, specloc) -> MSH3f#
+fullrow(species, "MSH4", MSH4, sex, preservation, specloc) -> MSH4f#
+fullrow(species, "MSH5", MSH5, sex, preservation, specloc) -> MSH5f#
+#
+rbind(MSH1f,MSH2f,MSH3f,MSH4f,MSH5f) -> allMSH
+allMSH
+alldata
+#onering#
+rbind(allEGD,allcont,allLLL, allMFU, allSFM, allSMU, allKhas, allMSH) -> alldata#
+alldata
+alldata
+#First remove runs where signal:noise is too low#
+#a <- subset(alldata, x < 0.02 | replicate=="Cn" | replicate=="Pg")#
+a <- subset(alldata, error < 0.02 )#
+aggregate(a[, 6:7], list(a$species), mean) -> means#
+means
+a <- subset(alldata, error < 0.02)#
+#
+p <- qplot(species, sgMax, data=a, geom=c("boxplot", "jitter"), colour=factor(species))#
+p + scale_colour_manual(values=c("#0071ff","#005cff","#007bff","#007fff","#007bff","#007fff","#0084ff","#009cff","#0097ff","#0097ff","#00a5ff","#00aeff")) + theme_bw()
+#Figure X - Box plot of all fwhm of species#
+p<-'clear'#
+require(ggplot2)#
+#a <- subset(alldata, error < 0.02 | replicate=="Cn" | replicate=="Pg")#
+a <- subset(alldata, error < 0.02)#
+#
+p <- qplot(species, sgfwhm, data=a, geom=c("boxplot", "jitter"))#
+p  + theme_bw()
+graphEmission(  "PmoriniLive1.asc", background, calibration,20,TRUE) -> Pmor_1;
+workingdir <- "1-23-2017/Pmor"#
+setwd(paste0(rootdir,workingdir))
+workingdir <- "1-23-2017/Pmorini"
+setwd(paste0(rootdir,workingdir))
+graphEmission(  "PmoriniLive1.asc", background, calibration,20,TRUE) -> Pmor_1;
+graphEmission(  "PmoriniLive2.asc", background, calibration,20,TRUE) -> Pmor_2;
+graphEmission(  "PmoriniLive3.asc", background, calibration,20,TRUE) -> Pmor_3;
+graphEmission(  "PmoriniLive4.asc", background, calibration,20,TRUE) -> Pmor_4;
+graphEmission(  "PmoriniLive5.asc", background, calibration,20,TRUE) -> Pmor_5;
+graphEmission(  "PmoriniLive4.asc", background, calibration,20,TRUE) -> Pmor_4;
+graphEmission(  "PmoriniLive5.asc", background, calibration,20,TRUE) -> Pmor_5;
+#A function to plot raw data (datafile), selecting just one sampling point (column). Note column#
+#1 is wavelength.#
+#This may be used to check for saturation of sensor visually#
+plot1sample <- function(datafile, column) {#
+	rawdata <- read.table(datafile);#
+	plot(rawdata[,1], rawdata[,column])#
+}
+plot1sample("PmoriniLive4.asc", V2)
+plot1sample("PmoriniLive4.asc", 2)
+plot1sample("PmoriniLive4.asc", 1)
+plot1sample("PmoriniLive4.asc", 3)
+plot1sample("PmoriniLive4.asc", 4)
+plot1sample("PmoriniLive4.asc", 5)
+plot1sample("PmoriniLive4.asc", 6)
+plot1sample("PmoriniLive4.asc", 7)
+plot1sample("PmoriniLive4.asc", 8)
+plot1sample("PmoriniLive4.asc", 9)
+plot1sample("PmoriniLive4.asc", 10)
+plot1sample("PmoriniLive4.asc", 11)
+plot1sample("PmoriniLive4.asc", 12)
+plot1sample("PmoriniLive4.asc", 13)
+plot1sample("PmoriniLive4.asc", 14)
+plot1sample("PmoriniLive4.asc", 15)
+plot1sample("PmoriniLive4.asc", 16)
+plot1sample("PmoriniLive4.asc", 17)
+plot1sample("PmoriniLive4.asc", 18)
+plot1sample("PmoriniLive4.asc", 19)
+plot1sample("PmoriniLive4.asc", 20)
+plot1sample("PmoriniLive4.asc", 21)
+plot1sample("PmoriniLive4.asc", 22)
+graphEmission(  "PmoriniLive4.asc", background, calibration,20,TRUE) -> Pmor_4;
+graphEmission(  "PmoriniLive5.asc", background, calibration,20,TRUE) -> Pmor_5;
+plot1sample("PmoriniLive5.asc", 2)
+plot1sample("PmoriniLive5.asc", 3)
+plot1sample("PmoriniLive5.asc", 4)
+plot1sample("PmoriniLive5.asc", 5)
+read.table(file="PmoriniLive5.asc")
+read.table(file="PmoriniLive5.asc") -> rawdata
+write.table(file="Pmorini5remax.txt")
+write.table(rawdata, file="Pmorini5remax.txt")
+graphEmission(  "Pmorini5remax.txt", background, calibration,20,TRUE) -> Pmor_5;
+graphEmission(  "Pmorini5remax.txt", background, calibration,17,TRUE) -> Pmor_5;
+graphEmission(  "Pmorini5remax.txt", background, calibration,17,TRUE) -> Pmor_5; #first 3 maxed sensor, removed
+graphEmission(  "PmoriniLive4.asc", background, calibration,20,TRUE) -> Pmor_4;
+graphEmission(  "PmoriniLive1.asc", background, calibration,20,TRUE) -> Pmor_1;
+graphEmission(  "PmoriniLive4.asc", background, calibration,20,TRUE) -> Pmor_4;
+#***********************************Photeros morini#
+species<-"Photeros_morini"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+fullrow(species, "Pmor1", Pmor1, sex, preservation, specloc) -> Pmor1f#
+fullrow(species, "Pmor2", Pmor2, sex, preservation, specloc) -> Pmor2f#
+fullrow(species, "Pmor3", Pmor3, sex, preservation, specloc) -> Pmor3f#
+fullrow(species, "Pmor4", Pmor4, sex, preservation, specloc) -> Pmor4f#
+fullrow(species, "Pmor5", Pmor5, sex, preservation, specloc) -> Pmor5f#
+#
+rbind(Pmor1f,Pmor2f,Pmor3f,Pmor4f,Pmor5f) -> allPmor#
+#onering#
+rbind(allEGD,allcont,allLLL, allMFU, allSFM, allSMU, allKhas, allMSH, allPmor) -> alldata#
+alldata
+graphEmission(  "PmoriniLive3.asc", background, calibration,20,TRUE) -> Pmor_3;
+graphEmission(  "PmoriniLive4.asc", background, calibration,20,TRUE) -> Pmor_4;
+alldata
+#Table 1 - lmax and fwhm for all species studied#
+#
+#First remove runs where signal:noise is too low#
+#a <- subset(alldata, x < 0.02 | replicate=="Cn" | replicate=="Pg")#
+a <- subset(alldata, error < 0.02 )#
+aggregate(a[, 6:7], list(a$species), mean) -> means#
+means
+#***********************************Photeros morini#
+species<-"Photeros_morini"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+fullrow(species, "Pmor1", Pmor1, sex, preservation, specloc) -> Pmor1f#
+fullrow(species, "Pmor2", Pmor2, sex, preservation, specloc) -> Pmor2f#
+fullrow(species, "Pmor3", Pmor3, sex, preservation, specloc) -> Pmor3f#
+fullrow(species, "Pmor4", Pmor4, sex, preservation, specloc) -> Pmor4f#
+fullrow(species, "Pmor5", Pmor5, sex, preservation, specloc) -> Pmor5f#
+#
+rbind(Pmor1f,Pmor2f,Pmor3f,Pmor4f,Pmor5f) -> allPmor#
+#onering#
+rbind(allEGD,allcont,allLLL, allMFU, allSFM, allSMU, allKhas, allMSH, allPmor) -> alldata#
+alldata
+rbind(Pmor1f,Pmor2f,Pmor3f,Pmor4f,Pmor5f) -> allPmor
+species<-"Photeros_morini"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+fullrow(species, "Pmor1", Pmor1, sex, preservation, specloc) -> Pmor1f#
+fullrow(species, "Pmor2", Pmor2, sex, preservation, specloc) -> Pmor2f#
+fullrow(species, "Pmor3", Pmor3, sex, preservation, specloc) -> Pmor3f#
+fullrow(species, "Pmor4", Pmor4, sex, preservation, specloc) -> Pmor4f#
+fullrow(species, "Pmor5", Pmor5, sex, preservation, specloc) -> Pmor5f
+#***********************************Maristella chicoi#
+species<-"Maristella_chicoi"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+fullrow(species, "MSH1", MSH_1, sex, preservation, specloc) -> MSH1f#
+fullrow(species, "MSH2", MSH_2, sex, preservation, specloc) -> MSH2f#
+fullrow(species, "MSH3", MSH_3, sex, preservation, specloc) -> MSH3f#
+fullrow(species, "MSH4", MSH_4, sex, preservation, specloc) -> MSH4f#
+fullrow(species, "MSH5", MSH_5, sex, preservation, specloc) -> MSH5f#
+#
+rbind(MSH1f,MSH2f,MSH3f,MSH4f,MSH5f) -> allMSH#
+#
+#***********************************Photeros morini#
+species<-"Photeros_morini"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+fullrow(species, "Pmor1", Pmor_1, sex, preservation, specloc) -> Pmor1f#
+fullrow(species, "Pmor2", Pmor_2, sex, preservation, specloc) -> Pmor2f#
+fullrow(species, "Pmor3", Pmor_3, sex, preservation, specloc) -> Pmor3f#
+fullrow(species, "Pmor4", Pmor_4, sex, preservation, specloc) -> Pmor4f#
+fullrow(species, "Pmor5", Pmor_5, sex, preservation, specloc) -> Pmor5f#
+#
+rbind(Pmor1f,Pmor2f,Pmor3f,Pmor4f,Pmor5f) -> allPmor
+#onering#
+rbind(allEGD,allcont,allLLL, allMFU, allSFM, allSMU, allKhas, allMSH, allPmor) -> alldata#
+alldata
+#Table 1 - lmax and fwhm for all species studied#
+#
+#First remove runs where signal:noise is too low#
+#a <- subset(alldata, x < 0.02 | replicate=="Cn" | replicate=="Pg")#
+a <- subset(alldata, error < 0.02 )#
+aggregate(a[, 6:7], list(a$species), mean) -> means#
+means
+#Figure X - Box plot of all lmax of species#
+require(ggplot2)#
+#a <- subset(alldata, error < 0.02 | replicate=="Cn" | replicate=="Pg")#
+a <- subset(alldata, error < 0.02)#
+#
+p <- qplot(species, sgMax, data=a, geom=c("boxplot", "jitter"), colour=factor(species))#
+p + scale_colour_manual(values=c("#0071ff","#005cff","#007bff","#007fff","#007bff","#007fff","#0084ff","#009cff","#0097ff","#0097ff","#00a5ff","#00aeff")) + theme_bw() #
+#colors set by mean
+#SVD-------------------------------------------------------------#
+workingdir <- "1-23-2017/SVD"#
+setwd(paste0(rootdir,workingdir))#
+graphEmission(  "SVDLive1.asc", background, calibration,20,TRUE) -> SVD_1;#
+graphEmission(  "SVDLive2.asc", background, calibration,20,TRUE) -> SVD_2;#
+graphEmission(  "SVDLive3.asc", background, calibration,20,TRUE) -> SVD_3;#
+graphEmission(  "SVDLive4.asc", background, calibration,20,TRUE) -> SVD_4;#
+graphEmission(  "SVDLive5.asc", background, calibration,20,TRUE) -> SVD_5;
+graphEmission(  "SVDLive1.asc", background, calibration,20,TRUE) -> SVD_1;
+graphEmission(  "SVDLive2.asc", background, calibration,20,TRUE) -> SVD_2;
+graphEmission(  "SVDLive3.asc", background, calibration,20,TRUE) -> SVD_3;
+graphEmission(  "SVDLive4.asc", background, calibration,20,TRUE) -> SVD_4;
+graphEmission(  "SVDLive5.asc", background, calibration,20,TRUE) -> SVD_5;
+#***********************************SVD#
+species<-"Maristella_SVD"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+fullrow(species, "SVD1", SVD_1, sex, preservation, specloc) -> SVD1f#
+fullrow(species, "SVD2", SVD_2, sex, preservation, specloc) -> SVD2f#
+fullrow(species, "SVD3", SVD_3, sex, preservation, specloc) -> SVD3f#
+fullrow(species, "SVD4", SVD_4, sex, preservation, specloc) -> SVD4f#
+fullrow(species, "SVD5", SVD_5, sex, preservation, specloc) -> SVD5f#
+#
+rbind(SVD1f,SVD2f,SVD3f,SVD4f,SVD5f) -> allSVD#
+#onering#
+rbind(allEGD,allcont,allLLL, allMFU, allSFM, allSMU, allKhas, allMSH, allPmor, allSVD) -> alldata#
+alldata
+#Figure X - Box plot of all lmax of species#
+require(ggplot2)#
+#a <- subset(alldata, error < 0.02 | replicate=="Cn" | replicate=="Pg")#
+a <- subset(alldata, error < 0.02)#
+#
+p <- qplot(species, sgMax, data=a, geom=c("boxplot", "jitter"), colour=factor(species))#
+p + scale_colour_manual(values=c("#0071ff","#005cff","#007bff","#007fff","#007bff","#007fff","#0084ff","#009cff","#0097ff","#0097ff","#00a5ff","#00aeff")) + theme_bw() #
+#colors set by mean
+#Table 1 - lmax and fwhm for all species studied#
+#
+#First remove runs where signal:noise is too low#
+#a <- subset(alldata, x < 0.02 | replicate=="Cn" | replicate=="Pg")#
+a <- subset(alldata, error < 0.02 )#
+aggregate(a[, 6:7], list(a$species), mean) -> means#
+means
+#SVU-------------------------------------------------------------#
+workingdir <- "1-23-2017/SVU"#
+setwd(paste0(rootdir,workingdir))
+graphEmission(  "SVULive1.asc", background, calibration,20,TRUE) -> SVU_1;
+graphEmission(  "SVULive2.asc", background, calibration,20,TRUE) -> SVU_2;
+graphEmission(  "SVULive3.asc", background, calibration,20,TRUE) -> SVU_3;
+graphEmission(  "SVULive4.asc", background, calibration,20,TRUE) -> SVU_4;
+graphEmission(  "SVULive5.asc", background, calibration,20,TRUE) -> SVU_5;
+plot1sample("SVULive5.asc", 2)
+plot1sample("SVULive5.asc", 3)
+plot1sample("SVULive5.asc", 4)
+plot1sample("SVULive5.asc", 5)
+plot1sample("SVULive5.asc", 6)
+read.table(file="SVULive5.asc")
+read.table(file="SVULive5.asc") -> rawdata
+write.table(rawdata, file="SVUremax5.txt")
+#SVU-------------------------------------------------------------#
+workingdir <- "1-23-2017/SVU"#
+setwd(paste0(rootdir,workingdir))#
+graphEmission(  "SVULive1.asc", background, calibration,20,TRUE) -> SVU_1;#
+graphEmission(  "SVULive2.asc", background, calibration,20,TRUE) -> SVU_2;#
+graphEmission(  "SVULive3.asc", background, calibration,20,TRUE) -> SVU_3;#
+graphEmission(  "SVULive4.asc", background, calibration,20,TRUE) -> SVU_4;#
+graphEmission(  "SVUremax5.asc", background, calibration,16,TRUE) -> SVU_5;	#first 4 maxed sensor, removed
+#***********************************SVD#
+species<-"Maristella_SVU"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+fullrow(species, "SVU1", SVU_1, sex, preservation, specloc) -> SVU1f#
+fullrow(species, "SVU2", SVU_2, sex, preservation, specloc) -> SVU2f#
+fullrow(species, "SVU3", SVU_3, sex, preservation, specloc) -> SVU3f#
+fullrow(species, "SVU4", SVU_4, sex, preservation, specloc) -> SVU4f#
+fullrow(species, "SVU5", SVU_5, sex, preservation, specloc) -> SVU5f#
+#
+rbind(SVU1f,SVU2f,SVU3f,SVU4f,SVU5f) -> allSVU#
+#onering#
+rbind(allEGD,allcont,allLLL, allMFU, allSFM, allSMU, allKhas, allMSH, allPmor, allSVD, allSVU) -> alldata#
+alldata
+fullrow(species, "SVU5", SVU_5, sex, preservation, specloc) -> SVU5f
+SVU5f
+graphEmission(  "SVUremax5.asc", background, calibration,16,TRUE) -> SVU_5;	#first 4 maxed sensor, removed
+graphEmission(  "SVUremax5.txt", background, calibration,16,TRUE) -> SVU_5;	#first 4 maxed sensor, removed
+workingdir <- "1-23-2017/SVU"#
+setwd(paste0(rootdir,workingdir))#
+graphEmission(  "SVULive1.asc", background, calibration,20,TRUE) -> SVU_1;#
+graphEmission(  "SVULive2.asc", background, calibration,20,TRUE) -> SVU_2;#
+graphEmission(  "SVULive3.asc", background, calibration,20,TRUE) -> SVU_3;#
+graphEmission(  "SVULive4.asc", background, calibration,20,TRUE) -> SVU_4;#
+graphEmission(  "SVUremax5.txt", background, calibration,16,TRUE) -> SVU_5;	#first 4 maxed sensor, removed
+rbind(SVU1f,SVU2f,SVU3f,SVU4f,SVU5f) -> allSVU
+#onering#
+rbind(allEGD,allcont,allLLL, allMFU, allSFM, allSMU, allKhas, allMSH, allPmor, allSVD, allSVU) -> alldata#
+alldata
+fullrow(species, "SVU5", SVU_5, sex, preservation, specloc) -> SVU5f
+graphEmission(  "SVUremax5.txt", background, calibration,16,TRUE) -> SVU_5;	#first 4 maxed sensor, removed
+graphEmission(  "SVULive4.asc", background, calibration,20,TRUE) -> SVU_4;
+graphEmission(  "SVUremax5.txt", background, calibration,16,TRUE) -> SVU_5;	#first 4 maxed sensor, removed
+#Table 1 - lmax and fwhm for all species studied#
+#
+#First remove runs where signal:noise is too low#
+#a <- subset(alldata, x < 0.02 | replicate=="Cn" | replicate=="Pg")#
+a <- subset(alldata, error < 0.02 )#
+aggregate(a[, 6:7], list(a$species), mean) -> means#
+means
+#Figure X - Box plot of all lmax of species#
+require(ggplot2)#
+#a <- subset(alldata, error < 0.02 | replicate=="Cn" | replicate=="Pg")#
+a <- subset(alldata, error < 0.02)#
+#
+p <- qplot(species, sgMax, data=a, geom=c("boxplot", "jitter"), colour=factor(species))#
+p + scale_colour_manual(values=c("#0071ff","#005cff","#007bff","#007fff","#007bff","#007fff","#0084ff","#009cff","#0097ff","#0097ff","#00a5ff","#00aeff")) + theme_bw() #
+#colors set by mean
+rbind(SVU1f,SVU2f,SVU3f,SVU4f,SVU5f) -> allSVU
+allSVU
+species<-"Maristella_SVU"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+fullrow(species, "SVU1", SVU_1, sex, preservation, specloc) -> SVU1f#
+fullrow(species, "SVU2", SVU_2, sex, preservation, specloc) -> SVU2f#
+fullrow(species, "SVU3", SVU_3, sex, preservation, specloc) -> SVU3f#
+fullrow(species, "SVU4", SVU_4, sex, preservation, specloc) -> SVU4f#
+fullrow(species, "SVU5", SVU_5, sex, preservation, specloc) -> SVU5f#
+#
+rbind(SVU1f,SVU2f,SVU3f,SVU4f,SVU5f) -> allSVU#
+#onering#
+rbind(allEGD,allcont,allLLL, allMFU, allSFM, allSMU, allKhas, allMSH, allPmor, allSVD, allSVU) -> alldata#
+alldata
+#Table 1 - lmax and fwhm for all species studied#
+#
+#First remove runs where signal:noise is too low#
+#a <- subset(alldata, x < 0.02 | replicate=="Cn" | replicate=="Pg")#
+a <- subset(alldata, error < 0.02 )#
+aggregate(a[, 6:7], list(a$species), mean) -> means#
+means
+#Figure X - Box plot of all lmax of species#
+require(ggplot2)#
+#a <- subset(alldata, error < 0.02 | replicate=="Cn" | replicate=="Pg")#
+a <- subset(alldata, error < 0.02)#
+#
+p <- qplot(species, sgMax, data=a, geom=c("boxplot", "jitter"), colour=factor(species))#
+p + scale_colour_manual(values=c("#0071ff","#005cff","#007bff","#007fff","#007bff","#007fff","#0084ff","#009cff","#0097ff","#0097ff","#00a5ff","#00aeff")) + theme_bw() #
+#colors set by mean
+#Figure X - Box plot of all lmax of species#
+require(ggplot2)#
+#a <- subset(alldata, error < 0.02 | replicate=="Cn" | replicate=="Pg")#
+a <- subset(alldata, error < 0.02)#
+#
+p <- qplot(species, sgMax, data=a, geom=c("boxplot", "jitter"), colour=factor(species))#
+p + scale_colour_manual(values=c("#0071ff","#005cff","#007bff","#007fff","#007bff","#007fff","#0084ff","#009cff","#0097ff","#0097ff","#00a5ff","#00aeff")) + theme_bw()
+#Table 1 - lmax and fwhm for all species studied#
+#
+#First remove runs where signal:noise is too low#
+#a <- subset(alldata, x < 0.02 | replicate=="Cn" | replicate=="Pg")#
+a <- subset(alldata, error < 0.02 )#
+aggregate(a[, 6:7], list(a$species), mean) -> means#
+means
+workingdir <- "1-23-2017/Vhil_standard"#
+setwd(paste0(rootdir,workingdir))#
+graphEmission(  "VhilgendorfiiDry.asc", background, calibration,20,TRUE) -> Vhil012317_1;#
+graphEmission(  "VhilgendorfiiDry2.asc", background, calibration,20,TRUE) -> Vhil012317_2;#
+graphEmission(  "VhilgendorfiiDry3.asc", background, calibration,20,TRUE) -> Vhil012317_3;
+graphEmission(  "VhilgendorfiiDry.asc", background, calibration,20,TRUE) -> Vhil012317_1;
+graphEmission(  "VhilgendorfiiDry2.asc", background, calibration,20,TRUE) -> Vhil012317_2;
+graphEmission(  "VhilgendorfiiDry3.asc", background, calibration,20,TRUE) -> Vhil012317_3;
+#Vargula hilgendorfii control-------------------------------------------------------------#
+workingdir <- "1-23-2017/Vhil_standard"#
+setwd(paste0(rootdir,workingdir))#
+graphEmission(  "VhilgendorfiiDry.asc", background, calibration,20,TRUE) -> Vhil012317_1;#
+graphEmission(  "VhilgendorfiiDry2.asc", background, calibration,20,TRUE) -> Vhil012317_2;#
+graphEmission(  "VhilgendorfiiDry3.asc", background, calibration,20,TRUE) -> Vhil012317_3;
+species<-"Vargula_hilgendorfii"#
+sex<-"unknown"#
+specloc <- "ucsb"#
+preservation <- "dried"#
+fullrow(species, "Vhil0123171", Vhil012317_1, sex, preservation, specloc) -> Vhil0123171f#
+fullrow(species, "Vhil0123172", Vhil012317_2, sex, preservation, specloc) -> Vhil0123172f#
+fullrow(species, "Vhil0123173", Vhil012317_3, sex, preservation, specloc) -> Vhil0123173f#
+#
+rbind(Vhil0123171f, Vhil0123172f, Vhil0123173f) -> allVhil012317
+allVhil012317
+#***********************************Vargula hilgendorfii#
+species<-"Vargula_hilgendorfii"#
+sex<-"unknown"#
+specloc <- "ucsb"#
+preservation <- "dried"#
+fullrow(species, "Vhil0123171", Vhil012317_1, sex, preservation, specloc) -> Vhil0123171f#
+fullrow(species, "Vhil0123172", Vhil012317_2, sex, preservation, specloc) -> Vhil0123172f#
+fullrow(species, "Vhil0123173", Vhil012317_3, sex, preservation, specloc) -> Vhil0123173f#
+#
+rbind(Vhil0123171f, Vhil0123172f, Vhil0123173f) -> allVhil012317#
+#onering#
+rbind(allEGD,allcont,allLLL, allMFU, allSFM, allSMU, allKhas, allMSH, allPmor, allSVD, allSVU, allVhil012317) -> alldata#
+alldata
+#Table 1 - lmax and fwhm for all species studied#
+#
+#First remove runs where signal:noise is too low#
+#a <- subset(alldata, x < 0.02 | replicate=="Cn" | replicate=="Pg")#
+a <- subset(alldata, error < 0.02 )#
+aggregate(a[, 6:7], list(a$species), mean) -> means#
+means
+#Figure X - Box plot of all lmax of species#
+require(ggplot2)#
+#a <- subset(alldata, error < 0.02 | replicate=="Cn" | replicate=="Pg")#
+a <- subset(alldata, error < 0.02)#
+#
+p <- qplot(species, sgMax, data=a, geom=c("boxplot", "jitter"), colour=factor(species))#
+p + scale_colour_manual(values=c("#0071ff","#005cff","#007bff","#007fff","#007bff","#007fff","#0084ff","#009cff","#0097ff","#0097ff","#00a5ff","#00aeff")) + theme_bw() #
+#colors set by mean
+par(mfrow=c(4,4))#
+graphEmission("GPH/GPH_1_05sec_x10x1sp_live_sig.asc", "GPH/GPH_1_05sec_x10x1sp_live_bgd.asc", "correction factor.txt") -> GPH1;#
+graphEmission("GPH/GPH_2_05sec_x10x1sp_live_sig.asc", "GPH/GPH_2_05sec_x10x1sp_live_bgd.asc", "correction factor.txt") -> GPH2;#
+graphEmission("GPH/GPH_3_05sec_x10x1sp_live_sig.asc", "GPH/GPH_3_05sec_x10x1sp_live_bgd.asc", "correction factor.txt") -> GPH3;#
+graphEmission("GPH/GPH_4_05sec_x10x1sp_live_sig.asc", "GPH/GPH_4_05sec_x10x1sp_live_bgd.asc", "correction factor.txt") -> GPH4;#
+graphEmission("GPH/GPH_5_05sec_x10x1sp_live_sig.asc", "GPH/GPH_5_05sec_x10x1sp_live_bgd.asc", "correction factor.txt") -> GPH5;#
+graphEmission("GPH/GPH_6_05sec_x10x1sp_live_sig.asc", "GPH/GPH_6_05sec_x10x1sp_live_bgd.asc", "correction factor.txt") -> GPH6;#
+graphEmission("GPH/GPH_7_05sec_x10x1sp_live_sig.asc", "GPH/GPH_7_05sec_x10x1sp_live_bgd.asc", "correction factor.txt") -> GPH7;#
+graphEmission("GPH/GPH_8_05sec_x10x1sp_live_sig.asc", "GPH/GPH_8_05sec_x10x1sp_live_bgd.asc", "correction factor.txt") -> GPH8;
+graphEmission("GPH_1_05sec_x10x1sp_live_sig.asc", background, calibration,20,TRUE) -> GPH_1;
+workingdir <- "6-08-2016/GPH"#
+#
+background <- "../GPH_1_05sec_x10x1sp_live_bgd.asc";#
+calibration <- "../correction factor.txt"#
+#
+graphEmission("GPH_1_05sec_x10x1sp_live_sig.asc", background, calibration,10,TRUE) -> GPH_1;
+rootdir <- "~/Desktop/Color_Variation/Raw Data/"
+setwd(rootdir)
+#####Roatan data June 2016 carried live from field#
+workingdir <- "6-08-2016/GPH"#
+#
+background <- "../GPH_1_05sec_x10x1sp_live_bgd.asc";#
+calibration <- "../correction factor.txt"
+graphEmission("GPH_1_05sec_x10x1sp_live_sig.asc", background, calibration,10,TRUE) -> GPH_1;
+dir()
+workingdir <- "6-08-2016/GPH"
+workingdir <- "6-08-2016/GPH"#
+setwd(paste0(rootdir,workingdir))
+background <- "../GPH_1_05sec_x10x1sp_live_bgd.asc";#
+calibration <- "../correction factor.txt"#
+#
+graphEmission("GPH_1_05sec_x10x1sp_live_sig.asc", background, calibration,10,TRUE) -> GPH_1;
+workingdir <- "6-08-2016/GPH"#
+setwd(paste0(rootdir,workingdir))#
+#
+background <- "GPH_1_05sec_x10x1sp_live_bgd.asc";#
+calibration <- "../correction factor.txt"#
+#
+graphEmission("GPH_1_05sec_x10x1sp_live_sig.asc", background, calibration,10,TRUE) -> GPH_1;
+graphEmission("GPH_2_05sec_x10x1sp_live_sig.asc", "GPH_2_05sec_x10x1sp_live_bgd.asc", calibration,10,TRUE) -> GPH_2;
+graphEmission("GPH_3_05sec_x10x1sp_live_sig.asc", "GPH_3_05sec_x10x1sp_live_bgd.asc", calibration,10,TRUE) -> GPH_3;
+graphEmission("GPH_4_05sec_x10x1sp_live_sig.asc", "GPH_4_05sec_x10x1sp_live_bgd.asc", calibration,10,TRUE) -> GPH_4;
+graphEmission("GPH_5_05sec_x10x1sp_live_sig.asc", "GPH_5_05sec_x10x1sp_live_bgd.asc", calibration,10,TRUE) -> GPH_5;
+graphEmission("GPH_6_05sec_x10x1sp_live_sig.asc", "GPH_6_05sec_x10x1sp_live_bgd.asc", calibration,10,TRUE) -> GPH_6;
+graphEmission("GPH_7_05sec_x10x1sp_live_sig.asc", "GPH_7_05sec_x10x1sp_live_bgd.asc", calibration,10,TRUE) -> GPH_7;
+graphEmission("GPH_8_05sec_x10x1sp_live_sig.asc", "GPH_8_05sec_x10x1sp_live_bgd.asc", calibration,10,TRUE) -> GPH_8;
+workingdir <- "6-08-2016/GPH"#
+setwd(paste0(rootdir,workingdir))#
+#
+background <- "GPH_1_05sec_x10x1sp_live_bgd.asc"; #obtained background for each spectrum#
+calibration <- "../correction factor.txt"#
+#
+graphEmission("GPH_1_05sec_x10x1sp_live_sig.asc", "GPH_1_05sec_x10x1sp_live_bgd.asc", calibration,10,TRUE) -> GPH_1;#
+graphEmission("GPH_2_05sec_x10x1sp_live_sig.asc", "GPH_2_05sec_x10x1sp_live_bgd.asc", calibration,10,TRUE) -> GPH_2;#
+graphEmission("GPH_3_05sec_x10x1sp_live_sig.asc", "GPH_3_05sec_x10x1sp_live_bgd.asc", calibration,10,TRUE) -> GPH_3;#
+graphEmission("GPH_4_05sec_x10x1sp_live_sig.asc", "GPH_4_05sec_x10x1sp_live_bgd.asc", calibration,10,TRUE) -> GPH_4;#
+graphEmission("GPH_5_05sec_x10x1sp_live_sig.asc", "GPH_5_05sec_x10x1sp_live_bgd.asc", calibration,10,TRUE) -> GPH_5;#
+graphEmission("GPH_6_05sec_x10x1sp_live_sig.asc", "GPH_6_05sec_x10x1sp_live_bgd.asc", calibration,10,TRUE) -> GPH_6;#
+graphEmission("GPH_7_05sec_x10x1sp_live_sig.asc", "GPH_7_05sec_x10x1sp_live_bgd.asc", calibration,10,TRUE) -> GPH_7;#
+graphEmission("GPH_8_05sec_x10x1sp_live_sig.asc", "GPH_8_05sec_x10x1sp_live_bgd.asc", calibration,10,TRUE) -> GPH_8;
+#***********************************GPH#
+species<-"GPH"#
+sex<-"male"#
+specloc <- "ucsb"#
+#
+fullrow(species, "GPH1", GPH_1, sex, preservation, specloc) -> GPH1f#
+fullrow(species, "GPH2", GPH_2, sex, preservation, specloc) -> GPH2f#
+fullrow(species, "GPH3", GPH_3, sex, preservation, specloc) -> GPH3f#
+fullrow(species, "GPH4", GPH_4, sex, preservation, specloc) -> GPH4f#
+fullrow(species, "GPH5", GPH_5, sex, preservation, specloc) -> GPH5f#
+fullrow(species, "GPH6", GPH_6, sex, preservation, specloc) -> GPH6f#
+fullrow(species, "GPH7", GPH_7, sex, preservation, specloc) -> GPH7f#
+fullrow(species, "GPH8", GPH_8, sex, preservation, specloc) -> GPH8f#
+#
+rbind(GPH1f, GPH2f, GPH3f, GPH4f, GPH5f, GPH6f, GPH7f, GPH8f) -> allGPH
+rbind(allEGD,allcont,allLLL, allMFU, allSFM, allSMU, allKhas, allMSH, allPmor, allSVD, allSVU, allVhil012317, allGPH) -> alldata
+alldata
+species<-"GPH"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+#
+fullrow(species, "GPH1", GPH_1, sex, preservation, specloc) -> GPH1f#
+fullrow(species, "GPH2", GPH_2, sex, preservation, specloc) -> GPH2f#
+fullrow(species, "GPH3", GPH_3, sex, preservation, specloc) -> GPH3f#
+fullrow(species, "GPH4", GPH_4, sex, preservation, specloc) -> GPH4f#
+fullrow(species, "GPH5", GPH_5, sex, preservation, specloc) -> GPH5f#
+fullrow(species, "GPH6", GPH_6, sex, preservation, specloc) -> GPH6f#
+fullrow(species, "GPH7", GPH_7, sex, preservation, specloc) -> GPH7f#
+fullrow(species, "GPH8", GPH_8, sex, preservation, specloc) -> GPH8f#
+#
+rbind(GPH1f, GPH2f, GPH3f, GPH4f, GPH5f, GPH6f, GPH7f, GPH8f) -> allGPH
+allGPH
+species<-"Photeros_GPH"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+#
+fullrow(species, "GPH1", GPH_1, sex, preservation, specloc) -> GPH1f#
+fullrow(species, "GPH2", GPH_2, sex, preservation, specloc) -> GPH2f#
+fullrow(species, "GPH3", GPH_3, sex, preservation, specloc) -> GPH3f#
+fullrow(species, "GPH4", GPH_4, sex, preservation, specloc) -> GPH4f#
+fullrow(species, "GPH5", GPH_5, sex, preservation, specloc) -> GPH5f#
+fullrow(species, "GPH6", GPH_6, sex, preservation, specloc) -> GPH6f#
+fullrow(species, "GPH7", GPH_7, sex, preservation, specloc) -> GPH7f#
+fullrow(species, "GPH8", GPH_8, sex, preservation, specloc) -> GPH8f#
+#
+rbind(GPH1f, GPH2f, GPH3f, GPH4f, GPH5f, GPH6f, GPH7f, GPH8f) -> allGPH
+#First remove runs where signal:noise is too low#
+#a <- subset(alldata, x < 0.02 | replicate=="Cn" | replicate=="Pg")#
+a <- subset(alldata, error < 0.02 )#
+aggregate(a[, 6:7], list(a$species), mean) -> means#
+means
+species<-"Photeros_GPH"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+#
+fullrow(species, "GPH1", GPH_1, sex, preservation, specloc) -> GPH1f#
+fullrow(species, "GPH2", GPH_2, sex, preservation, specloc) -> GPH2f#
+fullrow(species, "GPH3", GPH_3, sex, preservation, specloc) -> GPH3f#
+fullrow(species, "GPH4", GPH_4, sex, preservation, specloc) -> GPH4f#
+fullrow(species, "GPH5", GPH_5, sex, preservation, specloc) -> GPH5f#
+fullrow(species, "GPH6", GPH_6, sex, preservation, specloc) -> GPH6f#
+fullrow(species, "GPH7", GPH_7, sex, preservation, specloc) -> GPH7f#
+fullrow(species, "GPH8", GPH_8, sex, preservation, specloc) -> GPH8f#
+#
+rbind(GPH1f, GPH2f, GPH3f, GPH4f, GPH5f, GPH6f, GPH7f, GPH8f) -> allGPH
+#First remove runs where signal:noise is too low#
+#a <- subset(alldata, x < 0.02 | replicate=="Cn" | replicate=="Pg")#
+a <- subset(alldata, error < 0.02 )#
+aggregate(a[, 6:7], list(a$species), mean) -> means#
+means
+alldata
+fullrow(species, "GPH1", GPH_1, sex, preservation, specloc) -> GPH1f
+GPH1f
+fullrow(species, "GPH1", GPH_1, sex, preservation, specloc) -> GPH1f#
+fullrow(species, "GPH2", GPH_2, sex, preservation, specloc) -> GPH2f#
+fullrow(species, "GPH3", GPH_3, sex, preservation, specloc) -> GPH3f#
+fullrow(species, "GPH4", GPH_4, sex, preservation, specloc) -> GPH4f#
+fullrow(species, "GPH5", GPH_5, sex, preservation, specloc) -> GPH5f#
+fullrow(species, "GPH6", GPH_6, sex, preservation, specloc) -> GPH6f#
+fullrow(species, "GPH7", GPH_7, sex, preservation, specloc) -> GPH7f#
+fullrow(species, "GPH8", GPH_8, sex, preservation, specloc) -> GPH8f#
+#
+rbind(GPH1f, GPH2f, GPH3f, GPH4f, GPH5f, GPH6f, GPH7f, GPH8f) -> allGPH
+#onering#
+rbind(allEGD,allcont,allLLL, allMFU, allSFM, allSMU, allKhas, allMSH, allPmor, allSVD, allSVU, allVhil012317, allGPH) -> alldata#
+alldata
+#First remove runs where signal:noise is too low#
+#a <- subset(alldata, x < 0.02 | replicate=="Cn" | replicate=="Pg")#
+a <- subset(alldata, error < 0.02 )#
+aggregate(a[, 6:7], list(a$species), mean) -> means#
+means
+#Figure X - Box plot of all lmax of species#
+require(ggplot2)#
+#a <- subset(alldata, error < 0.02 | replicate=="Cn" | replicate=="Pg")#
+a <- subset(alldata, error < 0.02)#
+#
+p <- qplot(species, sgMax, data=a, geom=c("boxplot", "jitter"), colour=factor(species))#
+p + scale_colour_manual(values=c("#0071ff","#005cff","#007bff","#007fff","#007bff","#007fff","#0084ff","#009cff","#0097ff","#0097ff","#00a5ff","#00aeff")) + theme_bw() #
+#colors set by mean
+#Figure X - Box plot of all fwhm of species#
+p<-'clear'#
+require(ggplot2)#
+#a <- subset(alldata, error < 0.02 | replicate=="Cn" | replicate=="Pg")#
+a <- subset(alldata, error < 0.02)#
+#
+p <- qplot(species, sgfwhm, data=a, geom=c("boxplot", "jitter"))#
+p  + theme_bw()
+require(ggplot2)#
+#a <- subset(alldata, error < 0.02 | replicate=="Cn" | replicate=="Pg")#
+a <- subset(alldata, error < 0.02)#
+#
+p <- qplot(species, sgMax, data=a, geom=c("boxplot", "jitter"), colour=factor(species))#
+p + scale_colour_manual(values=c("#0071ff","#005cff","#007bff","#007fff","#007bff","#007fff","#0084ff","#009cff","#0097ff","#0097ff","#00a5ff","#00aeff")) + theme_bw()
+require(ggplot2)#
+#a <- subset(alldata, error < 0.02 | replicate=="Cn" | replicate=="Pg")#
+a <- subset(alldata, error < 0.02)#
+#
+p <- qplot(species, sgMax, data=a, geom=c("boxplot", "jitter"), colour=factor(species))#
+#p + scale_colour_manual(values=c("#0071ff","#005cff","#007bff","#007fff","#007bff","#007fff","#0084ff","#009cff","#0097ff","#0097ff","#00a5ff","#00aeff")) + theme_bw() #
+p#
+#colors set by mean
+#Figure X - Box plot of all lmax of species#
+require(ggplot2)#
+#a <- subset(alldata, error < 0.02 | replicate=="Cn" | replicate=="Pg")#
+a <- subset(alldata, error < 0.02)#
+#
+p <- qplot(species, sgMax, data=a, geom=c("boxplot", "jitter"))#
+#p + scale_colour_manual(values=c("#0071ff","#005cff","#007bff","#007fff","#007bff","#007fff","#0084ff","#009cff","#0097ff","#0097ff","#00a5ff","#00aeff")) + theme_bw() #
+p#
+#colors set by mean
+p<-'clear'#
+require(ggplot2)#
+#a <- subset(alldata, error < 0.02 | replicate=="Cn" | replicate=="Pg")#
+a <- subset(alldata, error < 0.02)#
+#
+p <- qplot(species, sgfwhm, data=a, geom=c("boxplot", "jitter"))#
+p
+require(ggplot2)#
+#a <- subset(alldata, error < 0.02 | replicate=="Cn" | replicate=="Pg")#
+a <- subset(alldata, error < 0.02)#
+#
+p <- qplot(species, sgMax, data=a, geom=c("boxplot", "jitter"))#
+p
+require(ggplot2)#
+#a <- subset(alldata, error < 0.02 | replicate=="Cn" | replicate=="Pg")#
+a <- subset(alldata, error < 0.02)#
+#
+p <- qplot(species, sgfwhm, data=a, geom=c("boxplot", "jitter"))#
+p
+a <- subset(alldata, error < 0.02)#
+#
+p <- qplot(species, sgMax, data=a, geom=c("boxplot", "jitter"))#
+p
+workingdir <- "6-08-2016/WLU"#
+setwd(paste0(rootdir,workingdir))
+workingdir <- "6-08-2016/WLU"#
+setwd(paste0(rootdir,workingdir))
+graphEmission("WLU_1_05sec_x5x1sp_sig.asc", "WLU_1_05sec_x5x1sp_bgd.asc", calibration,5,TRUE) -> WLU_1;
+graphEmission("WLU_2_05sec_x5x1sp_sig.asc", "WLU_2_05sec_x5x1sp_bgd.asc", calibration,5,TRUE) -> WLU_2;
+graphEmission("WLU_3_05sec_x5x1sp_sig.asc", "WLU_3_05sec_x5x1sp_bgd.asc", calibration,5,TRUE) -> WLU_3;
+graphEmission("WLU_4_05sec_x5x1sp_sig.asc", "WLU_4_05sec_x5x1sp_bgd.asc", calibration,5,TRUE) -> WLU_4;
+graphEmission("WLU_5_05sec_x5x1sp_sig.asc", "WLU_5_05sec_x5x1sp_bgd.asc", calibration,5,TRUE) -> WLU_5;
+graphEmission("WLU_6_05sec_x5x1sp_sig.asc", "WLU_6_05sec_x5x1sp_bgd.asc", calibration,5,TRUE) -> WLU_6;
+graphEmission("WLU_7_05sec_x10x1sp_dry_sig.asc", "WLU_7_05sec_x10x1sp_dry_bgd.asc", calibration,10,TRUE) -> WLU_7;
+graphEmission("WLU_8_05sec_x10x3sp_dry_sig.asc", "WLU_8_05sec_x10x3sp_dry_bgd.asc", calibration,10,TRUE) -> WLU_8;
+graphEmission("WLU_10_05sec_x10x3sp_dry_sig.asc", "WLU_10_05sec_x10x3sp_dry_bgd.asc", calibration,10,TRUE) -> WLU_10;
+##############WLU#
+workingdir <- "6-08-2016/WLU"#
+setwd(paste0(rootdir,workingdir))#
+#
+graphEmission("WLU_1_05sec_x5x1sp_sig.asc", "WLU_1_05sec_x5x1sp_bgd.asc", calibration,5,TRUE) -> WLU_1;#
+graphEmission("WLU_2_05sec_x5x1sp_sig.asc", "WLU_2_05sec_x5x1sp_bgd.asc", calibration,5,TRUE) -> WLU_2;#
+graphEmission("WLU_3_05sec_x5x1sp_sig.asc", "WLU_3_05sec_x5x1sp_bgd.asc", calibration,5,TRUE) -> WLU_3;#
+graphEmission("WLU_4_05sec_x5x1sp_sig.asc", "WLU_4_05sec_x5x1sp_bgd.asc", calibration,5,TRUE) -> WLU_4;#
+graphEmission("WLU_5_05sec_x5x1sp_sig.asc", "WLU_5_05sec_x5x1sp_bgd.asc", calibration,5,TRUE) -> WLU_5;#
+graphEmission("WLU_6_05sec_x5x1sp_sig.asc", "WLU_6_05sec_x5x1sp_bgd.asc", calibration,5,TRUE) -> WLU_6;#
+graphEmission("WLU_7_05sec_x10x1sp_dry_sig.asc", "WLU_7_05sec_x10x1sp_dry_bgd.asc", calibration,10,TRUE) -> WLU_7;#
+graphEmission("WLU_8_05sec_x10x3sp_dry_sig.asc", "WLU_8_05sec_x10x3sp_dry_bgd.asc", calibration,10,TRUE) -> WLU_8;#
+graphEmission("WLU_10_05sec_x10x3sp_dry_sig.asc", "WLU_10_05sec_x10x3sp_dry_bgd.asc", calibration,10,TRUE) -> WLU_10;
+species<-"WLU"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+#
+fullrow(species, "WLU1", WLU_1, sex, preservation, specloc) -> WLU1f#
+fullrow(species, "WLU2", WLU_2, sex, preservation, specloc) -> WLU2f#
+fullrow(species, "WLU3", WLU_3, sex, preservation, specloc) -> WLU3f#
+fullrow(species, "WLU4", WLU_4, sex, preservation, specloc) -> WLU4f#
+fullrow(species, "WLU5", WLU_5, sex, preservation, specloc) -> WLU5f#
+fullrow(species, "WLU6", WLU_6, sex, preservation, specloc) -> WLU6f#
+fullrow(species, "WLU7", WLU_7, sex, preservation, specloc) -> WLU7f#
+fullrow(species, "WLU8", WLU_8, sex, preservation, specloc) -> WLU8f#
+fullrow(species, "WLU10", WLU_10, sex, preservation, specloc) -> WLU10f#
+#
+rbind(WLU1f, WLU2f, WLU3f, WLU4f, WLU5f, WLU6f, WLU7f, WLU8f, WLU10f) -> allWLU
+fullrow(species, "WLU7", WLU_7, sex, preservation, specloc) -> WLU7f
+graphEmission("WLU_7_05sec_x10x1sp_dry_sig.asc", "WLU_7_05sec_x10x1sp_dry_bgd.asc", calibration,10,TRUE) -> WLU_7;
+species<-"WLU"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+#
+fullrow(species, "WLU1", WLU_1, sex, preservation, specloc) -> WLU1f#
+fullrow(species, "WLU2", WLU_2, sex, preservation, specloc) -> WLU2f#
+fullrow(species, "WLU3", WLU_3, sex, preservation, specloc) -> WLU3f#
+fullrow(species, "WLU4", WLU_4, sex, preservation, specloc) -> WLU4f#
+fullrow(species, "WLU5", WLU_5, sex, preservation, specloc) -> WLU5f#
+fullrow(species, "WLU6", WLU_6, sex, preservation, specloc) -> WLU6f#
+#fullrow(species, "WLU7", WLU_7, sex, preservation, specloc) -> WLU7f No signal here#
+fullrow(species, "WLU8", WLU_8, sex, preservation, specloc) -> WLU8f#
+fullrow(species, "WLU10", WLU_10, sex, preservation, specloc) -> WLU10f#
+#
+rbind(WLU1f, WLU2f, WLU3f, WLU4f, WLU5f, WLU6f, WLU8f, WLU10f) -> allWLU
+rbind(allEGD,allcont,allLLL, allMFU, allSFM, allSMU, allKhas, allMSH, allPmor, allSVD, allSVU, allVhil012317, allGPH, allWLU) -> alldata
+alldata
+#Table 1 - lmax and fwhm for all species studied#
+#
+#First remove runs where signal:noise is too low#
+#a <- subset(alldata, x < 0.02 | replicate=="Cn" | replicate=="Pg")#
+a <- subset(alldata, error < 0.02 )#
+aggregate(a[, 6:7], list(a$species), mean) -> means#
+means
+#Figure X - Box plot of all lmax of species#
+require(ggplot2)#
+#a <- subset(alldata, error < 0.02 | replicate=="Cn" | replicate=="Pg")#
+a <- subset(alldata, error < 0.02)#
+#
+p <- qplot(species, sgMax, data=a, geom=c("boxplot", "jitter"))#
+p
+#***********************************WLU#
+species<-"WLU"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+#
+fullrow(species, "WLU1", WLU_1, sex, preservation, specloc) -> WLU1f#
+fullrow(species, "WLU2", WLU_2, sex, preservation, specloc) -> WLU2f#
+fullrow(species, "WLU3", WLU_3, sex, preservation, specloc) -> WLU3f#
+fullrow(species, "WLU4", WLU_4, sex, preservation, specloc) -> WLU4f#
+fullrow(species, "WLU5", WLU_5, sex, preservation, specloc) -> WLU5f#
+fullrow(species, "WLU6", WLU_6, sex, preservation, specloc) -> WLU6f#
+preservation <- "dried"#
+#fullrow(species, "WLU7", WLU_7, sex, preservation, specloc) -> WLU7f No signal here#
+fullrow(species, "WLU8", WLU_8, sex, preservation, specloc) -> WLU8f#
+fullrow(species, "WLU10", WLU_10, sex, preservation, specloc) -> WLU10f#
+#
+rbind(WLU1f, WLU2f, WLU3f, WLU4f, WLU5f, WLU6f, WLU8f, WLU10f) -> allWLU#
+#onering#
+rbind(allEGD,allcont,allLLL, allMFU, allSFM, allSMU, allKhas, allMSH, allPmor, allSVD, allSVU, allVhil012317, allGPH, allWLU) -> alldata#
+alldata
+workingdir <- "6-08-2016/LSD"#
+setwd(paste0(rootdir,workingdir))
+##############LSD#
+workingdir <- "6-08-2016/LSD"#
+setwd(paste0(rootdir,workingdir))#
+graphEmission("LSD1.txt", "background.txt", calibration,10,TRUE) -> LSD_1;#
+graphEmission("LSD2.txt", "background.txt", calibration,10,TRUE) -> LSD_2;
+workingdir <- "6-08-2016/LSD"
+setwd(paste0(rootdir,workingdir))
+graphEmission("LSD1.txt", "background.asc", calibration,10,TRUE) -> LSD_1;
+graphEmission("LSD2.txt", "background.asc", calibration,10,TRUE) -> LSD_2;
+workingdir <- "6-08-2016/IR"
+setwd(paste0(rootdir,workingdir))
+graphEmission("IR_1_05sec_x5x1sp_dead_sig.asc", "IR_1_05sec_x5x1sp_dead_bgd.asc", calibration,10,TRUE) -> IR_1;
+graphEmission("IR_2_05sec_x5x1sp_dead_sig.asc", "IR_2_05sec_x5x1sp_dead_bgd.asc", calibration,10,TRUE) -> IR_2;
+graphEmission("IR_3_05sec_x5x1sp_live_sig.asc", "IR_3_05sec_x5x1sp_live_bgd.asc", calibration,10,TRUE) -> IR_3;
+graphEmission("IR_4_05sec_x5x1sp_dead_sig.asc", "IR_4_05sec_x5x1sp_dead_bgd.asc", calibration,10,TRUE) -> IR_4;
+graphEmission("IR_5_05sec_x5x1sp_dead_sig.asc", "IR_5_05sec_x5x1sp_dead_bgd.asc", calibration,10,TRUE) -> IR_5;
+graphEmission("IR_6_05sec_x5x1sp_dead_sig.asc", "IR_6_05sec_x5x1sp_dead_bgd.asc", calibration,10,TRUE) -> IR_6;
+graphEmission("LSD1.txt", "background.txt", calibration,10,TRUE) -> LSD_1;
+workingdir <- "6-08-2016/LSD"#
+setwd(paste0(rootdir,workingdir))#
+graphEmission("LSD1.txt", "background.txt", calibration,10,TRUE) -> LSD_1;
+graphEmission("LSD2.txt", "background.txt", calibration,10,TRUE) -> LSD_2;
+workingdir <- "6-08-2016/IR"#
+setwd(paste0(rootdir,workingdir))
+graphEmission("IR_1_05sec_x5x1sp_dead_sig.asc", "IR_1_05sec_x5x1sp_dead_bgd.asc", calibration,10,TRUE) -> IR_1;
+graphEmission("IR_2_05sec_x5x1sp_dead_sig.asc", "IR_2_05sec_x5x1sp_dead_bgd.asc", calibration,10,TRUE) -> IR_2;
+graphEmission("IR_3_05sec_x5x1sp_live_sig.asc", "IR_3_05sec_x5x1sp_live_bgd.asc", calibration,10,TRUE) -> IR_3;
+graphEmission("IR_4_05sec_x5x1sp_dead_sig.asc", "IR_4_05sec_x5x1sp_dead_bgd.asc", calibration,10,TRUE) -> IR_4;
+graphEmission("IR_5_05sec_x5x1sp_dead_sig.asc", "IR_5_05sec_x5x1sp_dead_bgd.asc", calibration,10,TRUE) -> IR_5;
+graphEmission("IR_6_05sec_x5x1sp_dead_sig.asc", "IR_6_05sec_x5x1sp_dead_bgd.asc", calibration,10,TRUE) -> IR_6;
+workingdir <- "6-08-2016/RD"#
+setwd(paste0(rootdir,workingdir))
+graphEmission5("RD_1_05sec_x5x1sp_dead_sig.asc", "RD_1_05sec_x5x1sp_dead_bgd.asc", calibration,5,TRUE) -> RD_1;
+graphEmission5("RD_1_05sec_x5x1sp_dead_sig.asc", "RD_1_05sec_x5x1sp_dead_bgd.asc", calibration,5,TRUE) -> RD_1;
+setwd(paste0(rootdir,workingdir))
+graphEmission("RD_1_05sec_x5x1sp_dead_sig.asc", "RD_1_05sec_x5x1sp_dead_bgd.asc", calibration,5,TRUE) -> RD_1;
+graphEmission("RD_2_05sec_x5x1sp_dead_sig.asc", "RD_2_05sec_x5x1sp_dead_bgd.asc", calibration,5,TRUE) -> RD_2;
+graphEmission("RD_3_05sec_x5x1sp_dead_sig.asc", "RD_3_05sec_x5x1sp_dead_bgd.asc", calibration,5,TRUE) -> RD_3;
+graphEmission("RD_4_05sec_x5x1sp_dead_sig.asc", "RD_4_05sec_x5x1sp_dead_bgd.asc", calibration,5,TRUE) -> RD_4;
+graphEmission("RD_5_05sec_x5x1sp_dead_sig.asc", "RD_5_05sec_x5x1sp_dead_bgd.asc", calibration,5,TRUE) -> RD_5;
+##############LSD#
+workingdir <- "6-08-2016/LSD"#
+setwd(paste0(rootdir,workingdir))#
+graphEmission("LSD1.txt", "background.txt", calibration,10,TRUE) -> LSD_1;#
+graphEmission("LSD2.txt", "background.txt", calibration,10,TRUE) -> LSD_2;#
+#
+##############IR#
+workingdir <- "6-08-2016/IR"#
+setwd(paste0(rootdir,workingdir))#
+graphEmission("IR_1_05sec_x5x1sp_dead_sig.asc", "IR_1_05sec_x5x1sp_dead_bgd.asc", calibration,10,TRUE) -> IR_1;#
+graphEmission("IR_2_05sec_x5x1sp_dead_sig.asc", "IR_2_05sec_x5x1sp_dead_bgd.asc", calibration,10,TRUE) -> IR_2;#
+graphEmission("IR_3_05sec_x5x1sp_live_sig.asc", "IR_3_05sec_x5x1sp_live_bgd.asc", calibration,10,TRUE) -> IR_3;#
+graphEmission("IR_4_05sec_x5x1sp_dead_sig.asc", "IR_4_05sec_x5x1sp_dead_bgd.asc", calibration,10,TRUE) -> IR_4;#
+graphEmission("IR_5_05sec_x5x1sp_dead_sig.asc", "IR_5_05sec_x5x1sp_dead_bgd.asc", calibration,10,TRUE) -> IR_5;#
+graphEmission("IR_6_05sec_x5x1sp_dead_sig.asc", "IR_6_05sec_x5x1sp_dead_bgd.asc", calibration,10,TRUE) -> IR_6;#
+#
+##############RD#
+workingdir <- "6-08-2016/RD"#
+setwd(paste0(rootdir,workingdir))#
+graphEmission("RD_1_05sec_x5x1sp_dead_sig.asc", "RD_1_05sec_x5x1sp_dead_bgd.asc", calibration,5,TRUE) -> RD_1;#
+graphEmission("RD_2_05sec_x5x1sp_dead_sig.asc", "RD_2_05sec_x5x1sp_dead_bgd.asc", calibration,5,TRUE) -> RD_2;#
+graphEmission("RD_3_05sec_x5x1sp_dead_sig.asc", "RD_3_05sec_x5x1sp_dead_bgd.asc", calibration,5,TRUE) -> RD_3;#
+graphEmission("RD_4_05sec_x5x1sp_dead_sig.asc", "RD_4_05sec_x5x1sp_dead_bgd.asc", calibration,5,TRUE) -> RD_4;#
+graphEmission("RD_5_05sec_x5x1sp_dead_sig.asc", "RD_5_05sec_x5x1sp_dead_bgd.asc", calibration,5,TRUE) -> RD_5;
+species<-"LSD"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+#
+fullrow(species, "LSD1", LSD_1, sex, preservation, specloc) -> LSD1f#
+fullrow(species, "LSD2", LSD_2, sex, preservation, specloc) -> LSD2f#
+#
+rbind(LSD1f, LSD2f) -> allLSD#
+#onering#
+rbind(allEGD,allcont,allLLL, allMFU, allSFM, allSMU, allKhas, allMSH, allPmor, allSVD, allSVU, allVhil012317, allGPH, allWLU, allLSD) -> alldata#
+alldata
+a
+#First remove runs where signal:noise is too low#
+#a <- subset(alldata, x < 0.02 | replicate=="Cn" | replicate=="Pg")#
+a <- subset(alldata, error < 0.02 )#
+aggregate(a[, 6:7], list(a$species), mean) -> means#
+means
+#Figure X - Box plot of all lmax of species#
+require(ggplot2)#
+#a <- subset(alldata, error < 0.02 | replicate=="Cn" | replicate=="Pg")#
+a <- subset(alldata, error < 0.02)#
+#
+p <- qplot(species, sgMax, data=a, geom=c("boxplot", "jitter"))#
+p
+a
+alldata
+a
+rbind(IR1f, IR2f, IR3f, IR4f, IR5f, IR6f) -> allIR
+IR#***********************************IR#
+species<-"IR"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+#
+fullrow(species, "IR1", IR_1, sex, preservation, specloc) -> IR1f#
+fullrow(species, "IR2", IR_2, sex, preservation, specloc) -> IR2f#
+fullrow(species, "IR3", IR_3, sex, preservation, specloc) -> IR3f#
+fullrow(species, "IR4", IR_4, sex, preservation, specloc) -> IR4f#
+fullrow(species, "IR5", IR_5, sex, preservation, specloc) -> IR5f#
+fullrow(species, "IR6", IR_6, sex, preservation, specloc) -> IR6f#
+#
+rbind(IR1f, IR2f, IR3f, IR4f, IR5f, IR6f) -> allIR
+allIR
+#onering#
+rbind(allEGD,allcont,allLLL, allMFU, allSFM, allSMU, allKhas, allMSH, allPmor, allSVD, allSVU, allVhil012317, allGPH, allWLU, allLSD, allIR) -> alldata#
+alldata
+species<-"RD"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+#
+fullrow(species, "RD1", RD_1, sex, preservation, specloc) -> RD1f#
+fullrow(species, "RD2", RD_2, sex, preservation, specloc) -> RD2f#
+fullrow(species, "RD3", RD_3, sex, preservation, specloc) -> RD3f#
+fullrow(species, "RD4", RD_4, sex, preservation, specloc) -> RD4f#
+fullrow(species, "RD5", RD_5, sex, preservation, specloc) -> RD5f#
+fullrow(species, "RD6", RD_6, sex, preservation, specloc) -> RD6f#
+#
+rbind(RD1f, RD2f, RD3f, RD4f, RD5f, RD6f) -> allRD
+fullrow(species, "RD6", RD_6, sex, preservation, specloc) -> RD6f
+#***********************************RD#
+species<-"RD"#
+sex<-"male"#
+specloc <- "ucsb"#
+preservation <- "live"#
+#
+fullrow(species, "RD1", RD_1, sex, preservation, specloc) -> RD1f#
+fullrow(species, "RD2", RD_2, sex, preservation, specloc) -> RD2f#
+fullrow(species, "RD3", RD_3, sex, preservation, specloc) -> RD3f#
+fullrow(species, "RD4", RD_4, sex, preservation, specloc) -> RD4f#
+fullrow(species, "RD5", RD_5, sex, preservation, specloc) -> RD5f#
+#
+rbind(RD1f, RD2f, RD3f, RD4f, RD5f) -> allRD
+#onering#
+rbind(allEGD,allcont,allLLL, allMFU, allSFM, allSMU, allKhas, allMSH, allPmor, allSVD, allSVU, allVhil012317, allGPH, allWLU, allLSD, allIR, allRD) -> alldata#
+alldata
+#Table 1 - lmax and fwhm for all species studied#
+#
+#First remove runs where signal:noise is too low#
+#a <- subset(alldata, x < 0.02 | replicate=="Cn" | replicate=="Pg")#
+a <- subset(alldata, error < 0.02 )#
+aggregate(a[, 6:7], list(a$species), mean) -> means#
+means
+#Figure X - Box plot of all lmax of species#
+require(ggplot2)#
+#a <- subset(alldata, error < 0.02 | replicate=="Cn" | replicate=="Pg")#
+a <- subset(alldata, error < 0.02)#
+#
+p <- qplot(species, sgMax, data=a, geom=c("boxplot", "jitter"))#
+p
+alldata
