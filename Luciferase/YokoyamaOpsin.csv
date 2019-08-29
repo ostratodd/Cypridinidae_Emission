@@ -1,0 +1,41 @@
+pigmenttype,S180,S197,S277,S285,S308,lmax,Pigment
+a,S,H,Y,T,A,563,AncestorA
+a,S,H,Y,T,A,563,AncestorB
+a,S,H,Y,T,A,561,AncestorC
+a,S,H,Y,T,A,558,AncestorD
+a,S,H,Y,T,A,558,AncestorE
+a,S,H,Y,T,A,561,AncestorG
+a,S,H,Y,T,A,564,AncestorI
+a,S,H,Y,T,A,560,AncestorD
+a,S,H,Y,T,A,558,CavefishL
+a,S,H,Y,T,A,559,GoldfishL
+a,S,H,Y,T,A,561,MedakaLA
+a,S,H,Y,T,A,562,MedakaLB
+a,S,H,Y,T,A,557,ClawedFrogL
+a,S,H,Y,T,A,560,Zebrafinch
+b,A,H,Y,T,A,555,Ancestor d (P555)
+b,A,H,Y,T,A,558,Zebrafish L-1 (P558)b
+b,A,H,Y,T,A,553,Marmoset L (P553)a
+b,A,H,Y,T,A,553,Cat L (P553)a
+b,A,H,Y,T,A,552,Elephant L (P552)c
+b,A,H,Y,T,A,553,Goat L (P553)a
+c,S,Y,Y,T,A,536,Ancestor f (P536)a
+c,S,Y,Y,T,A,536,Ancestor d (P536)
+c,S,Y,Y,T,A,532,Squirrel M (P532)a
+d,S,H,F,T,A,550,AncestorD
+e,S,H,Y,A,A,543,AncestorD
+f,S,H,Y,T,S,527,AncestorD
+g,A,Y,Y,T,A,533,AncestorD
+g,A,Y,Y,T,A,534,Mole Rat
+h,A,H,F,T,A,545,AncestorD
+h,A,H,F,T,A,548,Zebrafish L2
+h,A,H,F,T,A,545,Capuchin M
+h,A,H,F,T,A,545,Sq Monkey L
+h,A,H,F,T,A,545,Horse M
+i,A,H,Y,A,A,536,NA
+j,A,H,Y,T,S,525,NA
+k,S,Y,Y,A,A,522,NA
+l,S,Y,Y,T,S,516,NA
+m,S,H,F,A,A,534,NA
+n,A,Y,Y,T,S,512,NA
+o,A,H,F,A,A,532,NA

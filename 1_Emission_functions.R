@@ -1,12 +1,12 @@
 require(signal)
-fullrow <- function(abbreviation, species, replicate, df, sex, preservation, source) {
+fullrow <- function(abbreviation, locality, genus, species, replicate, df, sex, preservation, source) {
 	#This function creates a full data row adding all metadata
 	#and calculating values from spectra, including lmax, fwhm, and error (signal:noise)
 	sgsmooth <- 35 #This is the smoothing value for SG smoothing. Doesn't seem to affect results at all
 	round(error(df,500),digits=4)->error
 	sgfwhm(df,sgsmooth,FALSE)->fwhm
 	sgMax(df, sgsmooth)-> lmax
-	data.frame(abbreviation, species, replicate, sex, preservation, source, lmax,fwhm,error) -> t1
+	data.frame(abbreviation, locality, genus, species, replicate, sex, preservation, source, lmax,fwhm,error) -> t1
 	#merge(round(error(df,500),digits=4), t4) -> t5
 }
 graphEmission <- function(datafile, backgroundfile, calibrationfile, cols, plot) {
