@@ -1,8 +1,3 @@
-#First execute functions
-
-#Next read in data
-
-
 #Here, calculate parameters and add metadata
 #***********************************EGD
 locality <- "Panama"
@@ -69,7 +64,7 @@ rbind(MFU1f, MFU2f, MFU3f, MFU4f, MFU5f) -> allMFU
 #***********************************SFM
 genus <- "Photeros"
 species<-"Photeros_SFM"
-abbreviation<-"SFM"
+abbreviation<-"P_SFM"
 sex<-"male"
 specloc <- "ucsb"
 
@@ -172,47 +167,6 @@ fullrow(abbreviation, locality, genus,  species, "SVU5", SVU_5, sex, preservatio
 
 rbind(SVU1f,SVU2f,SVU3f,SVU4f,SVU5f) -> allSVU
 
-#***********************************Vargula hilgendorfii
-genus <- "Vargula"
-locality <- "Purchased"
-species<-"Vargula_hilgendorfii"
-abbreviation<-"V_hil"
-sex<-"unknown"
-specloc <- "ucsb"
-preservation <- "dried"
-fullrow(abbreviation, locality, genus,  species, "Vhil0123171", Vhil012317_1, sex, preservation, specloc) -> Vhil0123171f
-fullrow(abbreviation, locality, genus,  species, "Vhil0123172", Vhil012317_2, sex, preservation, specloc) -> Vhil0123172f
-fullrow(abbreviation, locality, genus,  species, "Vhil0123173", Vhil012317_3, sex, preservation, specloc) -> Vhil0123173f
-
-rbind(Vhil0123171f, Vhil0123172f, Vhil0123173f) -> allVhil012317
-
-species<-"Vargula_hilgendorfii"
-abbreviation<-"V_hil"
-sex<-"unknown"
-specloc <- "ucsb"
-preservation <- "dried"
-fullrow(abbreviation, locality, genus,  species, "Vhil0907161", Vhil090716_1, sex, preservation, specloc) -> Vhil0907161f
-fullrow(abbreviation, locality, genus,  species, "Vhil0907162", Vhil090716_2, sex, preservation, specloc) -> Vhil0907162f
-fullrow(abbreviation, locality, genus,  species, "Vhil0907163", Vhil090716_3, sex, preservation, specloc) -> Vhil0907163f
-fullrow(abbreviation, locality, genus,  species, "Vhil0907164", Vhil090716_4, sex, preservation, specloc) -> Vhil0907164f
-fullrow(abbreviation, locality, genus,  species, "Vhil0907165", Vhil090716_5, sex, preservation, specloc) -> Vhil0907165f
-fullrow(abbreviation, locality, genus,  species, "Vhil0907166", Vhil090716_6, sex, preservation, specloc) -> Vhil0907166f
-
-	rbind(Vhil0907161f, Vhil0907162f, Vhil0907163f, Vhil0907164f, Vhil0907165f, Vhil0907166f) -> allVhil090716
-
-fullrow(abbreviation, locality, genus,  species, "Vhil0920161", Vhil092016_1, sex, preservation, specloc) -> Vhil0920161f
-fullrow(abbreviation, locality, genus,  species, "Vhil0920162", Vhil092016_2, sex, preservation, specloc) -> Vhil0920162f
-fullrow(abbreviation, locality, genus,  species, "Vhil0920163", Vhil092016_3, sex, preservation, specloc) -> Vhil0920163f
-	rbind(Vhil0920161f, Vhil0920162f, Vhil0920163f) -> allVhil092016
-
-	#one trial from 10-05 
-fullrow(abbreviation, locality, genus,  species, "Vhil100520161", Vhil10052016_1, sex, preservation, specloc) -> Vhil100520161f
-	rbind(Vhil100520161f) -> allVhil10052016
-specloc <- "Japan"
-preservation <- "live"
-fullrow(abbreviation, locality, genus,  species, "Vhil_Japan", Vhil_Japan, sex, preservation, specloc) -> VhilJapan1f
-	rbind(VhilJapan1f) -> allVhilJapan
-
 #***********************************GPH
 locality <- "Roatan"
 genus <- "Photeros"
@@ -308,7 +262,7 @@ fullrow(abbreviation, locality, genus,  species, "DU5", DU_5, sex, preservation,
 rbind(DU1f, DU2f, DU3f, DU4f, DU5f) -> allDU
 
 #***********************************Vargula tsujii
-locality <- "California_USA"
+locality <- "CA_USA"
 genus <- "Fred"
 species<-"Vargula_tsujii"
 abbreviation<-"V_tsu"
@@ -329,7 +283,7 @@ fullrow(abbreviation, locality, genus,  species, "Vtsu8", Vtsu_8, sex, preservat
 rbind(Vtsu1f, Vtsu2f, Vtsu3f, Vtsu4f, Vtsu5f, Vtsu6f, Vtsu7f, Vtsu8f) -> allVtsu
 
 
-locality <- "Puerto Rico_USA"
+locality <- "PR_USA"
 genus <- "Kornickeria"
 species<-"Kornickeria_WCU"
 abbreviation<-"K_WCU"
@@ -374,6 +328,49 @@ fullrow(abbreviation, locality, genus,  species, "Pann2", Pann_2, sex, preservat
 fullrow(abbreviation, locality, genus,  species, "Pann3", Pann_3, sex, preservation, specloc) -> Pann3f
 
 rbind(Pann1f,Pann2f,Pann3f) -> allPann
+
+#***********************************Vargula hilgendorfii -- dried and purchased from Carolina Biological
+genus <- "Vargula"
+locality <- "Japan"
+species<-"Vargula_hilgendorfii"
+abbreviation<-"V_hil"
+sex<-"unknown"
+specloc <- "ucsb"
+preservation <- "dried"
+fullrow(abbreviation, locality, genus,  species, "Vhil0123171", Vhil012317_1, sex, preservation, specloc) -> Vhil0123171f
+fullrow(abbreviation, locality, genus,  species, "Vhil0123172", Vhil012317_2, sex, preservation, specloc) -> Vhil0123172f
+fullrow(abbreviation, locality, genus,  species, "Vhil0123173", Vhil012317_3, sex, preservation, specloc) -> Vhil0123173f
+
+rbind(Vhil0123171f, Vhil0123172f, Vhil0123173f) -> allVhil012317
+
+species<-"Vargula_hilgendorfii"
+abbreviation<-"V_hil"
+sex<-"unknown"
+specloc <- "ucsb"
+preservation <- "dried"
+fullrow(abbreviation, locality, genus,  species, "Vhil0907161", Vhil090716_1, sex, preservation, specloc) -> Vhil0907161f
+fullrow(abbreviation, locality, genus,  species, "Vhil0907162", Vhil090716_2, sex, preservation, specloc) -> Vhil0907162f
+fullrow(abbreviation, locality, genus,  species, "Vhil0907163", Vhil090716_3, sex, preservation, specloc) -> Vhil0907163f
+fullrow(abbreviation, locality, genus,  species, "Vhil0907164", Vhil090716_4, sex, preservation, specloc) -> Vhil0907164f
+fullrow(abbreviation, locality, genus,  species, "Vhil0907165", Vhil090716_5, sex, preservation, specloc) -> Vhil0907165f
+fullrow(abbreviation, locality, genus,  species, "Vhil0907166", Vhil090716_6, sex, preservation, specloc) -> Vhil0907166f
+
+	rbind(Vhil0907161f, Vhil0907162f, Vhil0907163f, Vhil0907164f, Vhil0907165f, Vhil0907166f) -> allVhil090716
+
+fullrow(abbreviation, locality, genus,  species, "Vhil0920161", Vhil092016_1, sex, preservation, specloc) -> Vhil0920161f
+fullrow(abbreviation, locality, genus,  species, "Vhil0920162", Vhil092016_2, sex, preservation, specloc) -> Vhil0920162f
+fullrow(abbreviation, locality, genus,  species, "Vhil0920163", Vhil092016_3, sex, preservation, specloc) -> Vhil0920163f
+	rbind(Vhil0920161f, Vhil0920162f, Vhil0920163f) -> allVhil092016
+
+	#one trial from 10-05 
+fullrow(abbreviation, locality, genus,  species, "Vhil100520161", Vhil10052016_1, sex, preservation, specloc) -> Vhil100520161f
+	rbind(Vhil100520161f) -> allVhil10052016
+specloc <- "Japan"
+preservation <- "live"
+fullrow(abbreviation, locality, genus,  species, "Vhil_Japan", Vhil_Japan, sex, preservation, specloc) -> VhilJapan1f
+	rbind(VhilJapan1f) -> allVhilJapan
+
+
 
 #***********************************Previously published data
 locality <- "Published"
