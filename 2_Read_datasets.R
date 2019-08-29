@@ -137,42 +137,6 @@ graphEmission("SPU5.txt", background, calibration,10,TRUE) -> SPU_5;
 graphEmission("SPU6.txt", background, calibration,10,TRUE) -> SPU_6;
 graphEmission("SPU7.txt", background, calibration,10,TRUE) -> SPU_7;
 
-#**********************************
-#Data Collection: September 7, 2016
-#********************************************************************
-#Ordered dried Vargula hilgendorfii from Carolina Biological. This is
-#to compare with spectrum taken by Yasuo Mitani in Japan, and to published
-#spectra of Vargula hilgendorfii. Also, used these dried samples later to 
-#serve as a sort of standard.
-#Vhilg
-workingdir <- "9-07-2016/Vhilg"
-setwd(paste0(rootdir,workingdir))
-background <- "bgd.asc"
-calibration <- "../correction factor.txt"
-
-graphEmission("Vhilg1.asc", background, calibration,10,TRUE) -> Vhil090716_1;
-graphEmission("Vhilg2.asc", background, calibration,10,TRUE) -> Vhil090716_2;
-graphEmission("Vhilg3.asc", background, calibration,10,TRUE) -> Vhil090716_3;
-graphEmission("Vhilg4.asc", background, calibration,10,TRUE) -> Vhil090716_4;
-graphEmission("Vhilg5_DeleteLastAcq.asc", background, calibration,9,TRUE) -> Vhil090716_5;
-graphEmission("Vhilg6.asc", background, calibration,10,TRUE) -> Vhil090716_6;
-
-
-#**********************************
-#Data Collection: September 20, 2016
-#********************************************************************
-#Ordered dried Vargula hilgendorfii from Carolina Biological. 
-#Vhilg
-workingdir <- "9-20-2016/Vhilg"
-setwd(paste0(rootdir,workingdir))
-background <- "background_bgd.asc"
-calibration <- "../correction factor.txt"
-
-graphEmission("Vhilg1_3indiv.asc", background, calibration,10,TRUE) -> Vhil092016_1;
-graphEmission("Vhilg_2_3indiv.asc", background, calibration,10,TRUE) -> Vhil092016_2;
-graphEmission("Vhilg3_3indiv.asc", background, calibration,10,TRUE) -> Vhil092016_3;
-
-
 
 
 #**********************************
@@ -247,12 +211,6 @@ graphEmission(  "SVULive3.asc", background, calibration,20,TRUE) -> SVU_3;
 graphEmission(  "SVULive4.asc", background, calibration,20,TRUE) -> SVU_4;
 graphEmission(  "SVUremax5.txt", background, calibration,16,TRUE) -> SVU_5;	#first 4 maxed sensor, removed
 
-#Vargula hilgendorfii control-------------------------------------------------------------
-workingdir <- "1-23-2017/Vhil_standard"
-setwd(paste0(rootdir,workingdir))
-graphEmission(  "VhilgendorfiiDry.asc", background, calibration,20,TRUE) -> Vhil012317_1;
-graphEmission(  "VhilgendorfiiDry2.asc", background, calibration,20,TRUE) -> Vhil012317_2;
-graphEmission(  "VhilgendorfiiDry3.asc", background, calibration,20,TRUE) -> Vhil012317_3;
 
 #*****************************
 #Collection Date: May 30, 2017
@@ -314,6 +272,57 @@ graphEmission("SMU_dried_male2.asc", background, calibration,15,TRUE) -> SMU_2;
 graphEmission("SMU_dried_male3.asc", background, calibration,15,TRUE) -> SMU_3;
 graphEmission("SMU_male4_remax.txt", background, calibration,11,TRUE) -> SMU_4; #last 4 maxed to deleted
 graphEmission("SMU_dried_male5.asc", background, calibration,15,TRUE) -> SMU_5;
+
+#Even though Vargula hilgendorfii collected on different days, placing here for the purpose
+#of ordering the data in the figures more easily
+#Vargula hilgendorfii control-------------------------------------------------------------
+workingdir <- "1-23-2017/Vhil_standard"
+background <- "../1-23-17background.asc";
+calibration <- "../correction factor.txt";
+setwd(paste0(rootdir,workingdir))
+graphEmission(  "VhilgendorfiiDry.asc", background, calibration,20,TRUE) -> Vhil012317_1;
+graphEmission(  "VhilgendorfiiDry2.asc", background, calibration,20,TRUE) -> Vhil012317_2;
+graphEmission(  "VhilgendorfiiDry3.asc", background, calibration,20,TRUE) -> Vhil012317_3;
+
+#**********************************
+#Data Collection: September 7, 2016
+#********************************************************************
+#Ordered dried Vargula hilgendorfii from Carolina Biological. This is
+#to compare with spectrum taken by Yasuo Mitani in Japan, and to published
+#spectra of Vargula hilgendorfii. Also, used these dried samples later to 
+#serve as a sort of standard.
+#Vhilg
+workingdir <- "9-07-2016/Vhilg"
+setwd(paste0(rootdir,workingdir))
+background <- "bgd.asc"
+calibration <- "../correction factor.txt"
+
+graphEmission("Vhilg1.asc", background, calibration,10,TRUE) -> Vhil090716_1;
+graphEmission("Vhilg2.asc", background, calibration,10,TRUE) -> Vhil090716_2;
+graphEmission("Vhilg3.asc", background, calibration,10,TRUE) -> Vhil090716_3;
+graphEmission("Vhilg4.asc", background, calibration,10,TRUE) -> Vhil090716_4;
+graphEmission("Vhilg5_DeleteLastAcq.asc", background, calibration,9,TRUE) -> Vhil090716_5;
+graphEmission("Vhilg6.asc", background, calibration,10,TRUE) -> Vhil090716_6;
+
+
+#**********************************
+#Data Collection: September 20, 2016
+#********************************************************************
+#Ordered dried Vargula hilgendorfii from Carolina Biological. 
+#Vhilg
+workingdir <- "9-20-2016/Vhilg"
+setwd(paste0(rootdir,workingdir))
+background <- "background_bgd.asc"
+calibration <- "../correction factor.txt"
+
+graphEmission("Vhilg1_3indiv.asc", background, calibration,10,TRUE) -> Vhil092016_1;
+graphEmission("Vhilg_2_3indiv.asc", background, calibration,10,TRUE) -> Vhil092016_2;
+graphEmission("Vhilg3_3indiv.asc", background, calibration,10,TRUE) -> Vhil092016_3;
+
+
+
+
+
 
 #*******************************************************************************
 #Non-ucsb data and published data

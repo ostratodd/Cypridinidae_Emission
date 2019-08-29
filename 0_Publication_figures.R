@@ -26,7 +26,7 @@ alldata
 require(ggplot2)
 clean <- subset(alldata, error < 0.02 | replicate=="Vhil_tsuji" | replicate=="Cnoc_ohmiya" | replicate=="Pgra_huvard")
 quartz("Figure 1", 13, 3)
-fig1 <- qplot(abbreviation, sgMax, data=clean, geom=c("boxplot", "jitter"))
+fig1 <- qplot(abbreviation, sgMax, data=clean, geom=c("boxplot", "jitter")) + ylab("Lambda max (nm)") + xlab("Species")
 	#highlight data with rectangles
 	#add green blue shading w/ rectangle (geom_rect). This uses y-co-ordinates as min and max of photeros (green) and non-photeros (blue). facet_grid sorts into panels by collection locality
 t2.rect1 <- data.frame (xmin=-Inf, xmax=Inf, ymin=463.97, ymax=471.14)
@@ -40,8 +40,9 @@ require(ggplot2)
 clean <- subset(alldata, error < 0.02 | replicate=="Vhil_tsuji" | replicate=="Cnoc_ohmiya" | replicate=="Pgra_huvard")
 
 quartz("Figure 2", 13, 3)
-p <- qplot(abbreviation, sgfwhm, data=clean, geom=c("boxplot", "jitter"))
-p 
+fig2 <- qplot(abbreviation, sgfwhm, data=clean, geom=c("boxplot", "jitter"))
+fig2 + facet_grid(cols = vars(locality), scales = "free_x", switch = "x", space = "free")
+
 
 #*********************************************************************************
 #Experimental plots

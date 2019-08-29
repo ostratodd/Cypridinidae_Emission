@@ -167,6 +167,21 @@ fullrow(abbreviation, locality, genus,  species, "SVU5", SVU_5, sex, preservatio
 
 rbind(SVU1f,SVU2f,SVU3f,SVU4f,SVU5f) -> allSVU
 
+#***********************************Photeros annecohenae
+locality <- "Belize"
+genus <- "Photeros"
+species<-"Photeros_annecohenae"
+abbreviation<-"P_ann"
+sex<-"unknown"
+specloc <- "ucsb"
+preservation <- "live"
+fullrow(abbreviation, locality, genus,  species, "Pann1", Pann_1, sex, preservation, specloc) -> Pann1f
+fullrow(abbreviation, locality, genus,  species, "Pann2", Pann_2, sex, preservation, specloc) -> Pann2f
+fullrow(abbreviation, locality, genus,  species, "Pann3", Pann_3, sex, preservation, specloc) -> Pann3f
+
+rbind(Pann1f,Pann2f,Pann3f) -> allPann
+
+#ROATAN
 #***********************************GPH
 locality <- "Roatan"
 genus <- "Photeros"
@@ -315,20 +330,6 @@ fullrow(abbreviation, locality, genus,  species, "SPU7", SPU_7, sex, preservatio
 
 rbind(SPU1f, SPU2f, SPU3f, SPU4f, SPU5f, SPU6f, SPU7f) -> allSPU
 
-#***********************************Photeros annecohenae
-locality <- "Belize"
-genus <- "Photeros"
-species<-"Photeros_annecohenae"
-abbreviation<-"P_ann"
-sex<-"unknown"
-specloc <- "ucsb"
-preservation <- "live"
-fullrow(abbreviation, locality, genus,  species, "Pann1", Pann_1, sex, preservation, specloc) -> Pann1f
-fullrow(abbreviation, locality, genus,  species, "Pann2", Pann_2, sex, preservation, specloc) -> Pann2f
-fullrow(abbreviation, locality, genus,  species, "Pann3", Pann_3, sex, preservation, specloc) -> Pann3f
-
-rbind(Pann1f,Pann2f,Pann3f) -> allPann
-
 #***********************************Vargula hilgendorfii -- dried and purchased from Carolina Biological
 genus <- "Vargula"
 locality <- "Japan"
@@ -405,6 +406,6 @@ fullrow(abbreviation, locality, genus,  species, "Pgra_huvard", Pgra_huvard, sex
 
 #****************************************Put all data into a single data frame, using one row bind command to bind them all
 #onering
-rbind(allEGD,allcont,allLLL, allMFU, allSFM, allSMU, allKhas, allMSH, allPmor, allSVD, allSVU, allVhil012317, allVhil090716, allVhil10052016, allVhil092016, allVhilJapan, allGPH, allWLU, allLSD, allIR, allRD, allDU, allVtsu, allWCU, allSPU, allPann, Vhiltsujif, Cnocohmiyaf, Pgrahuvardf) -> alldata
+rbind(allEGD, allSFM, allcont,allLLL, allMFU, allPann, allPmor, allSMU, allKhas, allMSH, allSVD,  allSVU,allGPH, allWLU, allLSD, allIR, allRD, allDU, allVtsu, allWCU, allSPU, allVhil012317, allVhil090716, allVhil10052016, allVhil092016, allVhilJapan, Pgrahuvardf, Vhiltsujif, Cnocohmiyaf) -> alldata
 alldata
 
