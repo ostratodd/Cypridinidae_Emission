@@ -40,7 +40,7 @@ require(ggplot2)
 clean <- subset(alldata, error < 0.02 | replicate=="Vhil_tsuji" | replicate=="Cnoc_ohmiya" | replicate=="Pgra_huvard")
 
 quartz("Figure 2", 13, 3)
-fig2 <- qplot(abbreviation, sgfwhm, data=clean, geom=c("boxplot", "jitter"))
+fig2 <- qplot(abbreviation, sgfwhm, data=clean, geom=c("boxplot", "jitter")) + ylab("FWHM (nm)") + xlab("Species")
 fig2 + facet_grid(cols = vars(locality), scales = "free_x", switch = "x", space = "free")
 
 

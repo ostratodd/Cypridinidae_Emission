@@ -77,10 +77,10 @@ fullrow(abbreviation, locality, genus,  species, "SFM5", SFM_5, sex, preservatio
 rbind(SFM1f, SFM2f, SFM3f, SFM4f, SFM5f) -> allSFM
 
 #***********************************SFM
-locality <- "Belize"
+locality <- "Panama"
 genus <- "Maristella"
 species<-"Maristella_SMU"
-abbreviation<-"SMU"
+abbreviation<-"M_SMU"
 sex<-"male"
 specloc <- "ucsb"
 
@@ -94,6 +94,7 @@ rbind(SMU1f, SMU2f, SMU3f, SMU4f, SMU5f) -> allSMU
 
 
 #***********************************Kornickeria hastingsi
+locality <- "Belize"
 genus <- "Kornickeria"
 species<-"Kornickeria_hastingsi"
 abbreviation<-"K_has"
