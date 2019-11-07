@@ -59,7 +59,8 @@ write.table(alldata, file="TableS3.txt", sep="\t")
 #Supplemental Table S4
 anova(lm(lmax ~ X38 * X178 * X191, data=nc)) -> tableS4
 write.table(tableS4, file = "TableS4.txt", sep="\t")
-
-
+#Supplemental Table S5 - Full table of mutant and natural luciferases and corresponding emission spectra
+cnplus->tableS5
+write.table(tableS5, file = "TableS5.txt", sep="\t")
 
 

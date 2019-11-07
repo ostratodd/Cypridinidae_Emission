@@ -338,31 +338,15 @@ for(n in names(mean_tauD)){#
   line = paste(c(n, tau_D, p), collapse='\t')#
   cat(line, '\n')#
 }
-setwd("~/Documents/GitHub/Cypridinidae_EmissionSpectra/Luciferase/anova/")
-read.csv(file="Cypridina mutagenesis.csv") -> cn
-setwd("~/Documents/GitHub/Cypridinidae_EmissionSpectra/Luciferase/anova/")
-setwd("~/Documents/")
-setwd("~/Documents/GitHub/")
-setwd("~/Documents/GitHub/Cypridinidae_Emission/")
-setwd("~/Documents/GitHub/Cypridinidae_EmissionSpectra/")
-setwd("~/Documents/GitHub/Cypridinidae_EmissionSpectra/Luciferase/")
-setwd("~/Documents/GitHub/Cypridinidae_EmissionSpectra/Luciferase/anova/")
-setwd("~/Documents/GitHub/Cypridinidae_EmissionSpectra/Luciferase/")
-dir()
 setwd("~/Documents/GitHub/Cypridinidae_EmissionSpectra/Luciferase/")
 read.csv(file="Cypridina mutagenesis.csv") -> cn
-cn
-cn
-cn
 anova(lm(lmax ~ X38 * X75 * X178 * X223 * X280 * X375 * X403, data=cn))
-anova(lm(lmax ~ X38 * X75 * X178 * X223 * X280, data=cn))
-anova(lm(lmax ~ X223, data=cn))
-anova(lm(lmax ~ X178, X223, data=cn))
 plot.design(lmax ~  X38 * X75 * X178 * X223 * X280 * X375 * X403, data=cn)
-anova(lm(lmax ~ X38 * X75 * X178 * X223 * X280 * X375 * X403, data=cn))
-read.csv(file="Cypridina mutagenesis.csv") -> cn
-plot(cn$Nsubs, cn$lmax)
-average()
-mean(cn$Lmax)
-mean(cn$lmax)
+cn
+anova(lm(lmax ~ X38 * X75 * X178 * X223 * X280 * X375, data=cn))
 plot.design(lmax ~  X38 * X75 * X178 * X223 * X280 * X375 * X403, data=cn)
+read.csv(file="YokoyamaOpsin.csv") -> opsin
+anova(lm(lmax ~ S180 * S197 * S277* S285 * S308, data=opsin))
+anova(lm(lmax ~ X38 * X75 * X178 * X223, data=cn))
+anova(lm(lmax ~ X38 * X75 * X375 * X403, data=cn))
+anova(lm(lmax ~ X38 * X178 * X375 * X403, data=cn))

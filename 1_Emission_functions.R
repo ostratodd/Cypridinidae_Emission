@@ -95,7 +95,7 @@ sgfwhm <- function(df, smooth, plot) {
 error <- function(df, rows) {
 	#This is a metric of signal to noise
 	#df is data frame with wavelength, sum
-	#n is number of highest rows (by sum) to average for wavelength
+	#n is number of highest rows (by sum, which adds all sampled time points together) to average for wavelength
 	#the data are ordered, and the "rows" decides how many of the lowest datapoints represent error
 	#averaging over them, instead of simply taking the lowest value as the background
 	sd(head(df[order(df$sum, decreasing=F),], n=rows)$sum ) -> error
