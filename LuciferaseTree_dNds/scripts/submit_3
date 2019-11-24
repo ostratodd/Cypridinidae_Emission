@@ -1,0 +1,7 @@
+#!/bin/bash -l
+#SBATCH --nodes=1 --ntasks-per-node=5
+
+cd $SLURM_SUBMIT_DIR
+
+/bin/hostname
+./3_alignNtre
