@@ -1,0 +1,33 @@
+#Our earlier assemblies were different from later assemblies. They used an earlier version of Trinity and a secondary step to consolodate transcripts
+# after trinity using cap3. We designed primers from these to amplify luciferases, but did not keep all records of those early assemblies.
+# This script uses our Sanger sequenced luciferases to pull out the best matches from current assemblies. Usually, the full gene 
+# is spread across multiple isoforms in the newer assemblies. This is probably caused by heterozygosity resulting from combining multiple indivual animals.
+#Trinity recognizes these as isoforms. CAP3 or other assembler could put these together.
+
+makeblastdb -in sequences/transcriptomes/Kornickeria_hastingsi_nt.fa -dbtype nucl
+blastn -query sequences/sequenced/KHC_nt.fa -db sequences/transcriptomes/Kornickeria_hastingsi_nt.fa > results/blast/KHCblast.out
+grep -A 6 -Fw 'Sequences producing' results/blast/KHCblast.out | grep -oP '...__.+i\d' > results/blast/transcriptome_models.txt
+
+makeblastdb -in sequences/transcriptomes/Maristella_chicoi_nt.fa -dbtype nucl
+blastn -query sequences/sequenced/MSH_nt.fa -db sequences/transcriptomes/Maristella_chicoi_nt.fa > results/blast/MSHblast.out
+grep -A 5 -Fw 'Sequences producing' results/blast/MSHblast.out | grep -oP '...__.+i\d' >> results/blast/transcriptome_models.txt
+
+makeblastdb -in sequences/transcriptomes/Photeros_morini_nt.fa -dbtype nucl
+blastn -query sequences/sequenced/PMO_nt.fa -db sequences/transcriptomes/Photeros_morini_nt.fa > results/blast/PMOblast.out
+grep -A 5 -Fw 'Sequences producing' results/blast/PMOblast.out | grep -oP '...__.+i\d' >> results/blast/transcriptome_models.txt
+
+makeblastdb -in sequences/transcriptomes/Maristella_sp_SVD_nt.fa -dbtype nucl
+blastn -query sequences/sequenced/SVD_nt.fa -db sequences/transcriptomes/Maristella_sp_SVD_nt.fa > results/blast/SVDblast.out
+grep -A 17 -Fw 'Sequences producing' results/blast/SVDblast.out | grep -oP '...__.+i\d' >> results/blast/transcriptome_models.txt
+
+makeblastdb -in sequences/transcriptomes/Maristella_sp_SVU_nt.fa -dbtype nucl
+blastn -query sequences/sequenced/SVU_nt.fa -db sequences/transcriptomes/Maristella_sp_SVU_nt.fa > results/blast/SVUblast.out
+grep -A 5 -Fw 'Sequences producing' results/blast/SVUblast.out | grep -oP '...__.+i\d' >> results/blast/transcriptome_models.txt
+
+cat sequences/transcriptomes/*nt.fa > sequences/transcriptomes/all_nt.fa
+grep -A 1 -Fwf results/blast/transcriptome_models.txt sequences/transcriptomes/all_nt.fa > sequences/transcriptome_models.fasta
+perl -pi -e 's/\-\-//g' sequences/transcriptome_models.fasta
+
+cat sequences/sequenced/sequenced_nt.fa sequences/transcriptome_models.fasta > sequences/temp.fasta
+mafft --adjustdirectionaccurately sequences/temp.fasta > sequences/transcriptome_models_ALN.fasta
+rm sequences/temp.fasta

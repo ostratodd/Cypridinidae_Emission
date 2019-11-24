@@ -1,0 +1,5 @@
+These scripts were executed on pod.cnsi.ucsb.edu and include mainly bash scripts and a few perl and python scripts.
+
+There are dependencies, including BLAST, IQTREE, and hyphy. I installed these using conda, and the appropriate conda
+
+environment must be called on pod before these scripts will work, using: conda activate gdownenv

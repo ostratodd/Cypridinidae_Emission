@@ -1,0 +1,72 @@
+echo
+echo "Must enter conda environment before running phython script. Name is gdownenv"
+echo "conda activate gdownenv ... which	doesn't	seem to	work from shell"
+
+#These are stored currently on Google Drive and accessible with link, downloadable with python (2.7) script
+
+#***************PHOTEROS
+#Photeros annecohenae
+python ~/bin/gdown.py 1bIoQRnENVSUx-cPRWqVpEixxr0pavfnc sequences/transcriptomes/Photeros_annecohenae_nt.fa 
+python ~/bin/gdown.py 1WDeMTA7R_ynZP7DD-vh0mYrv4DXG4-2N sequences/transcriptomes/Photeros_annecohenae_aa.fa
+
+
+#Photeros morini
+python ~/bin/gdown.py 1hXcOPGWB051BuxwPz5vhEaVF-BbGinOi sequences/transcriptomes/Photeros_morini_nt.fa
+python ~/bin/gdown.py 1eQpcC-YNLPKJVOdmAze4U6hIl0f6G_dO sequences/transcriptomes/Photeros_morini_aa.fa
+
+#Photeros macelroyi
+python ~/bin/gdown.py 1ADd6vffLj5JTDdsOqeX33OxMtct6Wcli sequences/transcriptomes/Photeros_macelroyi_nt.fa
+python ~/bin/gdown.py 1O9B4MlBa37jwsZOOaeiJM88PYyNpKxc9 sequences/transcriptomes/Photeros_macelroyi_aa.fa
+
+
+
+#Photeros WLU
+python ~/bin/gdown.py 1QFWT8p9DpskR_gEmpRaOxGYXSZX0jv42 sequences/transcriptomes/Photeros_sp_WLU_nt.fa
+python ~/bin/gdown.py 1RPAfiJS_fnolkJs35WdDOLDr3PWtmcbX sequences/transcriptomes/Photeros_sp_WLU_aa.fa
+
+
+#***************MARISTELLA
+#Maristella chicoi
+python ~/bin/gdown.py 1HvdlAar2qzeEBcPNTH5VoCA5FEXBYKKm sequences/transcriptomes/Maristella_chicoi_nt.fa
+python ~/bin/gdown.py 1ujLtAnjAkE6HxA18icAkRd_YtaoSYEx8 sequences/transcriptomes/Maristella_chicoi_aa.fa
+
+#Maristella SVU
+python ~/bin/gdown.py 15GQUXxVBUbgYA4LZbJ5UIqvHA7of1b63 sequences/transcriptomes/Maristella_sp_SVU_nt.fa
+python ~/bin/gdown.py 1OUU7OFLY5fS23T2wnQ_9uxBG1xqGV9D7 sequences/transcriptomes/Maristella_sp_SVU_aa.fa
+
+#Maristella SVD
+python ~/bin/gdown.py 1coBgnKl5ekCEdiEGmR9yTuo1mIUd9ieW sequences/transcriptomes/Maristella_sp_SVD_nt.fa
+python ~/bin/gdown.py 1dxedgn1Z6-6k2NzZ22RknDA7drftZwxi sequences/transcriptomes/Maristella_sp_SVD_aa.fa
+
+#Maristella AG
+python ~/bin/gdown.py 14Ug9nHhFrT8P2G6UAW7giZ-9pVeVt8VQ sequences/transcriptomes/Maristella_sp_AG_nt.fa
+python ~/bin/gdown.py 16a3PGf0ufBgpED9sC2KQGG5wPYRY9Dkp sequences/transcriptomes/Maristella_sp_AG_aa.fa
+
+#Maristella VAD
+python ~/bin/gdown.py 1cM9kCfYJzhwBmdT8A2TH_-kpgoCQdcVo sequences/transcriptomes/Maristella_sp_VAD_nt.fa
+python ~/bin/gdown.py 11kPnQElJlOX52y3RZXXGREgslruJAOol sequences/transcriptomes/Maristella_sp_VAD_aa.fa
+
+#***************KORNICKERIA
+#Kornickeria hastingsi
+python ~/bin/gdown.py 1E5s2-ZyolGKF0fP4XvpP9Ub-b1idajCT sequences/transcriptomes/Kornickeria_hastingsi_nt.fa	
+python ~/bin/gdown.py 1wF3UeYaPTLLVX_lmHMcQkxRr6nKJgIUU sequences/transcriptomes/Kornickeria_hastingsi_aa.fa
+
+
+#Change names of individual sequences to add species name both nt and aa
+perl -pi -e 's/\>TRINITY/\>PAN_/g' sequences/transcriptomes/Photeros_annecohenae*.fa
+perl -pi -e 's/\>TRINITY/\>PMO_/g' sequences/transcriptomes/Photeros_morini*.fa
+perl -pi -e 's/\>TRINITY/\>PMA_/g' sequences/transcriptomes/Photeros_macelroy*.fa
+perl -pi -e 's/\>TRINITY/\>WLU_/g' sequences/transcriptomes/Photeros_sp_WLU_*.fa
+
+perl -pi -e 's/\>TRINITY/\>VAD_/g' sequences/transcriptomes/Maristella_sp_VAD_*.fa
+perl -pi -e 's/\>TRINITY/\>MCH_/g' sequences/transcriptomes/Maristella_chicoi_*.fa
+perl -pi -e 's/\>TRINITY/\>MAG_/g' sequences/transcriptomes/Maristella_sp_AG_*.fa
+perl -pi -e 's/\>TRINITY/\>SVD_/g' sequences/transcriptomes/Maristella_sp_SVD_*.fa
+perl -pi -e 's/\>TRINITY/\>SVU_/g' sequences/transcriptomes/Maristella_sp_SVU_*.fa
+
+perl -pi -e 's/\>TRINITY/\>KHA_/g' sequences/transcriptomes/Kornickeria_hastingsi_*.fa
+
+
+#ADD TOGETHER FOR BLAST DATABASE                  
+cat sequences/transcriptomes/*_aa.fa > sequences/transcriptomes/allxtomes_aa.fasta
+cat sequences/transcriptomes/*_nt.fa > sequences/transcriptomes/allxtomes_nt.fasta
