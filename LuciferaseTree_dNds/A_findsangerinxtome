@@ -24,8 +24,8 @@ makeblastdb -in sequences/transcriptomes/Maristella_sp_SVU_nt.fa -dbtype nucl
 blastn -query sequences/sequenced/SVU_nt.fa -db sequences/transcriptomes/Maristella_sp_SVU_nt.fa > results/blast/SVUblast.out
 grep -A 5 -Fw 'Sequences producing' results/blast/SVUblast.out | grep -oP '...__.+i\d' >> results/blast/transcriptome_models.txt
 
-cat sequences/transcriptomes/*nt.fa > sequences/transcriptomes/all_nt.fa
-grep -A 1 -Fwf results/blast/transcriptome_models.txt sequences/transcriptomes/all_nt.fa > sequences/transcriptome_models.fasta
+cat sequences/transcriptomes/*_nt.fa > sequences/transcriptomes/allxtomes_nt.fasta
+grep -A 1 -Fwf results/blast/transcriptome_models.txt sequences/transcriptomes/allxtomes_nt.fa > sequences/transcriptome_models.fasta
 perl -pi -e 's/\-\-//g' sequences/transcriptome_models.fasta
 
 cat sequences/sequenced/sequenced_nt.fa sequences/transcriptome_models.fasta > sequences/temp.fasta

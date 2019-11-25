@@ -2,13 +2,14 @@ cat sequences/published/published_aa.fa sequences/sequenced/sequenced_aa.fa > se
 cat sequences/published/published_nt.fa sequences/sequenced/sequenced_nt.fa > sequences/nonxtome_nt.fa
 
 #pull out amino acid sequences that are in the lucclade (manually created file from tree results)
-	#this keeps the i number to pull specific isoform
-grep -A 1 -f sequences/lucclade.txt results/blast/besthits.fasta > sequences/lucclade_aa.fa
+	#this keeps the i (isoform) number to pull specific isoform
+grep -A 1 -f results/lucclade.txt results/blast/besthits.fasta > sequences/lucclade_aa.fa
 perl -pi -e 's/\-\-//g' sequences/lucclade_aa.fa
 perl -pi -e 's/:\:\TRINITY.+g\d+//g' sequences/lucclade_aa.fa
 perl -pi -e 's/\:/ /g' sequences/lucclade_aa.fa
 grep '>' sequences/lucclade_aa.fa > results/lucclade_i.txt
 
+#now grab matching nucleotide sequences
 perl -pi -e 's/\>//g' results/lucclade_i.txt
 perl -pi -e 's/ .+\n/\n/g' results/lucclade_i.txt
 grep -A 1 -f results/lucclade_i.txt sequences/transcriptomes/allxtomes_nt.fasta > sequences/lucclade_nt.fa
@@ -20,6 +21,7 @@ mafft sequences/nonxtome_aa.fa > sequences/nonxtome_aa_ALN.fa
 mafft sequences/lucclade_aa.fa > sequences/lucclade_aa_ALN.fa
 cat sequences/nonxtome_aa.fa sequences/lucclade_aa.fa > sequences/combined_aa.fa
 cat sequences/nonxtome_nt.fa sequences/lucclade_nt_rc.fa > sequences/combined_nt.fa
+perl -pi -e 's/\n\n/\n/g' sequences/combined_nt.fa
 mafft sequences/combined_aa.fa > sequences/combined_aa_ALN.fa
 
 #Usage:  pal2nal.pl  pep.aln  nuc.fasta - output paml
@@ -28,11 +30,11 @@ pal2nal.pl sequences/nonxtome_aa_ALN.fa sequences/nonxtome_nt.fa -output fasta >
 pal2nal.pl sequences/combined_aa_ALN.fa sequences/combined_nt.fa -output fasta > results/combined_codonaligned.fa
 
 #Need phylogeny for dn:ds
-rm results/phylogenies/nonxtome_codon.*
-iqtree -s results/nonxtome_codonaligned.fa -redo -pre results/phylogenies/nonxtome_codon
+#rm results/phylogenies/nonxtome_codon.*
+#iqtree -s results/nonxtome_codonaligned.fa -redo -pre results/phylogenies/nonxtome_codon
 
-rm results/phylogenies/combined_codon*
-iqtree -s results/combined_codonaligned.fa -redo -pre results/phylogenies/combined_codon
+#rm results/phylogenies/combined_codon*
+#iqtree -s results/combined_codonaligned.fa -redo -pre results/phylogenies/combined_codon
 
 
 #Run hyphy to test for episodic positive selection
