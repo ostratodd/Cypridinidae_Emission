@@ -24,21 +24,21 @@ cat sequences/nonxtome_aa.fa sequences/lucclade_aa.fa > sequences/combined_aa.fa
 cat sequences/nonxtome_nt.fa sequences/lucclade_nt_rc.fa > sequences/combined_nt.fa
 
 #now convert gene names to clearer names
-perl -pi -e 's/WLU\_\_/Photeros_sp_WLU_/g' sequences/combined*.fa
-perl -pi -e 's/PAN\_\_/Photeros_annecohenae_/g' sequences/combined*.fa
-perl -pi -e 's/KHC\_\_/Kornickeria_hastingsi_/g' sequences/combined*.fa
-perl -pi -e 's/KHA\_\_/Kornickeria_hastingsi_/g' sequences/combined*.fa
-perl -pi -e 's/PMA\_\_/Photeros_macelroyi_/g' sequences/combined*.fa
-perl -pi -e 's/PMO\_\_/Photeros_morini_/g' sequences/combined*.fa
-perl -pi -e 's/VTS\_\_/Vargula_tsujii_/g' sequences/combined*.fa
-perl -pi -e 's/SVU\_\_/Maristella_sp_SVU_/g' sequences/combined*.fa
-perl -pi -e 's/SVD\_\_/Maristella_sp_SVD_/g' sequences/combined*.fa
-perl -pi -e 's/MSH\_\_/Maristella_chicoi_/g' sequences/combined*.fa
-perl -pi -e 's/MAG\_\_/Maristella_sp_AG_/g' sequences/combined*.fa
-perl -pi -e 's/VAD\_\_/Maristella_sp_VAD_/g' sequences/combined*.fa
-
-perl -pi -e 's/25Feb2019/ sequenced/g' sequences/combined*.fa
-perl -pi -e 's/\:\:TRINITY.+/ only_transcriptome/g' sequences/combined*.fa
+perl -pi -e 's/WLU\_/Photeros_sp_WLU_/g' sequences/combined*.fa
+perl -pi -e 's/PAN\_/Photeros_annecohenae_/g' sequences/combined*.fa
+perl -pi -e 's/KHC\_/Kornickeria_hastingsi_/g' sequences/combined*.fa
+perl -pi -e 's/KHA\_/Kornickeria_hastingsi_/g' sequences/combined*.fa
+perl -pi -e 's/PMA\_/Photeros_macelroyi_/g' sequences/combined*.fa
+perl -pi -e 's/PMO\_/Photeros_morini_/g' sequences/combined*.fa
+perl -pi -e 's/VTS\_/Vargula_tsujii_/g' sequences/combined*.fa
+perl -pi -e 's/SVU\_/Maristella_sp_SVU_/g' sequences/combined*.fa
+perl -pi -e 's/SVD\_/Maristella_sp_SVD_/g' sequences/combined*.fa
+perl -pi -e 's/MSH\_/Maristella_chicoi_/g' sequences/combined*.fa
+perl -pi -e 's/MAG\_/Maristella_sp_AG_/g' sequences/combined*.fa
+perl -pi -e 's/VAD\_/Maristella_sp_VAD_/g' sequences/combined*.fa
+perl -pi -e 's/\_\_/\_/g' sequences/combined*.fa
+perl -pi -e 's/25Feb2019/sequenced/g' sequences/combined*.fa
+perl -pi -e 's/\:\:TRINITY.+/only_transcriptome/g' sequences/combined*.fa
 
 
 
