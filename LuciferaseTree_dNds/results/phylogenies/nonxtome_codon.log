@@ -4,8 +4,8 @@ Heiko Schmidt, Dominik Schrempf, Michael Woodhams.
 
 Host:    pod-login1.podcluster (AVX512, FMA3, 187 GB RAM)
 Command: iqtree -s results/nonxtome_codonaligned.fa -redo -pre results/phylogenies/nonxtome_codon
-Seed:    876609 (Using SPRNG - Scalable Parallel Random Number Generator)
-Time:    Sun Nov 24 10:56:46 2019
+Seed:    224776 (Using SPRNG - Scalable Parallel Random Number Generator)
+Time:    Sun Nov 24 11:35:27 2019
 Kernel:  AVX+FMA - 1 threads (40 CPU cores detected)
 
 HINT: Use -nt option to specify number of threads because your CPU has 40 cores!
@@ -169,8 +169,8 @@ Bayesian Information Criterion:         GTR+F+G4
 Best-fit model: GTR+F+G4 chosen according to BIC
 
 All model information printed to results/phylogenies/nonxtome_codon.model.gz
-CPU time for ModelFinder: 0.838 seconds (0h:0m:0s)
-Wall-clock time for ModelFinder: 1.742 seconds (0h:0m:1s)
+CPU time for ModelFinder: 0.825 seconds (0h:0m:0s)
+Wall-clock time for ModelFinder: 1.801 seconds (0h:0m:1s)
 
 NOTE: 0 MB RAM (0 GB) is required!
 Estimate model parameters (epsilon = 0.100)
@@ -184,36 +184,36 @@ Gamma shape alpha: 0.934
 Parameters optimization took 3 rounds (0.050 sec)
 Computing ML distances based on estimated model parameters... 0.001 sec
 Computing BIONJ tree...
-0.005 seconds
+0.004 seconds
 Log-likelihood of BIONJ tree: -8276.076
 --------------------------------------------------------------------
 |             INITIALIZING CANDIDATE TREE SET                      |
 --------------------------------------------------------------------
-Generating 98 parsimony trees... 0.178 second
-Computing log-likelihood of 46 initial trees ... 0.136 seconds
+Generating 98 parsimony trees... 0.075 second
+Computing log-likelihood of 44 initial trees ... 0.110 seconds
 Current best score: -8276.076
 
 Do NNI search on 20 best initial trees
 Estimate model parameters (epsilon = 0.100)
 BETTER TREE FOUND at iteration 1: -8276.058
-Iteration 10 / LogL: -8277.266 / Time: 0h:0m:0s
-Iteration 20 / LogL: -8276.065 / Time: 0h:0m:0s
+Iteration 10 / LogL: -8276.834 / Time: 0h:0m:0s
+Iteration 20 / LogL: -8276.121 / Time: 0h:0m:0s
 Finish initializing candidate tree set (1)
-Current best tree score: -8276.058 / CPU time: 0.592
+Current best tree score: -8276.058 / CPU time: 0.474
 Number of iterations: 20
 --------------------------------------------------------------------
 |               OPTIMIZING CANDIDATE TREE SET                      |
 --------------------------------------------------------------------
-Iteration 30 / LogL: -8276.102 / Time: 0h:0m:0s (0h:0m:1s left)
-Iteration 40 / LogL: -8277.465 / Time: 0h:0m:0s (0h:0m:1s left)
-Iteration 50 / LogL: -8276.394 / Time: 0h:0m:1s (0h:0m:1s left)
-Iteration 60 / LogL: -8276.782 / Time: 0h:0m:1s (0h:0m:0s left)
+Iteration 30 / LogL: -8277.022 / Time: 0h:0m:0s (0h:0m:1s left)
+Iteration 40 / LogL: -8276.064 / Time: 0h:0m:0s (0h:0m:1s left)
+Iteration 50 / LogL: -8276.284 / Time: 0h:0m:1s (0h:0m:1s left)
 UPDATE BEST LOG-LIKELIHOOD: -8276.058
-Iteration 70 / LogL: -8276.144 / Time: 0h:0m:1s (0h:0m:0s left)
-Iteration 80 / LogL: -8276.284 / Time: 0h:0m:1s (0h:0m:0s left)
-Iteration 90 / LogL: -8276.494 / Time: 0h:0m:1s (0h:0m:0s left)
-Iteration 100 / LogL: -8280.227 / Time: 0h:0m:1s (0h:0m:0s left)
-TREE SEARCH COMPLETED AFTER 102 ITERATIONS / Time: 0h:0m:1s
+Iteration 60 / LogL: -8276.728 / Time: 0h:0m:1s (0h:0m:1s left)
+Iteration 70 / LogL: -8276.113 / Time: 0h:0m:1s (0h:0m:0s left)
+Iteration 80 / LogL: -8276.111 / Time: 0h:0m:1s (0h:0m:0s left)
+Iteration 90 / LogL: -8276.315 / Time: 0h:0m:2s (0h:0m:0s left)
+Iteration 100 / LogL: -8276.106 / Time: 0h:0m:2s (0h:0m:0s left)
+TREE SEARCH COMPLETED AFTER 102 ITERATIONS / Time: 0h:0m:2s
 
 --------------------------------------------------------------------
 |                    FINALIZING TREE SEARCH                        |
@@ -222,18 +222,18 @@ Performs final model parameters optimization
 Estimate model parameters (epsilon = 0.010)
 1. Initial log-likelihood: -8276.058
 Optimal log-likelihood: -8276.056
-Rate parameters:  A-C: 3.93730  A-G: 4.67220  A-T: 2.54976  C-G: 2.20386  C-T: 8.13100  G-T: 1.00000
+Rate parameters:  A-C: 3.93728  A-G: 4.67221  A-T: 2.54978  C-G: 2.20388  C-T: 8.13099  G-T: 1.00000
 Base frequencies:  A: 0.288  C: 0.207  G: 0.240  T: 0.265
 Gamma shape alpha: 0.920
-Parameters optimization took 1 rounds (0.003 sec)
+Parameters optimization took 1 rounds (0.007 sec)
 BEST SCORE FOUND : -8276.056
 Total tree length: 1.573
 
 Total number of iterations: 102
-CPU time used for tree search: 0.828 sec (0h:0m:0s)
-Wall-clock time used for tree search: 1.828 sec (0h:0m:1s)
-Total CPU time used: 0.867 sec (0h:0m:0s)
-Total wall-clock time used: 1.919 sec (0h:0m:1s)
+CPU time used for tree search: 0.861 sec (0h:0m:0s)
+Wall-clock time used for tree search: 2.258 sec (0h:0m:2s)
+Total CPU time used: 0.896 sec (0h:0m:0s)
+Total wall-clock time used: 2.362 sec (0h:0m:2s)
 
 Analysis results written to: 
   IQ-TREE report:                results/phylogenies/nonxtome_codon.iqtree
@@ -241,4 +241,4 @@ Analysis results written to:
   Likelihood distances:          results/phylogenies/nonxtome_codon.mldist
   Screen log file:               results/phylogenies/nonxtome_codon.log
 
-Date and Time: Sun Nov 24 10:56:50 2019
+Date and Time: Sun Nov 24 11:35:31 2019
