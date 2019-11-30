@@ -27,6 +27,7 @@ anova(lm(lmax ~ X38 * X178 * X375 * X404 * X405, data=cn)) -> table2
 write.table(table2, file = "Table2.txt", sep="\t")
 
 #*************************************************Main Figures
+################
 #Figure 1 - Box plot of all lmax of species
 require(ggplot2)
 clean <- subset(alldata, error < 0.02 | replicate=="Vhil_tsuji" | replicate=="Cnoc_ohmiya" | replicate=="Pgra_huvard")
@@ -39,7 +40,7 @@ t1.rect1 <- data.frame (xmin=-Inf, xmax=Inf, ymin=454.27, ymax=463.42)
 
 fig1 + geom_rect(data=t2.rect1, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax), fill="green", alpha=0.1, inherit.aes = FALSE) + geom_rect(data=t1.rect1, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax), fill="blue", alpha=0.07, inherit.aes = FALSE)  + facet_grid(cols = vars(locality), scales = "free_x", switch = "x", space = "free")
 
-
+##############
 #Figure 2 - Box plot of all fwhm of species
 require(ggplot2)
 clean <- subset(alldata, error < 0.02 | replicate=="Vhil_tsuji" | replicate=="Cnoc_ohmiya" | replicate=="Pgra_huvard")
@@ -59,7 +60,15 @@ write.table(alldata, file="TableS3.txt", sep="\t")
 #Supplemental Table S4
 anova(lm(lmax ~ X38 * X178 * X191, data=nc)) -> tableS4
 write.table(tableS4, file = "TableS4.txt", sep="\t")
+#Supplemental Table S5 - Full table of mutant and natural luciferases and corresponding emission spectra
+cnplus->tableS5
+write.table(tableS5, file = "TableS5.txt", sep="\t")
 
-
-
-
+#***************************************************Supplemental Figures
+#Supplemental Figure S1
+require(ape)
+require(phytools)
+read.tree(file="./LuciferaseTree_dNds/results/phylogenies/all_aa.treefile") -> lucplus_tree
+midpoint.root(lucplus_tree) -> lucplus_tree_r
+ladderize(lucplus_tree_r)-> lprl
+plot(lprl, show.tip.label=TRUE, cex=.8, x.lim=2)
