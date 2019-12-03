@@ -159,23 +159,19 @@ m.1 <- lm(decay~V93 + V152 + V160 + V189+ V207 + V261 + V389 + V477 + V435 + V43
 anova(m.1)
 m.2 <- lm(decay~V189 + V389 + V477 + V435 + V436 + V581,data=dat2)
 
+
+
 ## plot of lamda max and decay
 #run THO's color data first to generate table1
-sp <- c("Pa EGD", "Pa CONT", "Pa LLL", "Pa MFU", "Pa SFM",
-        "Pa SMU", "Bx KHC", "Bz MSH", "Bz PMO",
-        "BzSFU", "Bz SVU", "Jp VHI", "Ro GPH", 
-        "Ro WLU", "Pr LSD", "Ro IR", "Ro RD", 
-        "Ro DU", "Us VTS", "Pr SPU", "Bz PAN", 
-        "VHilp","Jp CNO","Pa PGR")
-table1$SpID <- sp
+
 decay <- read.csv("Raw Data/expression-kinetics/decay_averages_all_for comparison_with_color.csv",header=TRUE)
-col_dec <- merge(decay,table1,by="SpID")
+col_dec <- merge(decay,table1,by="Species")
 head(col_dec)
 plot(Lmax_Mean~lambda,data=col_dec)
 cor.test(col_dec$lambda,col_dec$Lmax_Mean) #not sig P = 0.1862, corr = 33%
 cor.test(col_dec$lambda,col_dec$FWHM_Mean) #not sig
 
-library(ggplot)
+library(ggplot2)
 
 figS <- ggplot(data=col_dec,aes(x=lambda,y=Lmax_Mean)) + geom_point(aes(color=genus,shape=country),size=3) +
   xlab("Ave. decay constant per species") + ylab("Ave. peak emission per species")
