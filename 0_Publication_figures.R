@@ -72,3 +72,6 @@ read.tree(file="./LuciferaseTree_dNds/results/phylogenies/all_aa.treefile") -> l
 midpoint.root(lucplus_tree) -> lucplus_tree_r
 ladderize(lucplus_tree_r)-> lprl
 plot(lprl, show.tip.label=TRUE, cex=.8, x.lim=2)
+
+#Supplemental Figure S2
+#Created with prettyplot

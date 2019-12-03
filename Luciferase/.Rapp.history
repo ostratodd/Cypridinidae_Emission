@@ -339,14 +339,29 @@ for(n in names(mean_tauD)){#
   cat(line, '\n')#
 }
 setwd("~/Documents/GitHub/Cypridinidae_EmissionSpectra/Luciferase/")
-read.csv(file="Cypridina mutagenesis.csv") -> cn
-anova(lm(lmax ~ X38 * X75 * X178 * X223 * X280 * X375 * X403, data=cn))
-plot.design(lmax ~  X38 * X75 * X178 * X223 * X280 * X375 * X403, data=cn)
+read.csv(file="Cypridina only.csv") -> cn#
+#Calculate number of factors (different amino acids) per site#
+sapply(cn, function(x) length(unique(x))) -> aapersite#
+#
+#Choose sites (there are 5) with >2 different factors (amino acids at that site)#
+anova(lm(lmax ~ X38 * X178 * X375 * X404 * X405, data=cn))#
+plot.design(lmax ~  X38 * X178 * X375 * X404 * X405, data=cn)
+plot.design(lmax ~  X38 * X87 * X178 * X375 * X404 * X405, data=cn)
+anova(lm(lmax ~ X38 * X87 * X178 * X375 * X404 * X405, data=cn))
 cn
-anova(lm(lmax ~ X38 * X75 * X178 * X223 * X280 * X375, data=cn))
-plot.design(lmax ~  X38 * X75 * X178 * X223 * X280 * X375 * X403, data=cn)
-read.csv(file="YokoyamaOpsin.csv") -> opsin
-anova(lm(lmax ~ S180 * S197 * S277* S285 * S308, data=opsin))
-anova(lm(lmax ~ X38 * X75 * X178 * X223, data=cn))
-anova(lm(lmax ~ X38 * X75 * X375 * X403, data=cn))
-anova(lm(lmax ~ X38 * X178 * X375 * X403, data=cn))
+read.csv(file="Cypridina mutagenesis.csv") -> cnplus#
+anova(lm(lmax ~ X38 * X87* X178 * X375 * X404 * X405, data=cnplus))#
+plot.design(lmax ~  X38 * X87 * X178 * X375 * X404 * X405, data=cnplus)
+#now recalculate adding non-cypridina species#
+read.csv(file="Cypridina mutagenesis.csv") -> cnplus#
+anova(lm(lmax ~ X38 * X87* X178 * X375 * X404, data=cnplus))#
+plot.design(lmax ~  X38 * X87 * X178 * X375 * X404, data=cnplus)
+read.csv(file="Cypridina mutagenesis.csv") -> cnplus#
+anova(lm(lmax ~ X38 * X87* X178 * X375 * X404, X405 data=cnplus))#
+plot.design(lmax ~  X38 * X87 * X178 * X375 * X404, X405 data=cnplus)
+#now recalculate adding non-cypridina species#
+read.csv(file="Cypridina mutagenesis.csv") -> cnplus#
+anova(lm(lmax ~ X38 * X87* X178 * X375 * X404, X405 data=cnplus))#
+plot.design(lmax ~  X38 * X87 * X178 * X375 * X404, X405 data=cnplus)
+anova(lm(lmax ~ X38 * X87* X178 * X375 * X404 * X405, data=cnplus))
+plot.design(lmax ~  X38 * X87 * X178 * X375 * X404* X405, data=cnplus)

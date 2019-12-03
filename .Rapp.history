@@ -338,39 +338,37 @@ for(n in names(mean_tauD)){#
   line = paste(c(n, tau_D, p), collapse='\t')#
   cat(line, '\n')#
 }
-maindir <- "~/Documents/GitHub/Cypridinidae_EmissionSpectra/"#
+maindir <- "~/Documents/GitHub/Cypridinidae_EmissionSpectra/"
 setwd(maindir)
-source("1_Emission_Functions.R")
-source("2_Read_Datasets.R")
-source("3_Calculate_parameters.R")
-#Table 1 - lmax and fwhm for all species studied#
-#
-#First remove runs where signal:noise is too low#
-clean <- subset(alldata, error < 0.02 | replicate=="Vhil_tsuji" | replicate=="Cnoc_ohmiya" | replicate=="Pgra_huvard")#
-#calculate means, SDs, and counts, grouped by abbreviation#
-aggregate(clean[, 9:10], list(clean$abbreviation), FUN=mean) -> means#
-aggregate(clean[, 9:10], list(clean $abbreviation), FUN=sd) -> sds#
-aggregate(clean[, 9:10], list(clean $abbreviation), FUN=length) -> counts#
-#Now construct data frame as table for above information#
-cbind(subset(means, select="Group.1"), counts$sgMax, signif(means$sgMax,4), signif(sds$sgMax,2), signif(means$sgfwhm,4), signif(sds$sgfwhm,2)) -> table1#
-colnames(table1)[c(1,2,3,4,5,6)] <- c("Species", "N", "Lmax_Mean", "Lmax_SD", "FWHM_Mean", "FWHM_SD")#
-table1
-alldata
-#Figure 1 - Box plot of all lmax of species#
-require(ggplot2)#
-clean <- subset(alldata, error < 0.02 | replicate=="Vhil_tsuji" | replicate=="Cnoc_ohmiya" | replicate=="Pgra_huvard")#
-quartz("Figure 1", 13, 3)#
-fig1 <- qplot(abbreviation, sgMax, data=clean, geom=c("boxplot", "jitter")) + ylab("Lambda max (nm)") + xlab("Species")#
-	#highlight data with rectangles#
-	#add green blue shading w/ rectangle (geom_rect). This uses y-co-ordinates as min and max of photeros (green) and non-photeros (blue). facet_grid sorts into panels by collection locality#
-t2.rect1 <- data.frame (xmin=-Inf, xmax=Inf, ymin=463.97, ymax=471.14)#
-t1.rect1 <- data.frame (xmin=-Inf, xmax=Inf, ymin=454.27, ymax=463.42)#
-#
-fig1 + geom_rect(data=t2.rect1, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax), fill="green", alpha=0.1, inherit.aes = FALSE) + geom_rect(data=t1.rect1, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax), fill="blue", alpha=0.07, inherit.aes = FALSE)  + facet_grid(cols = vars(locality), scales = "free_x", switch = "x", space = "free")
-#Figure 2 - Box plot of all fwhm of species#
-require(ggplot2)#
-clean <- subset(alldata, error < 0.02 | replicate=="Vhil_tsuji" | replicate=="Cnoc_ohmiya" | replicate=="Pgra_huvard")#
-#
-quartz("Figure 2", 13, 3)#
-fig2 <- qplot(abbreviation, sgfwhm, data=clean, geom=c("boxplot", "jitter")) + ylab("FWHM (nm)") + xlab("Species")#
-fig2 + facet_grid(cols = vars(locality), scales = "free_x", switch = "x", space = "free")
+require(msa)
+codonAlign <- readDNAStringSet("LuciferaseTree_dNds/results/combined_codonaligned.fa", format="fasta")
+msa(codonAlign) -> codonAlignMSA
+msaPrettyPrint(codonAlignMSA, output="pdf", y=c(164, 213), file="Figure_S2.pdf")
+msaPrettyPrint(codonAlign, output="tex", showNames="none",#
+           showLogo="none", askForOverwrite=FALSE, verbose=FALSE)
+msaPrettyPrint(codonAlignMSA, output="tex", showNames="none",#
+           showLogo="none", askForOverwrite=FALSE, verbose=FALSE)
+msaPrettyPrint(codonAlignMSA, output="tex", showNames="none",#
+           showLogo="none", askForOverwrite=FALSE, verbose=FALSE)
+msaPrettyPrint(codonAlignMSA, output="tex", showNames="none",#
+           showLogo="none", askForOverwrite=FALSE, verbose=FALSE)
+msaPrettyPrint(codonAlignMSA, output="pdf", showNames="none",#
+           showLogo="none", askForOverwrite=FALSE, verbose=FALSE)
+msaPrettyPrint(codonAlignMSA, output="tex", showNames="none",#
+           showLogo="none", askForOverwrite=FALSE, verbose=FALSE)
+dir()
+msaPrettyPrint(codonAlignMSA, output="pdf", showNames="none",#
+           showLogo="none", askForOverwrite=FALSE, verbose=FALSE)
+Sys.which("pdflatex")
+Sys.getenv("PATH")
+Sys.setenv(PATH=paste(Sys.getenv("PATH"),"/usr/texbin",sep=":"))
+Sys.which("pdflatex")
+Sys.setenv(PATH=paste(Sys.getenv("PATH"),"/usr/texbin",sep=":"))
+Sys.getenv("PATH")
+msaPrettyPrint(codonAlignMSA, output="pdf", showNames="none",#
+           showLogo="none", askForOverwrite=FALSE, verbose=FALSE)
+msaPrettyPrint(codonAlignMSA, output="tex", showNames="none",#
+           showLogo="none", askForOverwrite=FALSE, verbose=FALSE)
+msaPrettyPrint(codonAlignMSA, output="asis", showNames="none",#
+           showLogo="none", askForOverwrite=FALSE, verbose=FALSE)
+dir()
