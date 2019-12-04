@@ -51,37 +51,37 @@ fig2 + facet_grid(cols = vars(locality), scales = "free_x", switch = "x", space 
 
 ##############
 #Figure 3 - Expression of luciferase candidates in Pichia yeast
-library(ggplot2); library(reshape2); library(dplyr); library(tidyverse)
-
+library(ggplot2); library(reshape2); library(dplyr); library(tidyverse); library(gridExtra)
+setwd(maindir)
 light_data <- read.csv("Raw Data/expression-kinetics/2019_pichia_assays.csv",header=TRUE)
 light_data2 <- light_data %>% group_by(Species,type,sample,count_type,Concentration,date) %>% summarise(mean_cps = mean(cps_norm))
 
 #Pichia yeast expression plot###
-ggplot(data=light_data2, aes(x = Species, y = log10(mean_cps),color=count_type)) + geom_boxplot() + 
+Figure3b <- ggplot(data=light_data2, aes(x = Species, y = log10(mean_cps),color=count_type)) + geom_boxplot() + 
   geom_point(position = position_jitterdodge()) + scale_discrete_manual(aes(x=sp)) +
   xlab("Species") + ylab(expression('log'[10]*'( CPS / Total Protein Conc. )')) + 
-  scale_color_manual(values = c("blue","grey"),name="Measures",labels=c("After + luciferin","Before"))
+  scale_color_manual(values = c("#0092ff","grey"),name="Measures",labels=c("After + luciferin","Before"))
 
-	##Pichia expression statistics###
-	library(nlme); library(rcompanion)
+	##############
+	#Mammalian expression
+mam_data <- read.csv(file="Raw Data/expression-kinetics/2014_mammalian_assays.csv", header=TRUE)
+#Add column for dilution*substrate
+luciferin <- data$dilution*data$substrate
+mam_data2 <- cbind(data,luciferin)
+mam_data <- mam_data2
 
-	##basic linear model##
-	m1 <- lm(log10(mean_cps) ~ Species*count_type,data=light_data2)
-	anova(m1)
-	qqnorm(resid(m1))
+#Subset data. the Soro-luc constructs did not have proper signal peptides
+tsuluc <- grep("VtLa", mam_data$construct); tsujii <- data[tsuluc,]; 
+pmorluc <- grep("PhM", mam_data$construct); morini <- data[pmorluc,]
+svuluc <- grep("SVUluc", mam_data$construct); svu <- data[svuluc,]
+blank <- grep("Blank", mam_data$construct); blankcells <- data[blank,]
+hek <- grep("HEK", mam_data$construct); hekcells <- data[hek,]
+mam_combine <- rbind(tsujii, morini, hekcells, blankcells, svu)
+subset(mam_combine, log(luciferin) > 6.5) -> maxluc
 
-	##mixed model to account for repeated measures amongst samples##
-	light_data3 <- subset.data.frame(light_data2,light_data2$mean_cps != "NA")
-	m.rand <- lme(log10(mean_cps) ~ Species*count_type, random = ~1 | sample, data = light_data3)
-	m.fixed <- gls(log10(mean_cps) ~ Species*count_type, data = light_data3)
-	m.null <- lme(log10(mean_cps) ~ 1, random = ~1 | sample, data = light_data3)
-	m.null2 <- gls(log10(mean_cps) ~ 1, data = light_data3)
-	summary(m.rand)
-	anova(m.rand,m.fixed)
-	nagelkerke(m.rand,m.null)
-	nagelkerke(m.rand,m.null2)
-	plotNormalHistogram(residuals(m.rand))
-	plot(fitted(m.rand), residuals(m.rand))
+Figure3a <- ggplot(data=maxluc, aes(x=construct, y=log10(light), fill=construct)) + scale_fill_manual(values=c("grey","grey","#0092ff","#0092ff","#0092ff")) + geom_boxplot() + geom_jitter() + xlab("Species") + ylab(expression('log'[10]*'( Counts Per Second)')) + theme(legend.position = "none")
+
+grid.arrange(Figure3a, Figure3b, nrow = 1) -> Figure3
 
 
 #*************************************************Supplemental Tables
@@ -159,25 +159,46 @@ m.1 <- lm(decay~V93 + V152 + V160 + V189+ V207 + V261 + V389 + V477 + V435 + V43
 anova(m.1)
 m.2 <- lm(decay~V189 + V389 + V477 + V435 + V436 + V581,data=dat2)
 
+
+
 ## plot of lamda max and decay
-#run THO's color data first to generate table1
-sp <- c("Pa EGD", "Pa CONT", "Pa LLL", "Pa MFU", "Pa SFM",
-        "Pa SMU", "Bx KHC", "Bz MSH", "Bz PMO",
-        "BzSFU", "Bz SVU", "Jp VHI", "Ro GPH", 
-        "Ro WLU", "Pr LSD", "Ro IR", "Ro RD", 
-        "Ro DU", "Us VTS", "Pr SPU", "Bz PAN", 
-        "VHilp","Jp CNO","Pa PGR")
-table1$SpID <- sp
+
+table1 <- read.table(file="Table1.txt", sep="\t", header=TRUE) #Read again if not executed above
 decay <- read.csv("Raw Data/expression-kinetics/decay_averages_all_for comparison_with_color.csv",header=TRUE)
-col_dec <- merge(decay,table1,by="SpID")
+col_dec <- merge(decay,table1,by="Species")
 head(col_dec)
 plot(Lmax_Mean~lambda,data=col_dec)
-cor.test(col_dec$lambda,col_dec$Lmax_Mean) #not sig P = 0.1862, corr = 33%
-cor.test(col_dec$lambda,col_dec$FWHM_Mean) #not sig
-
-library(ggplot)
+cor.test(col_dec$lambda,col_dec$Lmax_Mean) 
+cor.test(col_dec$lambda,col_dec$FWHM_Mean) 
+library(ggplot2)
 
 figS <- ggplot(data=col_dec,aes(x=lambda,y=Lmax_Mean)) + geom_point(aes(color=genus,shape=country),size=3) +
   xlab("Ave. decay constant per species") + ylab("Ave. peak emission per species")
 
+
+
+
+
+
+##########****************************
+	##Pichia expression statistics###
+	library(nlme); library(rcompanion)
+
+	##basic linear model##
+	m1 <- lm(log10(mean_cps) ~ Species*count_type,data=light_data2)
+	anova(m1)
+	qqnorm(resid(m1))
+
+	##mixed model to account for repeated measures amongst samples##
+	light_data3 <- subset.data.frame(light_data2,light_data2$mean_cps != "NA")
+	m.rand <- lme(log10(mean_cps) ~ Species*count_type, random = ~1 | sample, data = light_data3)
+	m.fixed <- gls(log10(mean_cps) ~ Species*count_type, data = light_data3)
+	m.null <- lme(log10(mean_cps) ~ 1, random = ~1 | sample, data = light_data3)
+	m.null2 <- gls(log10(mean_cps) ~ 1, data = light_data3)
+	summary(m.rand)
+	anova(m.rand,m.fixed)
+	nagelkerke(m.rand,m.null)
+	nagelkerke(m.rand,m.null2)
+	plotNormalHistogram(residuals(m.rand))
+	plot(fitted(m.rand), residuals(m.rand))
 
