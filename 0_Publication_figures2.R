@@ -57,11 +57,14 @@ light_data <- read.csv("Raw Data/expression-kinetics/2019_pichia_assays.csv",hea
 light_data2 <- light_data %>% group_by(Species,type,sample,count_type,Concentration,date) %>% summarise(mean_cps = mean(cps_norm))
 
 #Pichia yeast expression plot###
-Figure3b <- ggplot(data=light_data2, aes(x = Species, y = log10(mean_cps),color=count_type)) + geom_boxplot() + 
+sp <- c("Pichia","CNO","KHC","SVU","VTS")
+light_data2$Species <- factor(light_data2$Species,levels=sp)
+Figure3b <- ggplot(data=light_data2, aes(x = Species, y = log10(mean_cps),fill=count_type)) + geom_boxplot() + 
   geom_point(position = position_jitterdodge()) + scale_discrete_manual(aes(x=sp)) +
   xlab("Species") + ylab(expression('log'[10]*'( CPS / Total Protein Conc. )')) + 
-  scale_color_manual(values = c("#0092ff","grey"),name="Measures",labels=c("After + luciferin","Before"))
+  scale_fill_manual(values = c("#0092ff","grey"),name="Measures",labels=c("After + luciferin","Before"))
 
+Figure3b
 	##############
 	#Mammalian expression
 mam_data <- read.csv(file="Raw Data/expression-kinetics/2014_mammalian_assays.csv", header=TRUE)
