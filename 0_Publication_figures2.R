@@ -63,6 +63,7 @@ Figure3b <- ggplot(data=light_data2, aes(x = Species, y = log10(mean_cps),fill=c
   geom_point(position = position_jitterdodge()) + scale_discrete_manual(aes(x=sp)) +
   xlab("Species") + ylab(expression('log'[10]*'( CPS / Total Protein Conc. )')) + 
   scale_fill_manual(values = c("#0092ff","grey"),name="Measures",labels=c("After + luciferin","Before")) + 
+  scale_x_discrete(labels=c("Pichia","C_noc","K_has","M_SVU","V_tsu")) + 
   theme(legend.position = "none")
 
 	##############
@@ -82,7 +83,9 @@ hek <- grep("HEK", mam_data$construct); hekcells <- data[hek,]
 mam_combine <- rbind(tsujii, morini, hekcells, blankcells, svu)
 subset(mam_combine, log(luciferin) > 6.5) -> maxluc
 
-Figure3a <- ggplot(data=maxluc, aes(x=construct, y=log10(light), fill=construct)) + scale_fill_manual(values=c("grey","grey","#0092ff","#0092ff","#0092ff")) + geom_boxplot() + geom_jitter() + xlab("Species") + ylab(expression('log'[10]*'( Counts Per Second)')) + theme(legend.position = "none")
+Figure3a <- ggplot(data=maxluc, aes(x=construct, y=log10(light), fill=construct)) + scale_fill_manual(values=c("grey","grey","#0092ff","#0092ff","#0092ff")) + geom_boxplot() + geom_jitter() + xlab("Species") + ylab(expression('log'[10]*'( Counts Per Second)')) + 
+  scale_x_discrete(labels = c("Blank", "HEK", "P_mor", "M_SVU", "V_tsu")) + 
+  theme(legend.position = "none")
 
 grid.arrange(Figure3a, Figure3b, nrow = 1) -> Figure3
 
