@@ -19,7 +19,7 @@ rbind(EGD1f, EGD3f, EGD4f, EGD5f) -> allEGD
 #***********************************EGD
 genus <- "Contragula"
 species<-"contragula"
-abbreviation<-"CONT"
+abbreviation<-"M_CON" #Called "contragula" or CONT in some places. These are close to Kornickeria, but might also be Maristella
 sex<-"male"
 specloc <- "ucsb"
 
@@ -32,8 +32,8 @@ rbind(cont1f, cont2f, cont3f) -> allcont
 
 #***********************************LLL
 genus <- "Maristella"
-species<-"LLL"
-abbreviation<-"LLL"
+species<-"Maristella_LLL"
+abbreviation<-"M_LLL"
 sex<-"male"
 specloc <- "ucsb"
 
@@ -48,8 +48,8 @@ rbind(LLL1f, LLL2f, LLL3f, LLL4f, LLL5f) -> allLLL
 
 #***********************************MFU
 genus <- "Maristella"
-species<-"MFU"
-abbreviation<-"MFU"
+species<-"Maristella_MFU"
+abbreviation<-"M_MFU"
 sex<-"male"
 specloc <- "ucsb"
 
@@ -223,8 +223,8 @@ rbind(WLU1f, WLU2f, WLU3f, WLU4f, WLU5f, WLU6f, WLU8f, WLU10f) -> allWLU
 #LSD is from Puerto Rico, but data got mixed in with Roatan as we measured emission at the same time
 locality <- "PR_USA"
 genus <- "Maristella"
-species<-"LSD"
-abbreviation<-"LSD"
+species<-"Maristella_LSD"
+abbreviation<-"M_LSD"
 sex<-"male"
 specloc <- "ucsb"
 preservation <- "live"
@@ -236,8 +236,8 @@ rbind(LSD1f, LSD2f) -> allLSD
 #***********************************IR
 locality <- "Roatan"
 genus <- "Maristella"
-species<-"IR"
-abbreviation<-"IR"
+species<-"Maristella_IR"
+abbreviation<-"M_IR"
 sex<-"male"
 specloc <- "ucsb"
 preservation <- "dead"
@@ -254,8 +254,8 @@ fullrow(abbreviation, locality, genus,  species, "IR6", IR_6, sex, preservation,
 rbind(IR1f, IR2f, IR3f, IR4f, IR5f, IR6f) -> allIR
 
 genus <- "Maristella"
-species<-"RD"
-abbreviation<-"RD"
+species<-"Maristella_RD"
+abbreviation<-"M_RD"
 sex<-"male"
 specloc <- "ucsb"
 preservation <- "dead"
@@ -268,8 +268,8 @@ fullrow(abbreviation, locality, genus,  species, "RD5", RD_5, sex, preservation,
 rbind(RD1f, RD2f, RD3f, RD4f, RD5f) -> allRD
 
 genus <- "Maristella"
-species<-"DU"
-abbreviation<-"DU"
+species<-"Maristella_DU"
+abbreviation<-"M_DU"
 sex<-"male"
 specloc <- "ucsb"
 preservation <- "live"

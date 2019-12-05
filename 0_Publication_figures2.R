@@ -75,13 +75,13 @@ mam_data2 <- cbind(mam_data,luciferin)
 mam_data <- mam_data2
 
 #Subset data. the Soro-luc constructs did not have proper signal peptides
-tsuluc <- grep("VtLa", mam_data$construct); tsujii <- mam_data[tsuluc,];
-pmorluc <- grep("PhM", mam_data$construct); morini <- mam_data[pmorluc,]
-svuluc <- grep("SVUluc", mam_data$construct); svu <- mam_data[svuluc,]
-blank <- grep("Blank", mam_data$construct); blankcells <- mam_data[blank,]
-hek <- grep("HEK", mam_data$construct); hekcells <- mam_data[hek,]
-mam_combine <- rbind(tsujii, morini, hekcells, blankcells, svu)
-subset(mam_combine, log(luciferin) > 6.5) -> maxluc
+	tsuluc <- grep("VtLa", mam_data$construct); tsujii <- mam_data[tsuluc,];
+	pmorluc <- grep("PhM", mam_data$construct); morini <- mam_data[pmorluc,]
+	svuluc <- grep("SVUluc", mam_data$construct); svu <- mam_data[svuluc,]
+	blank <- grep("Blank", mam_data$construct); blankcells <- mam_data[blank,]
+	hek <- grep("HEK", mam_data$construct); hekcells <- mam_data[hek,]
+	mam_combine <- rbind(tsujii, morini, hekcells, blankcells, svu)
+	subset(mam_combine, log(luciferin) > 6.5) -> maxluc
 
 Figure3a <- ggplot(data=maxluc, aes(x=construct, y=log10(light), fill=construct)) + scale_fill_manual(values=c("grey","grey","#0092ff","#0092ff","#0092ff")) + geom_boxplot() + geom_jitter() + xlab("Species") + ylab(expression('log'[10]*'( Counts Per Second)')) +
   scale_x_discrete(labels = c("Blank", "HEK", "P_mor", "M_SVU", "V_tsu")) +
