@@ -59,11 +59,11 @@ light_data2 <- light_data %>% group_by(Species,type,sample,count_type,Concentrat
 #Pichia yeast expression plot###
 sp <- c("Pichia","CNO","KHC","SVU","VTS")
 light_data2$Species <- factor(light_data2$Species,levels=sp)
-Figure3b <- ggplot(data=light_data2, aes(x = Species, y = log10(mean_cps),fill=count_type)) + geom_boxplot() + 
+Figure3b <- ggplot(data=light_data2, aes(x = Species, y = log10(mean_cps),fill=count_type)) + geom_boxplot() +
   geom_point(position = position_jitterdodge()) + scale_discrete_manual(aes(x=sp)) +
-  xlab("Species") + ylab(expression('log'[10]*'( CPS / Total Protein Conc. )')) + 
-  scale_fill_manual(values = c("#0092ff","grey"),name="Measures",labels=c("After + luciferin","Before")) + 
-  scale_x_discrete(labels=c("Pichia","C_noc","K_has","M_SVU","V_tsu")) + 
+  xlab("Species") + ylab(expression('log'[10]*'( CPS / Total Protein Conc. )')) +
+  scale_fill_manual(values = c("#0092ff","grey"),name="Measures",labels=c("After + luciferin","Before")) +
+  scale_x_discrete(labels=c("Pichia","C_noc","K_has","M_SVU","V_tsu")) +
   theme(legend.position = "none")
 
 	##############
@@ -75,7 +75,7 @@ mam_data2 <- cbind(data,luciferin)
 mam_data <- mam_data2
 
 #Subset data. the Soro-luc constructs did not have proper signal peptides
-tsuluc <- grep("VtLa", mam_data$construct); tsujii <- data[tsuluc,]; 
+tsuluc <- grep("VtLa", mam_data$construct); tsujii <- data[tsuluc,];
 pmorluc <- grep("PhM", mam_data$construct); morini <- data[pmorluc,]
 svuluc <- grep("SVUluc", mam_data$construct); svu <- data[svuluc,]
 blank <- grep("Blank", mam_data$construct); blankcells <- data[blank,]
@@ -83,8 +83,8 @@ hek <- grep("HEK", mam_data$construct); hekcells <- data[hek,]
 mam_combine <- rbind(tsujii, morini, hekcells, blankcells, svu)
 subset(mam_combine, log(luciferin) > 6.5) -> maxluc
 
-Figure3a <- ggplot(data=maxluc, aes(x=construct, y=log10(light), fill=construct)) + scale_fill_manual(values=c("grey","grey","#0092ff","#0092ff","#0092ff")) + geom_boxplot() + geom_jitter() + xlab("Species") + ylab(expression('log'[10]*'( Counts Per Second)')) + 
-  scale_x_discrete(labels = c("Blank", "HEK", "P_mor", "M_SVU", "V_tsu")) + 
+Figure3a <- ggplot(data=maxluc, aes(x=construct, y=log10(light), fill=construct)) + scale_fill_manual(values=c("grey","grey","#0092ff","#0092ff","#0092ff")) + geom_boxplot() + geom_jitter() + xlab("Species") + ylab(expression('log'[10]*'( Counts Per Second)')) +
+  scale_x_discrete(labels = c("Blank", "HEK", "P_mor", "M_SVU", "V_tsu")) +
   theme(legend.position = "none")
 
 grid.arrange(Figure3a, Figure3b, nrow = 1) -> Figure3
@@ -174,37 +174,58 @@ decay <- read.csv("Raw Data/expression-kinetics/decay_averages_all_for compariso
 col_dec <- merge(decay,table1,by="Species")
 head(col_dec)
 plot(Lmax_Mean~lambda,data=col_dec)
-cor.test(col_dec$lambda,col_dec$Lmax_Mean) 
-cor.test(col_dec$lambda,col_dec$FWHM_Mean) 
+cor.test(col_dec$lambda,col_dec$Lmax_Mean)
+cor.test(col_dec$lambda,col_dec$FWHM_Mean)
 library(ggplot2)
 
 figS <- ggplot(data=col_dec,aes(x=lambda,y=Lmax_Mean)) + geom_point(aes(color=genus,shape=country),size=3) +
   xlab("Ave. decay constant per species") + ylab("Ave. peak emission per species")
 
 
+###******GGplot custom function to plot lme4 catepillar plot (confidence intervals of random effects)
+##credit to davebraze for this function: https://rdrr.io/github/davebraze/FDB1/man/ggCaterpillar.html
+##stack exchange resources: https://stackoverflow.com/questions/13847936/plot-random-effects-from-lmer-lme4-package-using-qqmath-or-dotplot-how-to-mak
 
+ggCaterpillar <- function(re, QQ=FALSE, likeDotplot=TRUE, detailedFacetLabs = TRUE) {
+  f <- function(x, nm = "ranef plot") {
+    pv   <- attr(x, "postVar")
+    cols <- 1:(dim(pv)[1])
+    se   <- unlist(lapply(cols, function(i) sqrt(pv[i, i, ])))
+    ord  <- unlist(lapply(x, order)) + rep((0:(ncol(x) - 1)) * nrow(x), each=nrow(x))
+    pDf  <- data.frame(y=unlist(x)[ord],
+                       ci=1.96*se[ord],
+                       nQQ=rep(stats::qnorm(stats::ppoints(nrow(x))), ncol(x)),
+                       ID=factor(rep(rownames(x), ncol(x))[ord], levels=rownames(x)[ord]),
+                       ind=gl(ncol(x), nrow(x), labels=names(x)))
 
+    if(detailedFacetLabs){
+      pDf$ind <- ifelse(grepl("(Intercept)", pDf$ind), "intercept adjustment", paste0("slope adj: ", pDf$ind))
+    }
 
+    if(QQ) {  ## normal QQ-plot
+      p <- ggplot(pDf, aes_string(x="nQQ", y="y"))
+      p <- p + facet_wrap(~ ind, scales="free")
+      p <- p + xlab("Standard normal quantiles") + ylab("Random effect quantiles")
+    } else {  ## caterpillar dotplot
+      p <- ggplot(pDf, aes_string(x="ID", y="y")) + coord_flip()
+      if(likeDotplot) {  ## imitate dotplot() -> same scales for random effects
+        p <- p + facet_wrap(~ ind)
+      } else {           ## different scales for random effects
+        p <- p + facet_grid(ind ~ ., scales="free_y")
+      }
+      p <- p + xlab(nm) + ylab("Random effects")
+      scale <- 12-log(length(levels(pDf$ID)),2)
+      p <- p + theme(axis.text.y = element_text(size=scale))
+    }
 
-##########****************************
-	##Pichia expression statistics###
-	library(nlme); library(rcompanion)
+    p <- p + theme(legend.position="none")
+    # p <- p + labs(title= nm)
+    p <- p + geom_hline(yintercept=0, lwd = I(7/12), colour = I(grDevices::hsv(0/12, 7/12, 7/12)), alpha = I(5/12))
+    p <- p + geom_errorbar(aes_string(ymin="y - ci", ymax="y + ci"), width=0, colour="black")
+    p <- p + geom_point(aes())
+    return(p)
+  }
 
-	##basic linear model##
-	m1 <- lm(log10(mean_cps) ~ Species*count_type,data=light_data2)
-	anova(m1)
-	qqnorm(resid(m1))
-
-	##mixed model to account for repeated measures amongst samples##
-	light_data3 <- subset.data.frame(light_data2,light_data2$mean_cps != "NA")
-	m.rand <- lme(log10(mean_cps) ~ Species*count_type, random = ~1 | sample, data = light_data3)
-	m.fixed <- gls(log10(mean_cps) ~ Species*count_type, data = light_data3)
-	m.null <- lme(log10(mean_cps) ~ 1, random = ~1 | sample, data = light_data3)
-	m.null2 <- gls(log10(mean_cps) ~ 1, data = light_data3)
-	summary(m.rand)
-	anova(m.rand,m.fixed)
-	nagelkerke(m.rand,m.null)
-	nagelkerke(m.rand,m.null2)
-	plotNormalHistogram(residuals(m.rand))
-	plot(fitted(m.rand), residuals(m.rand))
-
+  #   lapply(re, f) # original
+  lapply(seq_along(re), function(y, n, i) { f(y[[i]], n[[i]]) }, y=re, n=names(re)) # adds plot names
+}

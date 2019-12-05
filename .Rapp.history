@@ -348,10 +348,6 @@ msaPrettyPrint(codonAlign, output="tex", showNames="none",#
            showLogo="none", askForOverwrite=FALSE, verbose=FALSE)
 msaPrettyPrint(codonAlignMSA, output="tex", showNames="none",#
            showLogo="none", askForOverwrite=FALSE, verbose=FALSE)
-msaPrettyPrint(codonAlignMSA, output="tex", showNames="none",#
-           showLogo="none", askForOverwrite=FALSE, verbose=FALSE)
-msaPrettyPrint(codonAlignMSA, output="tex", showNames="none",#
-           showLogo="none", askForOverwrite=FALSE, verbose=FALSE)
 msaPrettyPrint(codonAlignMSA, output="pdf", showNames="none",#
            showLogo="none", askForOverwrite=FALSE, verbose=FALSE)
 msaPrettyPrint(codonAlignMSA, output="tex", showNames="none",#
