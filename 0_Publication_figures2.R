@@ -70,16 +70,16 @@ Figure3b <- ggplot(data=light_data2, aes(x = Species, y = log10(mean_cps),fill=c
 	#Mammalian expression
 mam_data <- read.csv(file="Raw Data/expression-kinetics/2014_mammalian_assays.csv", header=TRUE)
 #Add column for dilution*substrate
-luciferin <- data$dilution*data$substrate
-mam_data2 <- cbind(data,luciferin)
+luciferin <- mam_data$dilution*mam_data$substrate
+mam_data2 <- cbind(mam_data,luciferin)
 mam_data <- mam_data2
 
 #Subset data. the Soro-luc constructs did not have proper signal peptides
-tsuluc <- grep("VtLa", mam_data$construct); tsujii <- data[tsuluc,];
-pmorluc <- grep("PhM", mam_data$construct); morini <- data[pmorluc,]
-svuluc <- grep("SVUluc", mam_data$construct); svu <- data[svuluc,]
-blank <- grep("Blank", mam_data$construct); blankcells <- data[blank,]
-hek <- grep("HEK", mam_data$construct); hekcells <- data[hek,]
+tsuluc <- grep("VtLa", mam_data$construct); tsujii <- mam_data[tsuluc,];
+pmorluc <- grep("PhM", mam_data$construct); morini <- mam_data[pmorluc,]
+svuluc <- grep("SVUluc", mam_data$construct); svu <- mam_data[svuluc,]
+blank <- grep("Blank", mam_data$construct); blankcells <- mam_data[blank,]
+hek <- grep("HEK", mam_data$construct); hekcells <- mam_data[hek,]
 mam_combine <- rbind(tsujii, morini, hekcells, blankcells, svu)
 subset(mam_combine, log(luciferin) > 6.5) -> maxluc
 
