@@ -58,3 +58,6 @@ vts <- subset.data.frame(light_data2,light_data2$Species == "VTS")
 t.test(log10(vts$mean_cps)~vts$count_type)
 #p-value = 0.005704
 
+p.adjust(c(0.0002923,0.02686,0.005704),method = "bonf")
+#corrected: 0.0008769, 0.0805800, 0.0171120
+
