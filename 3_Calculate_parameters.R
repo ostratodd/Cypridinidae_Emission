@@ -138,10 +138,10 @@ fullrow(abbreviation, locality, genus,  species, "Pmor5", Pmor_5, sex, preservat
 
 rbind(Pmor1f,Pmor2f,Pmor3f,Pmor4f,Pmor5f) -> allPmor
 
-#***********************************SVD
+#***********************************This was originally called MFU but that turned out to be the same species as SVU
 genus <- "Maristella"
 species<-"Maristella_SVD"
-abbreviation<-"M_SFU"
+abbreviation<-"M_SVU"
 sex<-"male"
 specloc <- "ucsb"
 preservation <- "live"
@@ -151,9 +151,9 @@ fullrow(abbreviation, locality, genus,  species, "SVD3", SVD_3, sex, preservatio
 fullrow(abbreviation, locality, genus,  species, "SVD4", SVD_4, sex, preservation, specloc) -> SVD4f
 fullrow(abbreviation, locality, genus,  species, "SVD5", SVD_5, sex, preservation, specloc) -> SVD5f
 
-rbind(SVD1f,SVD2f,SVD3f,SVD4f,SVD5f) -> allSVD
+rbind(SVD1f,SVD2f,SVD3f,SVD4f,SVD5f) -> allSV
 
-#***********************************SVD
+#***********************************SVU
 genus <- "Maristella"
 species<-"Maristella_SVU"
 abbreviation<-"M_SVU"
@@ -219,6 +219,9 @@ fullrow(abbreviation, locality, genus,  species, "WLU7", WLU_8, sex, preservatio
 fullrow(abbreviation, locality, genus,  species, "WLU8", WLU_10, sex, preservation, specloc) -> WLU10f
 
 rbind(WLU1f, WLU2f, WLU3f, WLU4f, WLU5f, WLU6f, WLU8f, WLU10f) -> allWLU
+
+#LSD is from Puerto Rico, but data got mixed in with Roatan as we measured emission at the same time
+locality <- "PR_USA"
 genus <- "Maristella"
 species<-"LSD"
 abbreviation<-"LSD"
@@ -231,6 +234,7 @@ fullrow(abbreviation, locality, genus,  species, "LSD2", LSD_2, sex, preservatio
 rbind(LSD1f, LSD2f) -> allLSD
 
 #***********************************IR
+locality <- "Roatan"
 genus <- "Maristella"
 species<-"IR"
 abbreviation<-"IR"
@@ -407,6 +411,6 @@ fullrow(abbreviation, locality, genus,  species, "Pgra_huvard", Pgra_huvard, sex
 
 #****************************************Put all data into a single data frame, using one row bind command to bind them all
 #onering
-rbind(allEGD, allSFM, allcont,allLLL, allMFU, allPann, allPmor, allSMU, allKhas, allMSH, allSVD,  allSVU,allGPH, allWLU, allLSD, allIR, allRD, allDU, allVtsu, allWCU, allSPU, allVhil012317, allVhil090716, allVhil10052016, allVhil092016, allVhilJapan, Pgrahuvardf, Vhiltsujif, Cnocohmiyaf) -> alldata
+rbind(allEGD, allSFM, allcont,allLLL, allMFU, allPann, allPmor, allSMU, allKhas, allMSH, allSV,  allSVU, allGPH, allWLU, allLSD, allIR, allRD, allDU, allVtsu, allWCU, allSPU, allVhil012317, allVhil090716, allVhil10052016, allVhil092016, allVhilJapan, Pgrahuvardf, Vhiltsujif, Cnocohmiyaf) -> alldata
 alldata
 

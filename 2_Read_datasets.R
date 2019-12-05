@@ -45,7 +45,7 @@ graphEmission("WLU_6_05sec_x5x1sp_sig.asc", "WLU_6_05sec_x5x1sp_bgd.asc", calibr
 graphEmission("WLU_8_05sec_x10x3sp_dry_sig.asc", "WLU_8_05sec_x10x3sp_dry_bgd.asc", calibration,10,TRUE) -> WLU_8;
 graphEmission("WLU_10_05sec_x10x3sp_dry_sig.asc", "WLU_10_05sec_x10x3sp_dry_bgd.asc", calibration,10,TRUE) -> WLU_10;
 
-##############LSD
+##############LSD --  This is actually from Puerto Rico not Roatan
 workingdir <- "6-08-2016/LSD"
 setwd(paste0(rootdir,workingdir))
 #background #all different backgrounds, so specified in call to graphEmission
