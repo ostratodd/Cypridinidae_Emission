@@ -21,6 +21,14 @@ colnames(table1)[c(1,2,3,4,5,6)] <- c("Species", "N", "Lmax_Mean", "Lmax_SD", "F
 table1
 	#now write to text file
 write.table(table1, file = "Table1.txt", sep="\t")
+#graphical table
+library(gridExtra); library(grid);
+tt3 <- ttheme_default(
+  core=list(bg_params = list(fill = blues9[1:2], col=NA),
+            fg_params=list(fontface=1)),
+  colhead=list(fg_params=list(col="navyblue", fontface=1)),
+  rowhead=list(fg_params=list(col="white")));
+grid.arrange(tableGrob(table1, theme=tt3))
 
 #Table 2 - ANOVA results for 5 ‘mutagenesis sites’ using all data from mutagenesis study and available species’ luciferases
 anova(lm(lmax ~ X38 * X178 * X375 * X404 * X405, data=cn)) -> table2
@@ -157,15 +165,20 @@ colnames(dat)[589] <- "decay"
 # 285
 # 320
 # 371
-406
+# 406
 # 506
+library(gridExtra); library(grid);
+dat[,154]
 
 dat2 <- subset.data.frame(dat,dat$sp != "Vargula_tsujii_sequenced")
-m.1 <- lm(decay~V93 + V152 + V160 + V189+ V207 + V261 + V389 + V477 + V435 + V436 + V581,data=dat2)
+
+#add one for each to account for species names in first column
+#Positive selection sites -- 390 causes error
+m.1 <- lm(decay~ (V94 + V116 + V143 + V153 + V161 + V190 + V262 + V286 + V321 + V372 + V478 + V507 + V582),data=dat2)
 anova(m.1)
-m.2 <- lm(decay~V189 + V389 + V477 + V435 + V436 + V581,data=dat2)
 
-
+m.2 <- lm(decay ~ V94 + V153 + V190 + V478,data=dat2)
+anova(m.2)
 
 ## plot of lamda max and decay
 
