@@ -144,31 +144,54 @@ dat <- read.csv("Raw Data/expression-kinetics/clipboard-alignment_46718972828329
 # 178 --> 207
 # 375 --> 406
 # 404 --> 435
-# 405 --> 436
+# 405 --> 436 ##invariant in decay dataset
 
 #naming all columns properly
 colnames(dat)[1] <- "sp"
 colnames(dat)[589] <- "decay"
+colnames(dat)[2:588] <- paste("V",seq(1,587),sep="")
+dat2 <- dat[-8,]
+dat2 <- dat2[,c("sp","V93","V115","V142","V152","V160","V189","V261","V285",
+               "V320","V371","V389","V477","V506","V581","decay")]
 
-#sites that are invariant in the list above are:
-# 64
-# 115
-# 142
-# 285
-# 320
-# 371
-406
-# 506
+library(MuMIn)
+options(na.action = "na.fail")
+glb1 <- lm(decay ~ V93 + V142 + V152 + V160 + V189 + V261 + V285 + V320 + V371 + V389 + V477 + V506 + V581, data = dat2)
+mixnmatch <- dredge(glb1,rank = "AIC",m.lim = c(0,6)) #6 seems like the maximum terms we can fit safely
+av <- model.avg(mixnmatch)
 
-dat2 <- subset.data.frame(dat,dat$sp != "Vargula_tsujii_sequenced")
-m.1 <- lm(decay~V93 + V152 + V160 + V189+ V207 + V261 + V389 + V477 + V435 + V436 + V581,data=dat2)
-anova(m.1)
-m.2 <- lm(decay~V189 + V389 + V477 + V435 + V436 + V581,data=dat2)
+#model averaging approach produces these top 6 equivalent models:
+#       (Intrc) V142 V152 V160 V189 V261 V285 V320 V371 V389 V477 V506 V581 V93 df logLik  AIC  delta weight
+# 796   8.8620    +    +         +    +                   +    +               12  15.512  -7.0  0.00  0.166
+# 827   8.8620         +         +    +    +              +    +               12  15.512  -7.0  0.00  0.166
+# 859   8.8620         +         +    +         +         +    +               12  15.512  -7.0  0.00  0.166
+# 2332 15.7400    +    +         +    +                   +              +     12  15.512  -7.0  0.00  0.166
+# 2363 15.7400         +         +    +    +              +              +     12  15.512  -7.0  0.00  0.166
+# 2395 15.7400         +         +    +         +         +              +     12  15.512  -7.0  0.00  0.166
 
+#use this function to look at each model
+summary(eval(getCall(mixnmatch,796))) #189, 581
+summary(eval(getCall(mixnmatch,827))) #371, 477, 581
+summary(eval(getCall(mixnmatch,859))) #371, 581
+summary(eval(getCall(mixnmatch,2332))) #506
+summary(eval(getCall(mixnmatch,2363))) #371
+summary(eval(getCall(mixnmatch,2395))) #506
 
+#looking at the four sites are that ALWAYS present
+m_always <- lm(decay ~ V152 + V189 + V261 + V389,data=dat2)
+anova(m_always)
+
+m_some <- lm(decay ~ V142 + V285 + V320 + V477 + V581,data=dat2)
+anova(m_some)
+
+m_never <- lm(decay ~ V93 + V160 + V371 + V506,data=dat2)
+anova(m_never)
+
+#looking at a model that has all sites that appeared significant in at least one of the top models / comparisons above
+mixer <- lm(decay ~ V189 + V371 + V477 + V506 + V581,data=dat2)
+#site identity is correlated b/c limited sequence diversity
 
 ## plot of lamda max and decay
-
 table1 <- read.table(file="Table1.txt", sep="\t", header=TRUE) #Read again if not executed above
 decay <- read.csv("Raw Data/expression-kinetics/decay_averages_all_for comparison_with_color.csv",header=TRUE)
 col_dec <- merge(decay,table1,by="Species")
