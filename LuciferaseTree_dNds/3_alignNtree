@@ -1,5 +1,5 @@
 cat sequences/sequenced/sequenced_aa.fa sequences/published/published_aa.fa > sequences/nontranscriptome_aa.fa
-cat sequences/nontranscriptome_aa.fa results/blast/besthits.fasta  > sequences/all_aa.fa
+cat sequences/nontranscriptome_aa.fa results/blast/besthits.fasta  results/blast/phenotype_besthits.fasta > sequences/all_aa.fa
 
 #remove mafft checkpoints
 rm results/phylogenies/*.gz 
@@ -19,6 +19,11 @@ perl -pi -e 's/MSH\_\_/Maristella_chicoi /g' sequences/all_aa_ALN.fa
 perl -pi -e 's/MAG\_\_/Maristella_sp_AG /g' sequences/all_aa_ALN.fa
 perl -pi -e 's/VAD\_\_/Maristella_sp_VAD /g' sequences/all_aa_ALN.fa
 
+perl -pi -e 's/SRD\_\_/Maristella_sp_SRD /g' sequences/all_aa_ALN.fa
+perl -pi -e 's/MIR\_\_/Maristella_sp_MIR /g' sequences/all_aa_ALN.fa
+perl -pi -e 's/ODH\_\_/Maristella_sp_ODH /g' sequences/all_aa_ALN.fa
+perl -pi -e 's/CMU\_\_/Kornickeria_sp_CMU /g' sequences/all_aa_ALN.fa
+
 perl -pi -e 's/25Feb2019/sequenced/g' sequences/all_aa_ALN.fa
 perl -pi -e 's/\:\:TRINITY.+/ only_transcriptome/g' sequences/all_aa_ALN.fa
 
@@ -29,4 +34,4 @@ cat sequences/all_aa_ALN.fa |\
  tr "\t" "\n" > sequences/clean_all_aa_ALN.fa
 
 #execute iqtree this sould be done by calling slurm, because it is a longer job
-#iqtree -s sequences/clean_all_aa_ALN.fa -nt 5 -redo -pre results/phylogenies/all_aa
+iqtree -s sequences/clean_all_aa_ALN.fa -nt 5 -redo -pre results/phylogenies/all_aa
