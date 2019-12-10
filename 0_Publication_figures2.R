@@ -1,4 +1,4 @@
-maindir <- "~/Documents/GitHub/Cypridinidae_EmissionSpectra/"
+maindir <- "~/Documents/GitHub/Cypridinidae_Emission/"
 setwd(maindir)
 
 source("1_Emission_Functions.R")
@@ -182,45 +182,45 @@ m.2 <- lm(decay ~ V94 + V153 + V190 + V478,data=dat2)
 anova(m.2)
 =======
 colnames(dat)[2:588] <- paste("V",seq(1,587),sep="")
-dat2 <- dat[-8,]
+dat2 <- dat[-c(2,8),]
 dat2 <- dat2[,c("sp","V93","V115","V142","V152","V160","V189","V261","V285",
                "V320","V371","V389","V477","V506","V581","decay")]
 
 library(MuMIn)
 options(na.action = "na.fail")
-glb1 <- lm(decay ~ V93 + V142 + V152 + V160 + V189 + V261 + V285 + V320 + V371 + V389 + V477 + V506 + V581, data = dat2)
-mixnmatch <- dredge(glb1,rank = "AIC",m.lim = c(0,6)) #6 seems like the maximum terms we can fit safely
+glb1 <- lm(decay ~ V93 + V115 + V152 + V160 + V189 + V261 + V371 + V389 + V477 + V506 + V581, data = dat2)
+mixnmatch <- dredge(glb1,rank = "AIC",m.lim = c(0,5)) #5 seems like the maximum terms we can fit safely
 av <- model.avg(mixnmatch)
 
-#model averaging approach produces these top 6 equivalent models:
-#       (Intrc) V142 V152 V160 V189 V261 V285 V320 V371 V389 V477 V506 V581 V93 df logLik  AIC  delta weight
-# 796   8.8620    +    +         +    +                   +    +               12  15.512  -7.0  0.00  0.166
-# 827   8.8620         +         +    +    +              +    +               12  15.512  -7.0  0.00  0.166
-# 859   8.8620         +         +    +         +         +    +               12  15.512  -7.0  0.00  0.166
-# 2332 15.7400    +    +         +    +                   +              +     12  15.512  -7.0  0.00  0.166
-# 2363 15.7400         +         +    +    +              +              +     12  15.512  -7.0  0.00  0.166
-# 2395 15.7400         +         +    +         +         +              +     12  15.512  -7.0  0.00  0.166
+# Model selection table
+#       (Intrc) V115 V152 V160 V189 V261 V371 V389 V477 V506 V581 V93 df  logLik  AIC
+# 219   7.0960         +         +    +         +    +               11  13.741 -5.5
+# 603  13.9700         +         +    +         +              +     11  13.741 -5.5
+# 92    7.0960    +    +         +    +         +                    11  13.741 -5.5
 
 #use this function to look at each model
-summary(eval(getCall(mixnmatch,796))) #189, 581
-summary(eval(getCall(mixnmatch,827))) #371, 477, 581
-summary(eval(getCall(mixnmatch,859))) #371, 581
-summary(eval(getCall(mixnmatch,2332))) #506
-summary(eval(getCall(mixnmatch,2363))) #371
-summary(eval(getCall(mixnmatch,2395))) #506
+summary(eval(getCall(mixnmatch,219))) #581
+summary(eval(getCall(mixnmatch,603)))
+summary(eval(getCall(mixnmatch,92))) #261, 371, 581
+
+#477 and 506 may co-vary with other sites that are significant within certain seq
 
 #looking at the four sites are that ALWAYS present
 m_always <- lm(decay ~ V152 + V189 + V261 + V389,data=dat2)
 anova(m_always)
 
-m_some <- lm(decay ~ V142 + V285 + V320 + V477 + V581,data=dat2)
+#looking at the sites are are variably present
+m_some <- lm(decay ~ V115 + V142 + V285 + V320 + V477 + V581,data=dat2)
 anova(m_some)
 
+#looking at the sites are never present
 m_never <- lm(decay ~ V93 + V160 + V371 + V506,data=dat2)
-anova(m_never)
+anova(m_never) #371
 
 #looking at a model that has all sites that appeared significant in at least one of the top models / comparisons above
-mixer <- lm(decay ~ V189 + V371 + V477 + V506 + V581,data=dat2)
+mixer <- lm(decay ~ V115 + V189 + V261 + V371 + V477 + V581,data=dat2)
+#from the above model, we have evidence to suggest that 115, 189, and 261 effect decay rates
+
 #site identity is correlated b/c limited sequence diversity
 >>>>>>> 22d14059627d67655e952a4e3f935ac2d3d20bee
 

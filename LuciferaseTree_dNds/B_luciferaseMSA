@@ -1,3 +1,8 @@
 #uses EMBOSS transeq and prettyplot, which may be installed with bioconda
-cp sequences/combined_aa_ALN.fa results/combined_aa_ALN.fa
-prettyplot results/combined_aa_ALN.fa -graph ps -goutfile figures/combined_codonaln_pp
+
+
+#Need the amino acid sequence alignment below, but manually changed order of sequences for prettyplot
+#cp sequences/combined_aa_ALN.fa results/combined_aa_ALN.fa
+
+prettyplot results/combined_aa_ALN.fa -graph ps -goutfile figures/combined_codonaln_pp -residuesperline 100 -noccolours -maxnamelen 25 -pair 1.5,1.0,0.5 -nolistoptions -boxcol Y -boxuse YELLOW -portrait Yes -gtitle "Cypridinidae Luciferase Proteins" -gsubtitle " "
+
