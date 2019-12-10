@@ -1,23 +1,36 @@
 #Change names of individual sequences to add species name both nt and aa
 	#also done in 1_ file but here for redundancy in case I start with this file for efficiency during data exploration
+echo "changing sequence names"
 perl -pi -e 's/\>TRINITY/\>PAN_/g' sequences/transcriptomes/Photeros_annecohenae*.fa
 perl -pi -e 's/\>TRINITY/\>PMO_/g' sequences/transcriptomes/Photeros_morini*.fa
 perl -pi -e 's/\>TRINITY/\>PMA_/g' sequences/transcriptomes/Photeros_macelroy*.fa
 perl -pi -e 's/\>TRINITY/\>WLU_/g' sequences/transcriptomes/Photeros_sp_WLU_*.fa
 
 perl -pi -e 's/\>TRINITY/\>VAD_/g' sequences/transcriptomes/Maristella_sp_VAD_*.fa
-perl -pi -e 's/\>TRINITY/\>MCH_/g' sequences/transcriptomes/Maristella_chicoi_*.fa      
-perl -pi -e 's/\>TRINITY/\>MAG_/g' sequences/transcriptomes/Maristella_sp_AG_*.fa       
-perl -pi -e 's/\>TRINITY/\>SVD_/g' sequences/transcriptomes/Maristella_sp_SVD_*.fa      
-perl -pi -e 's/\>TRINITY/\>SVU_/g' sequences/transcriptomes/Maristella_sp_SVU_*.fa      
+perl -pi -e 's/\>TRINITY/\>MCH_/g' sequences/transcriptomes/Maristella_chicoi_*.fa
+perl -pi -e 's/\>TRINITY/\>MAG_/g' sequences/transcriptomes/Maristella_sp_AG_*.fa
+perl -pi -e 's/\>TRINITY/\>SVD_/g' sequences/transcriptomes/Maristella_sp_SVD_*.fa
+perl -pi -e 's/\>TRINITY/\>SVU_/g' sequences/transcriptomes/Maristella_sp_SVU_*.fa
 
-perl -pi -e 's/\>TRINITY/\>KHA_/g' sequences/transcriptomes/Kornickeria_hastingsi_*.fa  
+perl -pi -e 's/\>TRINITY/\>SRD_/g' sequences/transcriptomes/Maristella_sp_SRD_*.fa
+perl -pi -e 's/\>TRINITY/\>MIR_/g' sequences/transcriptomes/Maristella_sp_IR_*.fa
+perl -pi -e 's/\>TRINITY/\>ODH_/g' sequences/transcriptomes/Maristella_sp_ODH_*.fa
+
+perl -pi -e 's/\>TRINITY/\>KHA_/g' sequences/transcriptomes/Kornickeria_hastingsi_*.fa
+perl -pi -e 's/\>TRINITY/\>CMU_/g' sequences/transcriptomes/Kornickeria_CMU_*.fa
 
 
 #ADD TOGETHER FOR BLAST DATABASE
 cat sequences/transcriptomes/*_aa.fa > sequences/transcriptomes/allxtomes_aa.fasta
 cat sequences/transcriptomes/*_nt.fa > sequences/transcriptomes/allxtomes_nt.fasta
 
+#ADD TOGETHER FOR BLAST DATABASE
+cat sequences/transcriptomes/*_aa.fa > sequences/transcriptomes/allxtomes_aa.fasta
+cat sequences/transcriptomes/*_nt.fa > sequences/transcriptomes/allxtomes_nt.fasta
+
+
+echo "Assembling blast datbase for full length transcripts"
+###*************This section finds only full length blast hits which we retain for analysis, even when there is no color or decay data
 #Use awk to get all sequence data on a single line instead of interleaved
 awk '/^>/ {printf("%s%s\n",(N>0?"\n":""),$0);N++;next;}  {printf("%s",$0);} END {printf("\n");}' sequences/transcriptomes/allxtomes_aa.fasta > sequences/transcriptomes/allxtomes1_aa.fasta
 #now only retain complete (full length) transcripts as labeled by transdecoder
@@ -33,10 +46,21 @@ perl -pi -e 's/\:\:T//g' results/blast/top20.txt
 grep -A 1 -Fwf results/blast/top20.txt sequences/transcriptomes/complete_transcripts.fasta > results/blast/besthits.fasta
 perl -pi -e 's/\-\-//g' results/blast/besthits.fasta
 
+echo "Assembling blast database for trancriptomes with bioluminescent phenotype data"
+###*************Now search for luciferases from species where we have color or decay data, but no full length luciferase
+xtomedir="sequences/transcriptomes"
+
+cat $xtomedir/*SRD_aa* $xtomedir/*IR_aa* $xtomedir/*ODH_aa* $xtomedir/*CMU_aa* > $xtomedir/phenotype_xtome_aa.fasta
+#Use awk to get all sequence data on a single line instead of interleaved
+awk '/^>/ {printf("%s%s\n",(N>0?"\n":""),$0);N++;next;}  {printf("%s",$0);} END {printf("\n");}' $xtomedir/phenotype_xtome_aa.fasta > $xtomedir/phenotype_xtome1_aa.fasta
+
+makeblastdb -in $xtomedir/phenotype_xtome1_aa.fasta -dbtype prot
+blastp -query sequences/published/Vhilgendorfii_aa.fa -db $xtomedir/phenotype_xtome1_aa.fasta > results/blast/phenotype_blastresults.out
 
 
-
-
-
-
-
+#Now get top scoring sequences from blast output by maipulating text files. Assumes ...__
+#3-letter abbreviation for species at beginning of each sequence name
+grep -A 20 -Fw 'Sequences producing' results/blast/phenotype_blastresults.out | grep -oP '...__.+\:\:T' > results/blast/phenotype_top20.txt
+perl -pi -e 's/\:\:T//g' results/blast/phenotype_top20.txt
+grep -A 1 -Fwf results/blast/phenotype_top20.txt sequences/transcriptomes/phenotype_xtome1_aa.fasta > results/blast/phenotype_besthits.fasta
+perl -pi -e 's/\-\-//g' results/blast/phenotype_besthits.fasta
