@@ -150,38 +150,26 @@ dat <- read.csv("Raw Data/expression-kinetics/clipboard-alignment_46718972828329
 colnames(dat)[1] <- "sp"
 colnames(dat)[589] <- "decay"
 colnames(dat)[2:588] <- paste("V",seq(1,587),sep="")
-dat2 <- dat[-8,]
+dat2 <- dat[-c(2,8),]
 dat2 <- dat2[,c("sp","V93","V115","V142","V152","V160","V189","V261","V285",
                "V320","V371","V389","V477","V506","V581","decay")]
 
 library(MuMIn)
 options(na.action = "na.fail")
-glb1 <- lm(decay ~ V93 + V115 + V142 + V152 + V160 + V189 + V261 + V285 + V320 + V371 + V389 + V477 + V506 + V581, data = dat2)
-mixnmatch <- dredge(glb1,rank = "AIC",m.lim = c(0,6)) #6 seems like the maximum terms we can fit safely
+glb1 <- lm(decay ~ V93 + V115 + V152 + V160 + V189 + V261 + V371 + V389 + V477 + V506 + V581, data = dat2)
+mixnmatch <- dredge(glb1,rank = "AIC",m.lim = c(0,5)) #5 seems like the maximum terms we can fit safely
 av <- model.avg(mixnmatch)
 
 # Model selection table
-#        (Intrc) V115 V142 V152 V160 V189 V261 V285 V320 V371 V389 V477 V506 V581 V93 df
-# 1591   8.8620         +    +         +    +                   +    +               12
-# 1653   8.8620              +         +    +    +              +    +               12
-# 1717   8.8620              +         +    +         +         +    +               12
-# 630    8.8620    +         +         +    +    +              +                    12
-# 694    8.8620    +         +         +    +         +         +                    12
-# 4663  15.7400         +    +         +    +                   +              +     12
-# 568    8.8620    +    +    +         +    +                   +                    12
-# 4725  15.7400              +         +    +    +              +              +     12
-# 4789  15.7400              +         +    +         +         +              +     12
+#       (Intrc) V115 V152 V160 V189 V261 V371 V389 V477 V506 V581 V93 df  logLik  AIC
+# 219   7.0960         +         +    +         +    +               11  13.741 -5.5
+# 603  13.9700         +         +    +         +              +     11  13.741 -5.5
+# 92    7.0960    +    +         +    +         +                    11  13.741 -5.5
 
 #use this function to look at each model
-summary(eval(getCall(mixnmatch,1591))) #189, 581
-summary(eval(getCall(mixnmatch,1653))) #189, 477
-summary(eval(getCall(mixnmatch,1717))) #371, 581
-summary(eval(getCall(mixnmatch,630))) #189, 477
-summary(eval(getCall(mixnmatch,694))) #189, 261, 581
-summary(eval(getCall(mixnmatch,4663))) #115, 189, 261
-summary(eval(getCall(mixnmatch,568))) #115, 189, 261
-summary(eval(getCall(mixnmatch,4725))) #371
-summary(eval(getCall(mixnmatch,4789)))
+summary(eval(getCall(mixnmatch,219))) #581
+summary(eval(getCall(mixnmatch,603)))
+summary(eval(getCall(mixnmatch,92))) #261, 371, 581
 
 #477 and 506 may co-vary with other sites that are significant within certain seq
 
