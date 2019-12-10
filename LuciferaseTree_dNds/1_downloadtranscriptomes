@@ -9,7 +9,6 @@ echo "conda activate gdownenv ... which	doesn't	seem to	work from shell"
 python ~/bin/gdown.py 1bIoQRnENVSUx-cPRWqVpEixxr0pavfnc sequences/transcriptomes/Photeros_annecohenae_nt.fa 
 python ~/bin/gdown.py 1WDeMTA7R_ynZP7DD-vh0mYrv4DXG4-2N sequences/transcriptomes/Photeros_annecohenae_aa.fa
 
-
 #Photeros morini
 python ~/bin/gdown.py 1hXcOPGWB051BuxwPz5vhEaVF-BbGinOi sequences/transcriptomes/Photeros_morini_nt.fa
 python ~/bin/gdown.py 1eQpcC-YNLPKJVOdmAze4U6hIl0f6G_dO sequences/transcriptomes/Photeros_morini_aa.fa
@@ -17,8 +16,6 @@ python ~/bin/gdown.py 1eQpcC-YNLPKJVOdmAze4U6hIl0f6G_dO sequences/transcriptomes
 #Photeros macelroyi
 python ~/bin/gdown.py 1ADd6vffLj5JTDdsOqeX33OxMtct6Wcli sequences/transcriptomes/Photeros_macelroyi_nt.fa
 python ~/bin/gdown.py 1O9B4MlBa37jwsZOOaeiJM88PYyNpKxc9 sequences/transcriptomes/Photeros_macelroyi_aa.fa
-
-
 
 #Photeros WLU
 python ~/bin/gdown.py 1QFWT8p9DpskR_gEmpRaOxGYXSZX0jv42 sequences/transcriptomes/Photeros_sp_WLU_nt.fa
@@ -46,11 +43,26 @@ python ~/bin/gdown.py 16a3PGf0ufBgpED9sC2KQGG5wPYRY9Dkp sequences/transcriptomes
 python ~/bin/gdown.py 1cM9kCfYJzhwBmdT8A2TH_-kpgoCQdcVo sequences/transcriptomes/Maristella_sp_VAD_nt.fa
 python ~/bin/gdown.py 11kPnQElJlOX52y3RZXXGREgslruJAOol sequences/transcriptomes/Maristella_sp_VAD_aa.fa
 
+#Maristella SRD
+python ~/bin/gdown.py 12C8pTuTiTsFex20ejm8f_z-U_lXu-4I- sequences/transcriptomes/Maristella_sp_SRD_nt.fa
+python ~/bin/gdown.py 124nLrWYHn3xtqG8Ar5cA5uQpSSBOl-0k sequences/transcriptomes/Maristella_sp_SRD_aa.fa 
+
+#Maristella IR
+python ~/bin/gdown.py 1DsnfVdbpIoV-7m-41bGGnwdgbJhJBr3j sequences/transcriptomes/Maristella_sp_IR_nt.fa
+python ~/bin/gdown.py 1tsqxuJbHs9-amEM3wpW2oHZy4AQvSafx sequences/transcriptomes/Maristella_sp_IR_aa.fa 
+
+#Maristella ODH
+python ~/bin/gdown.py 1KNTCu5Ek2BRbJiZ_fajAvxdmH50ec-UV sequences/transcriptomes/Maristella_sp_ODH_nt.fa
+python ~/bin/gdown.py 1OBUB86DK3Neub0g8op0XcCR7IVR1hwHb sequences/transcriptomes/Maristella_sp_ODH_aa.fa 
+
 #***************KORNICKERIA
 #Kornickeria hastingsi
 python ~/bin/gdown.py 1E5s2-ZyolGKF0fP4XvpP9Ub-b1idajCT sequences/transcriptomes/Kornickeria_hastingsi_nt.fa	
 python ~/bin/gdown.py 1wF3UeYaPTLLVX_lmHMcQkxRr6nKJgIUU sequences/transcriptomes/Kornickeria_hastingsi_aa.fa
 
+#Kornickeria sp CMU
+python ~/bin/gdown.py 1qj_WapWuBp4w1JmRbMcmFdyLbTZ4tlOu sequences/transcriptomes/Kornickeria_CMU_nt.fa	
+python ~/bin/gdown.py 13cjyarER9OBxvk1vfBbUI-IoSalLJHsc sequences/transcriptomes/Kornickeria_CMU_aa.fa
 
 #Change names of individual sequences to add species name both nt and aa
 perl -pi -e 's/\>TRINITY/\>PAN_/g' sequences/transcriptomes/Photeros_annecohenae*.fa
@@ -64,7 +76,12 @@ perl -pi -e 's/\>TRINITY/\>MAG_/g' sequences/transcriptomes/Maristella_sp_AG_*.f
 perl -pi -e 's/\>TRINITY/\>SVD_/g' sequences/transcriptomes/Maristella_sp_SVD_*.fa
 perl -pi -e 's/\>TRINITY/\>SVU_/g' sequences/transcriptomes/Maristella_sp_SVU_*.fa
 
+perl -pi -e 's/\>TRINITY/\>SRD_/g' sequences/transcriptomes/Maristella_sp_SRD_*.fa
+perl -pi -e 's/\>TRINITY/\>IR_/g' sequences/transcriptomes/Maristella_sp_IR_*.fa
+perl -pi -e 's/\>TRINITY/\>ODH_/g' sequences/transcriptomes/Maristella_sp_ODH_*.fa
+
 perl -pi -e 's/\>TRINITY/\>KHA_/g' sequences/transcriptomes/Kornickeria_hastingsi_*.fa
+perl -pi -e 's/\>TRINITY/\>CMU_/g' sequences/transcriptomes/Kornickeria_CMU_*.fa
 
 
 #ADD TOGETHER FOR BLAST DATABASE                  

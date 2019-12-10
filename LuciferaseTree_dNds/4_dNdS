@@ -41,9 +41,6 @@ perl -pi -e 's/25Feb2019/sequenced/g' sequences/combined*.fa
 perl -pi -e 's/\:\:TRINITY.+/only_transcriptome/g' sequences/combined*.fa
 
 
-
-
-
 perl -pi -e 's/\n\n/\n/g' sequences/combined_nt.fa
 mafft sequences/combined_aa.fa > sequences/combined_aa_ALN.fa
 
@@ -56,8 +53,8 @@ pal2nal.pl sequences/combined_aa_ALN.fa sequences/combined_nt.fa -output fasta >
 #rm results/phylogenies/nonxtome_codon.*
 #iqtree -s results/nonxtome_codonaligned.fa -redo -pre results/phylogenies/nonxtome_codon
 
-#rm results/phylogenies/combined_codon*
-#iqtree -s results/combined_codonaligned.fa -redo -pre results/phylogenies/combined_codon
+rm results/phylogenies/combined_codon*
+iqtree -s results/combined_codonaligned.fa -redo -pre results/phylogenies/combined_codon -nt 5 -bb 1000
 
 
 #Run hyphy to test for episodic positive selection
