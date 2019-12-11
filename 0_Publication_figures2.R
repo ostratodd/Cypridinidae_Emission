@@ -129,11 +129,14 @@ plot(lprl, show.tip.label=TRUE, cex=.8, x.lim=2)
 ### decay ANOVA for luciferase function paper ###
 # using codon-aligned translations from AliView given THO's dNds output
 
-#Here is aligned amino acid file used for codon alignment. ~/Documents/GitHub/Cypridinidae_EmissionSpectra/LuciferaseTree_dNds/results/hyphy/lucclade.meme.csv
+#Here is aligned amino acid file used for codon alignment. 
 dat <- read.csv("LuciferaseTree_dNds/results/combined_aa.csv",header=FALSE, stringsAsFactors=FALSE, colClasses = c("character"))
-
-#Read results in csv from meme selection analysis
+#Read results in csv from meme selection analysis, including positively selected sites
 meme <- read.csv("LuciferaseTree_dNds/results/hyphy/lucclade.meme.csv",header=TRUE)
+#Now read decay data and mer
+
+decay <- read.csv("Raw Data/expression-kinetics/decay_averages_all_for comparison_with_color.csv",header=TRUE)
+col_dec <- merge(decay,table1,by="Species")
 
 #naming all columns properly
 colnames(dat)[1] <- "sp"
@@ -142,21 +145,11 @@ colnames(dat)[1] <- "sp"
 dat2 <- subset.data.frame(dat,dat$sp != "Vargula_tsujii_sequenced")
 <<<<<<< HEAD
 
-library(gridExtra); library(grid);
-dat[,154]
+#library(gridExtra); library(grid);
+#colnames(dat)[2:588] <- paste("V",seq(1,587),sep="")
+#dat2 <- dat[-8,]
 
 
-
-#add one for each to account for species names in first column
-#Positive selection sites -- 390 causes error
-m.1 <- lm(decay~ (V94 + V116 + V143 + V153 + V161 + V190 + V262 + V286 + V321 + V372 + V478 + V507 + V582),data=dat2)
-anova(m.1)
-
-m.2 <- lm(decay ~ V94 + V153 + V190 + V478,data=dat2)
-anova(m.2)
-=======
-colnames(dat)[2:588] <- paste("V",seq(1,587),sep="")
-dat2 <- dat[-8,]
 dat2 <- dat2[,c("sp","V93","V115","V142","V152","V160","V189","V261","V285",
                "V320","V371","V389","V477","V506","V581","decay")]
 
