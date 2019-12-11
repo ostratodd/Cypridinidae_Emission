@@ -1,0 +1,18 @@
+#!/bin/bash
+
+module load singularity
+
+sing_image="/home/pcw/ubuntu_bioperl_biopy2.img" 
+
+#if [ $thehost = "pod-login1.podcluster" ]; then
+#        sing_image="/home/pcw/ubuntu_bioperl_biopy2.img"
+#fi
+#if [ $thehost = "galaxy-dev" ]; then
+#        echo Using host: $thehost
+#        sing_image="ubuntu_bioperl_biopy2.img"
+#
+#fi
+
+infile="results/combined_aa_ALN.fa"
+
+singularity exec $sing_image perl scripts/fasta2csv.pl $infile > results/combined_aa.csv

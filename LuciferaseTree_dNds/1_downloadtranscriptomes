@@ -82,7 +82,7 @@ perl -pi -e 's/\>TRINITY/\>SVD_/g' sequences/transcriptomes/Maristella_sp_SVD_*.
 perl -pi -e 's/\>TRINITY/\>SVU_/g' sequences/transcriptomes/Maristella_sp_SVU_*.fa
 
 perl -pi -e 's/\>TRINITY/\>SRD_/g' sequences/transcriptomes/Maristella_sp_SRD_*.fa
-perl -pi -e 's/\>TRINITY/\>MIR_/g' sequences/transcriptomes/Maristella_sp_MIR_*.fa
+perl -pi -e 's/\>TRINITY/\>MIR_/g' sequences/transcriptomes/Maristella_sp_IR_*.fa
 perl -pi -e 's/\>TRINITY/\>ODH_/g' sequences/transcriptomes/Maristella_sp_ODH_*.fa
 
 perl -pi -e 's/\>TRINITY/\>KHA_/g' sequences/transcriptomes/Kornickeria_hastingsi_*.fa
