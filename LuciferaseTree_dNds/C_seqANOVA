@@ -15,6 +15,9 @@ sing_image="/home/pcw/ubuntu_bioperl_biopy2.img"
 
 infile="sequences/combined_aa_ALN.fa"
 
+./scripts/meme2csv.pl results/hyphy/lucclade.meme.out > results/hyphy/lucclade.meme.csv
+
 singularity exec $sing_image perl scripts/fasta2csv.pl $infile > results/combined_aa.csv
 
-./scripts/meme2csv.pl results/hyphy/lucclade.meme.out > results/hyphy/lucclade.meme.csv
+#Correspondence table of aligned site to ref site, in this case using Cypridina
+./scripts/make_seq_ref.pl sequences/combined_aa_ALN.fa Cypridina_noctiluca_BBG57195 > results/CypSites.csv
