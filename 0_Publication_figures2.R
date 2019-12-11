@@ -21,6 +21,14 @@ colnames(table1)[c(1,2,3,4,5,6)] <- c("Species", "N", "Lmax_Mean", "Lmax_SD", "F
 table1
 	#now write to text file
 write.table(table1, file = "Table1.txt", sep="\t")
+#graphical table
+library(gridExtra); library(grid);
+tt3 <- ttheme_default(
+  core=list(bg_params = list(fill = blues9[1:2], col=NA),
+            fg_params=list(fontface=1)),
+  colhead=list(fg_params=list(col="navyblue", fontface=1)),
+  rowhead=list(fg_params=list(col="white")));
+grid.arrange(tableGrob(table1, theme=tt3))
 
 #Table 2 - ANOVA results for 5 ‘mutagenesis sites’ using all data from mutagenesis study and available species’ luciferases
 anova(lm(lmax ~ X38 * X178 * X375 * X404 * X405, data=cn)) -> table2
@@ -149,6 +157,30 @@ dat <- read.csv("Raw Data/expression-kinetics/clipboard-alignment_46718972828329
 #naming all columns properly
 colnames(dat)[1] <- "sp"
 colnames(dat)[589] <- "decay"
+<<<<<<< HEAD
+
+#sites that are invariant in the list above are:
+# 64
+# 115
+# 142
+# 285
+# 320
+# 371
+# 406
+# 506
+library(gridExtra); library(grid);
+dat[,154]
+
+dat2 <- subset.data.frame(dat,dat$sp != "Vargula_tsujii_sequenced")
+
+#add one for each to account for species names in first column
+#Positive selection sites -- 390 causes error
+m.1 <- lm(decay~ (V94 + V116 + V143 + V153 + V161 + V190 + V262 + V286 + V321 + V372 + V478 + V507 + V582),data=dat2)
+anova(m.1)
+
+m.2 <- lm(decay ~ V94 + V153 + V190 + V478,data=dat2)
+anova(m.2)
+=======
 colnames(dat)[2:588] <- paste("V",seq(1,587),sep="")
 dat2 <- dat[-c(2,8),]
 dat2 <- dat2[,c("sp","V93","V115","V142","V152","V160","V189","V261","V285",
@@ -190,6 +222,7 @@ mixer <- lm(decay ~ V115 + V189 + V261 + V371 + V477 + V581,data=dat2)
 #from the above model, we have evidence to suggest that 115, 189, and 261 effect decay rates
 
 #site identity is correlated b/c limited sequence diversity
+>>>>>>> 22d14059627d67655e952a4e3f935ac2d3d20bee
 
 ## plot of lamda max and decay
 table1 <- read.table(file="Table1.txt", sep="\t", header=TRUE) #Read again if not executed above
