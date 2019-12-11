@@ -9,7 +9,8 @@ while (my $row = <$fh>) {
   chomp $row;
   #Check for multiple pipes in a line, which is used in text table of meme results
   my $number = () = $row =~ /\|/gi;
-  $row =~ s/ //g;
+  $row =~ s/ //g;	#remove padding spaces
+  $row =~ s/\,/_/g;	#remove comma that occurs before p-value
   if($number == 9){
 	my @columns = split /\|/, $row;
 	shift(@columns); #row leads with a pipe, so remove that

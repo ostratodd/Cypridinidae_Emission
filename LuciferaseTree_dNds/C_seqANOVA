@@ -16,3 +16,5 @@ sing_image="/home/pcw/ubuntu_bioperl_biopy2.img"
 infile="results/combined_aa_ALN.fa"
 
 singularity exec $sing_image perl scripts/fasta2csv.pl $infile > results/combined_aa.csv
+
+./scripts/meme2csv.pl results/hyphy/lucclade.meme.out > results/hyphy/lucclade.meme.csv
