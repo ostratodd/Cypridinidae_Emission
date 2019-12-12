@@ -126,9 +126,13 @@ plot(lprl, show.tip.label=TRUE, cex=.8, x.lim=2)
 
 ############
 #Supplemental Figure S3
+library(gridExtra); library(grid); require(janitor);
 ### decay ANOVA for luciferase function paper ###
 #Here is aligned amino acid file used for codon alignment. 
 dat <- read.csv("LuciferaseTree_dNds/results/combined_aa.csv",header=FALSE, stringsAsFactors=FALSE, colClasses = c("character"))
+#Columns are +1 compared to meme due to sp colum
+#Next command alters numbers by 1 to account for this
+colnames(dat)[2:ncol(dat)] <- paste("s",seq(1,(ncol(dat)-1)),sep="")
 #Read results in csv from meme selection analysis, including positively selected sites
 meme <- read.csv("LuciferaseTree_dNds/results/hyphy/lucclade.meme.csv",header=TRUE)
 #naming all columns properly
@@ -137,70 +141,87 @@ colnames(dat)[1] <- "sp"
 decay <- read.csv("Raw Data/expression-kinetics/decay_averages_all_for comparison_with_color.csv",header=TRUE)
 dat2 <- merge(dat,decay,by="sp")
 
+#Pull positively selected sites using vector of output table from meme
+pos_sel <- dat[,c("sp",paste("s",meme$Codon, sep=""))]
 
-#library(gridExtra); library(grid);
-#colnames(dat)[2:588] <- paste("V",seq(1,587),sep="")
-#dat2 <- dat[-8,]
-
-#Invariant sites include 161, 304, 339
-pos_sel <- dat2[,c("sp","V47","V48","V62","V112","V134","V179","V208",
-               "V280","V310","V408","V496","V600","lambda")]
+pos_sel_lam <- dat2[,c("sp",paste("s",meme$Codon, sep=""),"lambda")]
+remove_constant(pos_sel_lam)->pos_sel_lam ##Invariant sites because luc varies in spp without decay data 
 
 library(MuMIn)
 options(na.action = "na.fail")
-glb1 <- lm(lambda ~ V47 + V48 + V62 + V112 + V134 + V179 + V208 + 
-        			V280 + V310 + V408 + V496 + V600, data=pos_sel)
-               
+#doesn't work inside lm function but can cut and paste manually
+#after removing invariant sites, which are 160, 303, 338
+paste(colnames(pos_sel_lam)[3:ncol(pos_sel_lam)-1], collapse=" + "   ) -> modelsitesdecay
+glb1 <- lm(lambda ~ s46 + s47 + s61 + s111 + s133 + s178 + s207 + s279 + s309 + s407 + s495 + s599, data=pos_sel_lam)
+          
 mixnmatch <- dredge(glb1,rank = "AIC",m.lim = c(0,6)) #6 seems like the maximum terms we can fit safely
 av <- model.avg(mixnmatch)
 
-#model averaging approach produces these top 6 equivalent models:
 #Model selection table 
-#      (Intrc) V112 V134 V179 V208 V280 V310 V47 V48 V496 V600 V62 df logLik  AIC delta weight
-#61    7.40400              +    +    +    +                       10 -0.690 21.4  0.00  0.013
-#573   7.40400              +    +    +    +            +          10 -0.690 21.4  0.00  0.013
-#1085  7.40400              +    +    +    +                 +     10 -0.690 21.4  0.00  0.013
-#1597  7.40400              +    +    +    +            +    +     10 -0.690 21.4  0.00  0.013
-#2109  7.40400              +    +    +    +                     + 10 -0.690 21.4  0.00  0.013
-#2621  7.40400              +    +    +    +            +        + 10 -0.690 21.4  0.00  0.013
-#3133  7.40400              +    +    +    +                 +   + 10 -0.690 21.4  0.00  0.013
-#2073  5.72000                   +    +                          + 10 -0.690 21.4  0.00  0.013
-#1049  5.72000                   +    +                      +     10 -0.690 21.4  0.00  0.013
-#3097  5.72000                   +    +                      +   + 10 -0.690 21.4  0.00  0.013
-#2585  5.72000                   +    +                 +        + 10 -0.690 21.4  0.00  0.013
-#1561  5.72000                   +    +                 +    +     10 -0.690 21.4  0.00  0.013
-#3609  5.72000                   +    +                 +    +   + 10 -0.690 21.4  0.00  0.013
-#1565  8.95300              +    +    +                 +    +     10 -0.690 21.4  0.00  0.013
-#2589  7.40400              +    +    +                 +        + 10 -0.690 21.4  0.00  0.013
-#3613  8.95300              +    +    +                 +    +   + 10 -0.690 21.4  0.00  0.013
-#59    5.72000         +         +    +    +                       10 -0.690 21.4  0.00  0.013
-#63    5.72000         +    +    +    +    +                       10 -0.690 21.4  0.00  0.013
-#571   5.72000         +         +    +    +            +          10 -0.690 21.4  0.00  0.013
-#575   5.72000         +    +    +    +    +            +          10 -0.690 21.4  0.00  0.013
-#1051  5.72000         +         +    +                      +     10 -0.690 21.4  0.00  0.013
-#1055  5.72000         +    +    +    +                      +     10 -0.690 21.4  0.00  0.013
-#1083  5.72000         +         +    +    +                 +     10 -0.690 21.4  0.00  0.013
+#      (Intrc) s111 s133 s178 s207 s279 s309 s407 s46 s47 s495 s599 s61 df logLik  AIC delta weight
+#61    7.40400              +    +    +    +                            10 -0.690 21.4  0.00  0.008
+#573   7.40400              +    +    +    +                 +          10 -0.690 21.4  0.00  0.008
+#1085  7.40400              +    +    +    +                      +     10 -0.690 21.4  0.00  0.008
+#1597  7.40400              +    +    +    +                 +    +     10 -0.690 21.4  0.00  0.008
+#2109  7.40400              +    +    +    +                          + 10 -0.690 21.4  0.00  0.008
+#2621  7.40400              +    +    +    +                 +        + 10 -0.690 21.4  0.00  0.008
+#3133  7.40400              +    +    +    +                      +   + 10 -0.690 21.4  0.00  0.008
+#2073  5.72000                   +    +                               + 10 -0.690 21.4  0.00  0.008
+#1049  5.72000                   +    +                           +     10 -0.690 21.4  0.00  0.008
+#3097  5.72000                   +    +                           +   + 10 -0.690 21.4  0.00  0.008
+#2585  5.72000                   +    +                      +        + 10 -0.690 21.4  0.00  0.008
+#1561  5.72000                   +    +                      +    +     10 -0.690 21.4  0.00  0.008
+#3609  5.72000                   +    +                      +    +   + 10 -0.690 21.4  0.00  0.008
+#1565  8.95300              +    +    +                      +    +     10 -0.690 21.4  0.00  0.008
+#2589  7.40400              +    +    +                      +        + 10 -0.690 21.4  0.00  0.008
+#3613  8.95300              +    +    +                      +    +   + 10 -0.690 21.4  0.00  0.008
+#59    5.72000         +         +    +    +                            10 -0.690 21.4  0.00  0.008
+#63    5.72000         +    +    +    +    +                            10 -0.690 21.4  0.00  0.008
+#571   5.72000         +         +    +    +                 +          10 -0.690 21.4  0.00  0.008
+#575   5.72000         +    +    +    +    +                 +          10 -0.690 21.4  0.00  0.008
+#1051  5.72000         +         +    +                           +     10 -0.690 21.4  0.00  0.008
+#1055  5.72000         +    +    +    +                           +     10 -0.690 21.4  0.00  0.008
+#1083  5.72000         +         +    +    +                      +     10 -0.690 21.4  0.00  0.008
+#1087  5.72000         +    +    +    +    +                      +     10 -0.690 21.4  0.00  0.008
+#1563  5.72000         +         +    +                      +    +     10 -0.690 21.4  0.00  0.008
+#1567  5.72000         +    +    +    +                      +    +     10 -0.690 21.4  0.00  0.008
+#1595  5.72000         +         +    +    +                 +    +     10 -0.690 21.4  0.00  0.008
+#2075  5.72000         +         +    +                               + 10 -0.690 21.4  0.00  0.008
+#2079  5.72000         +    +    +    +                               + 10 -0.690 21.4  0.00  0.008
+#2107  5.72000         +         +    +    +                          + 10 -0.690 21.4  0.00  0.008
+#2111  5.72000         +    +    +    +    +                          + 10 -0.690 21.4  0.00  0.008
+#2587  5.72000         +         +    +                      +        + 10 -0.690 21.4  0.00  0.008
+#2591  5.72000         +    +    +    +                      +        + 10 -0.690 21.4  0.00  0.008
+#2619  5.72000         +         +    +    +                 +        + 10 -0.690 21.4  0.00  0.008
+#3099  5.72000         +         +    +                           +   + 10 -0.690 21.4  0.00  0.008
+#3103  5.72000         +    +    +    +                           +   + 10 -0.690 21.4  0.00  0.008
+#3131  5.72000         +         +    +    +                      +   + 10 -0.690 21.4  0.00  0.008
+#3611  5.72000         +         +    +                      +    +   + 10 -0.690 21.4  0.00  0.008
 
 #use this function to look at each model
-summary(eval(getCall(mixnmatch,61))) #112, 208, 280, 62
+summary(eval(getCall(mixnmatch,61))) #111, 207, 279, 61
+summary(eval(getCall(mixnmatch,1597))) #none
+summary(eval(getCall(mixnmatch,1049))) #none
+summary(eval(getCall(mixnmatch,63))) #111, 207 ,279, 310
+summary(eval(getCall(mixnmatch,575))) #207
 
 
-#looking at the four sites are that ALWAYS present
-m_always <- lm(lambda ~ V208 + V280,data=pos_sel)
+#looking at the two sites are that ALWAYS present
+m_always <- lm(lambda ~ s207 + s279,data=pos_sel_lam)
 anova(m_always)
 
-##****************Updated to here THO 12/11/2019
-#m_some <- lm(decay ~ V142 + V285 + V320 + V477 + V581,data=dat2)
+#m_some <- lm(lambda ~ V134 + V179 + V310 + V496 + V600 + V62,data=pos_sel_lam)
 #anova(m_some)
-
-#m_never <- lm(decay ~ V93 + V160 + V371 + V506,data=dat2)
+#
+#m_never <- lm(lambda ~ V112 + V47+ V48,data=pos_sel_lam)
 #anova(m_never)
 
 #looking at a model that has all sites that appeared significant in at least one of the top models / comparisons above
-mixer <- lm(decay ~ V189 + V371 + V477 + V506 + V581,data=dat2)
+#mixer <- lm(decay ~ V189 + V371 + V477 + V506 + V581,data=dat2)
 #site identity is correlated b/c limited sequence diversity
 >>>>>>> 22d14059627d67655e952a4e3f935ac2d3d20bee
 
+#############################
 ## plot of lamda max and decay
 table1 <- read.table(file="Table1.txt", sep="\t", header=TRUE) #Read again if not executed above
 decay <- read.csv("Raw Data/expression-kinetics/decay_averages_all_for comparison_with_color.csv",header=TRUE)
