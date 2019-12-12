@@ -127,64 +127,74 @@ plot(lprl, show.tip.label=TRUE, cex=.8, x.lim=2)
 ############
 #Supplemental Figure S3
 ### decay ANOVA for luciferase function paper ###
-# using codon-aligned translations from AliView given THO's dNds output
-
 #Here is aligned amino acid file used for codon alignment. 
 dat <- read.csv("LuciferaseTree_dNds/results/combined_aa.csv",header=FALSE, stringsAsFactors=FALSE, colClasses = c("character"))
 #Read results in csv from meme selection analysis, including positively selected sites
 meme <- read.csv("LuciferaseTree_dNds/results/hyphy/lucclade.meme.csv",header=TRUE)
-#Now read decay data and mer
-
-decay <- read.csv("Raw Data/expression-kinetics/decay_averages_all_for comparison_with_color.csv",header=TRUE)
-col_dec <- merge(decay,table1,by="Species")
-
 #naming all columns properly
 colnames(dat)[1] <- "sp"
-#colnames(dat)[589] <- "decay"
+#Now read decay data and merge -- decay column called lambda
+decay <- read.csv("Raw Data/expression-kinetics/decay_averages_all_for comparison_with_color.csv",header=TRUE)
+dat2 <- merge(dat,decay,by="sp")
 
-dat2 <- subset.data.frame(dat,dat$sp != "Vargula_tsujii_sequenced")
-<<<<<<< HEAD
 
 #library(gridExtra); library(grid);
 #colnames(dat)[2:588] <- paste("V",seq(1,587),sep="")
 #dat2 <- dat[-8,]
 
-
-dat2 <- dat2[,c("sp","V93","V115","V142","V152","V160","V189","V261","V285",
-               "V320","V371","V389","V477","V506","V581","decay")]
+#Invariant sites include 161, 304, 339
+pos_sel <- dat2[,c("sp","V47","V48","V62","V112","V134","V179","V208",
+               "V280","V310","V408","V496","V600","lambda")]
 
 library(MuMIn)
 options(na.action = "na.fail")
-glb1 <- lm(decay ~ V93 +V115 + V142 + V152 + V160 + V189 + V261 + V285 + V320 + V371 + V389 + V477 + V506 + V581, data = dat2)
+glb1 <- lm(lambda ~ V47 + V48 + V62 + V112 + V134 + V179 + V208 + 
+        			V280 + V310 + V408 + V496 + V600, data=pos_sel)
+               
 mixnmatch <- dredge(glb1,rank = "AIC",m.lim = c(0,6)) #6 seems like the maximum terms we can fit safely
 av <- model.avg(mixnmatch)
 
 #model averaging approach produces these top 6 equivalent models:
-#       (Intrc) V142 V152 V160 V189 V261 V285 V320 V371 V389 V477 V506 V581 V93 df logLik  AIC  delta weight
-# 796   8.8620    +    +         +    +                   +    +               12  15.512  -7.0  0.00  0.166
-# 827   8.8620         +         +    +    +              +    +               12  15.512  -7.0  0.00  0.166
-# 859   8.8620         +         +    +         +         +    +               12  15.512  -7.0  0.00  0.166
-# 2332 15.7400    +    +         +    +                   +              +     12  15.512  -7.0  0.00  0.166
-# 2363 15.7400         +         +    +    +              +              +     12  15.512  -7.0  0.00  0.166
-# 2395 15.7400         +         +    +         +         +              +     12  15.512  -7.0  0.00  0.166
+#Model selection table 
+#      (Intrc) V112 V134 V179 V208 V280 V310 V47 V48 V496 V600 V62 df logLik  AIC delta weight
+#61    7.40400              +    +    +    +                       10 -0.690 21.4  0.00  0.013
+#573   7.40400              +    +    +    +            +          10 -0.690 21.4  0.00  0.013
+#1085  7.40400              +    +    +    +                 +     10 -0.690 21.4  0.00  0.013
+#1597  7.40400              +    +    +    +            +    +     10 -0.690 21.4  0.00  0.013
+#2109  7.40400              +    +    +    +                     + 10 -0.690 21.4  0.00  0.013
+#2621  7.40400              +    +    +    +            +        + 10 -0.690 21.4  0.00  0.013
+#3133  7.40400              +    +    +    +                 +   + 10 -0.690 21.4  0.00  0.013
+#2073  5.72000                   +    +                          + 10 -0.690 21.4  0.00  0.013
+#1049  5.72000                   +    +                      +     10 -0.690 21.4  0.00  0.013
+#3097  5.72000                   +    +                      +   + 10 -0.690 21.4  0.00  0.013
+#2585  5.72000                   +    +                 +        + 10 -0.690 21.4  0.00  0.013
+#1561  5.72000                   +    +                 +    +     10 -0.690 21.4  0.00  0.013
+#3609  5.72000                   +    +                 +    +   + 10 -0.690 21.4  0.00  0.013
+#1565  8.95300              +    +    +                 +    +     10 -0.690 21.4  0.00  0.013
+#2589  7.40400              +    +    +                 +        + 10 -0.690 21.4  0.00  0.013
+#3613  8.95300              +    +    +                 +    +   + 10 -0.690 21.4  0.00  0.013
+#59    5.72000         +         +    +    +                       10 -0.690 21.4  0.00  0.013
+#63    5.72000         +    +    +    +    +                       10 -0.690 21.4  0.00  0.013
+#571   5.72000         +         +    +    +            +          10 -0.690 21.4  0.00  0.013
+#575   5.72000         +    +    +    +    +            +          10 -0.690 21.4  0.00  0.013
+#1051  5.72000         +         +    +                      +     10 -0.690 21.4  0.00  0.013
+#1055  5.72000         +    +    +    +                      +     10 -0.690 21.4  0.00  0.013
+#1083  5.72000         +         +    +    +                 +     10 -0.690 21.4  0.00  0.013
 
 #use this function to look at each model
-summary(eval(getCall(mixnmatch,796))) #189, 581
-summary(eval(getCall(mixnmatch,827))) #371, 477, 581
-summary(eval(getCall(mixnmatch,859))) #371, 581
-summary(eval(getCall(mixnmatch,2332))) #506
-summary(eval(getCall(mixnmatch,2363))) #371
-summary(eval(getCall(mixnmatch,2395))) #506
+summary(eval(getCall(mixnmatch,61))) #112, 208, 280, 62
+
 
 #looking at the four sites are that ALWAYS present
-m_always <- lm(decay ~ V152 + V189 + V261 + V389,data=dat2)
+m_always <- lm(lambda ~ V208 + V280,data=pos_sel)
 anova(m_always)
 
-m_some <- lm(decay ~ V142 + V285 + V320 + V477 + V581,data=dat2)
-anova(m_some)
+##****************Updated to here THO 12/11/2019
+#m_some <- lm(decay ~ V142 + V285 + V320 + V477 + V581,data=dat2)
+#anova(m_some)
 
-m_never <- lm(decay ~ V93 + V160 + V371 + V506,data=dat2)
-anova(m_never)
+#m_never <- lm(decay ~ V93 + V160 + V371 + V506,data=dat2)
+#anova(m_never)
 
 #looking at a model that has all sites that appeared significant in at least one of the top models / comparisons above
 mixer <- lm(decay ~ V189 + V371 + V477 + V506 + V581,data=dat2)
