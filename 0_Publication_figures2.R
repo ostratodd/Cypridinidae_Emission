@@ -31,6 +31,9 @@ tt3 <- ttheme_default(
 grid.arrange(tableGrob(table1, theme=tt3))
 
 #Table 2 - ANOVA results for 5 ‘mutagenesis sites’ using all data from mutagenesis study and available species’ luciferases
+allmutsites <- c(38, 45, 75, 79, 87, 126, 167, 170, 178, 191, 197, 223, 258, 276, 280, 372, 375, 403, 404, 405, 406, 407, 479)
+mutsites <- c(38, 178, 375, 404, 405) #Cypridina numbering
+cyptoalign$Aligned[match(allmutsites,cyptoalign$Cypridina_noctiluca_BBG57195)]
 anova(lm(lmax ~ X38 * X178 * X375 * X404 * X405, data=cn)) -> table2
 write.table(table2, file = "Table2.txt", sep="\t")
 
@@ -158,7 +161,7 @@ paste(colnames(pos_sel_col)[3:ncol(pos_sel_col)-2], collapse=" + "   )
 colorlm <- lm(Lmax_Mean ~ s46 + s47 + s61 + s111 + s133 + s178 + s207 + s279 + s309 + s338 + s407 + s495 + s599, data=pos_sel_col)
           
 mixnmatch_col <- dredge(colorlm,rank = "AIC",m.lim = c(0,2)) #2 seems like the maximum terms we can fit safely
-head(mixnmatch_col)
+head(mixnmatch_col, 12)
 av <- model.avg(mixnmatch_col)
 
 #Global model call: lm(formula = Lmax_Mean ~ s46 + s47 + s61 + s111 + s133 + s178 + 
@@ -182,7 +185,7 @@ av <- model.avg(mixnmatch_col)
 
 
 #***********kinetics/decay
-### decay ANOVA for luciferase function paper ###
+### decay ANOVA  ###
 #Now read decay data and merge -- decay column called lambda
 decay <- read.csv("Raw Data/expression-kinetics/decay_averages_all_for comparison_with_color.csv",header=TRUE)
 lucNkinetics <- merge(dat,decay,by="sp")
