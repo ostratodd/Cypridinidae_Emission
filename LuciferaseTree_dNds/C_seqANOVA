@@ -20,4 +20,4 @@ infile="sequences/combined_aa_ALN.fa"
 singularity exec $sing_image perl scripts/fasta2csv.pl $infile > results/combined_aa.csv
 
 #Correspondence table of aligned site to ref site, in this case using Cypridina
-./scripts/make_seq_ref.pl sequences/combined_aa_ALN.fa Cypridina_noctiluca_BBG57195 > results/CypSites.csv
+./scripts/make_seq_ref.pl sequences/combined_aa_ALN.fa Cypridina_noctiluca_BAD08210 > results/CypSites.csv

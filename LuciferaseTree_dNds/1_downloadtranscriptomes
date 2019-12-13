@@ -63,11 +63,6 @@ echo "Downloading Kornickeria"
 python ~/bin/gdown.py 1E5s2-ZyolGKF0fP4XvpP9Ub-b1idajCT sequences/transcriptomes/Kornickeria_hastingsi_nt.fa	
 python ~/bin/gdown.py 1wF3UeYaPTLLVX_lmHMcQkxRr6nKJgIUU sequences/transcriptomes/Kornickeria_hastingsi_aa.fa
 
-#Kornickeria sp CMU
-python ~/bin/gdown.py 1qj_WapWuBp4w1JmRbMcmFdyLbTZ4tlOu sequences/transcriptomes/Kornickeria_CMU_nt.fa	
-python ~/bin/gdown.py 13cjyarER9OBxvk1vfBbUI-IoSalLJHsc sequences/transcriptomes/Kornickeria_CMU_aa.fa
-
-
 echo "Changing names and concatenating"
 #Change names of individual sequences to add species name both nt and aa
 perl -pi -e 's/\>TRINITY/\>PAN_/g' sequences/transcriptomes/Photeros_annecohenae*.fa
@@ -86,7 +81,6 @@ perl -pi -e 's/\>TRINITY/\>MIR_/g' sequences/transcriptomes/Maristella_sp_IR_*.f
 perl -pi -e 's/\>TRINITY/\>ODH_/g' sequences/transcriptomes/Maristella_sp_ODH_*.fa
 
 perl -pi -e 's/\>TRINITY/\>KHA_/g' sequences/transcriptomes/Kornickeria_hastingsi_*.fa
-perl -pi -e 's/\>TRINITY/\>CMU_/g' sequences/transcriptomes/Kornickeria_CMU_*.fa
 
 
 #ADD TOGETHER FOR BLAST DATABASE                  

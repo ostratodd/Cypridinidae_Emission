@@ -17,7 +17,6 @@ perl -pi -e 's/\>TRINITY/\>MIR_/g' sequences/transcriptomes/Maristella_sp_IR_*.f
 perl -pi -e 's/\>TRINITY/\>ODH_/g' sequences/transcriptomes/Maristella_sp_ODH_*.fa
 
 perl -pi -e 's/\>TRINITY/\>KHA_/g' sequences/transcriptomes/Kornickeria_hastingsi_*.fa
-perl -pi -e 's/\>TRINITY/\>CMU_/g' sequences/transcriptomes/Kornickeria_CMU_*.fa
 
 
 #ADD TOGETHER FOR BLAST DATABASE
@@ -47,22 +46,25 @@ perl -pi -e 's/\:\:T//g' results/blast/top20.txt
 grep -A 1 -Fwf results/blast/top20.txt sequences/transcriptomes/complete_transcripts.fasta > results/blast/besthits.fasta
 perl -pi -e 's/\-\-//g' results/blast/besthits.fasta
 
-echo "Assembling blast database for trancriptomes with bioluminescent phenotype data"
-###*************Now search for luciferases from species where we have color or decay data, but no full length luciferase
-xtomedir="sequences/transcriptomes"
-
-cat $xtomedir/*SRD_aa* $xtomedir/*CMU_aa* > $xtomedir/phenotype_xtome_aa.fasta
-#Use awk to get all sequence data on a single line instead of interleaved
-awk '/^>/ {printf("%s%s\n",(N>0?"\n":""),$0);N++;next;}  {printf("%s",$0);} END {printf("\n");}' $xtomedir/phenotype_xtome_aa.fasta > $xtomedir/phenotype_xtome1_aa.fasta
-
-makeblastdb -in $xtomedir/phenotype_xtome1_aa.fasta -dbtype prot
-blastp -query sequences/published/Vhilgendorfii_aa.fa -db $xtomedir/phenotype_xtome1_aa.fasta > results/blast/phenotype_blastresults.out
 
 
-#Now get top scoring sequences from blast output by maipulating text files. Assumes ...__
-#3-letter abbreviation for species at beginning of each sequence name
-grep -A 5 -Fw 'Sequences producing' results/blast/phenotype_blastresults.out | grep -oP '...__.+\:\:T' > results/blast/phenotype_top20.txt
-perl -pi -e 's/\:\:T//g' results/blast/phenotype_top20.txt
-grep -A 1 -Fwf results/blast/phenotype_top20.txt sequences/transcriptomes/phenotype_xtome1_aa.fasta > results/blast/phenotype_besthits.fasta
-perl -pi -e 's/\-\-//g' results/blast/phenotype_besthits.fasta
+####*********Removed because CMU looks to be assembly artifact other phenotype data had complete luciferases
+#echo "Assembling blast database for trancriptomes with bioluminescent phenotype data"
+####*************Now search for luciferases from species where we have color or decay data, but no full length luciferase
+#xtomedir="sequences/transcriptomes"
+#
+#cat $xtomedir/*SRD_aa* $xtomedir/*CMU_aa* > $xtomedir/phenotype_xtome_aa.fasta
+##Use awk to get all sequence data on a single line instead of interleaved
+#awk '/^>/ {printf("%s%s\n",(N>0?"\n":""),$0);N++;next;}  {printf("%s",$0);} END {printf("\n");}' $xtomedir/phenotype_xtome_aa.fasta > $xtomedir/phenotype_xtome1_aa.fasta
+#
+#makeblastdb -in $xtomedir/phenotype_xtome1_aa.fasta -dbtype prot
+#blastp -query sequences/published/Vhilgendorfii_aa.fa -db $xtomedir/phenotype_xtome1_aa.fasta > results/blast/phenotype_blastresults.out
+#
+#
+##Now get top scoring sequences from blast output by maipulating text files. Assumes ...__
+##3-letter abbreviation for species at beginning of each sequence name
+#grep -A 5 -Fw 'Sequences producing' results/blast/phenotype_blastresults.out | grep -oP '...__.+\:\:T' > results/blast/phenotype_top20.txt
+#perl -pi -e 's/\:\:T//g' results/blast/phenotype_top20.txt
+#grep -A 1 -Fwf results/blast/phenotype_top20.txt sequences/transcriptomes/phenotype_xtome1_aa.fasta > results/blast/phenotype_besthits.fasta
+#perl -pi -e 's/\-\-//g' results/blast/phenotype_besthits.fasta
 
