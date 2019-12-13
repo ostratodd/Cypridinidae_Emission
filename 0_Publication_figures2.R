@@ -125,29 +125,73 @@ plot(lprl, show.tip.label=TRUE, cex=.8, x.lim=2)
 #Created with prettyplot
 
 ############
-#Supplemental Figure S3
+#Figure XX - Do + selected sites predict color or kinetics?
 library(gridExtra); library(grid); require(janitor);
-### decay ANOVA for luciferase function paper ###
-#Here is aligned amino acid file used for codon alignment. 
+library(MuMIn);
+
+#Read in luciferase alignment and sites under selection
 dat <- read.csv("LuciferaseTree_dNds/results/combined_aa.csv",header=FALSE, stringsAsFactors=FALSE, colClasses = c("character"))
 #Columns are +1 compared to meme due to sp colum
 #Next command alters numbers by 1 to account for this
 colnames(dat)[2:ncol(dat)] <- paste("s",seq(1,(ncol(dat)-1)),sep="")
+#Here is aligned amino acid file used for codon alignment. 
 #Read results in csv from meme selection analysis, including positively selected sites
 meme <- read.csv("LuciferaseTree_dNds/results/hyphy/lucclade.meme.csv",header=TRUE)
 #naming all columns properly
 colnames(dat)[1] <- "sp"
-#Now read decay data and merge -- decay column called lambda
-decay <- read.csv("Raw Data/expression-kinetics/decay_averages_all_for comparison_with_color.csv",header=TRUE)
-dat2 <- merge(dat,decay,by="sp")
-
 #Pull positively selected sites using vector of output table from meme
 pos_sel <- dat[,c("sp",paste("s",meme$Codon, sep=""))]
+#decay file has translation of different codes between datasets
+decay <- read.csv("Raw Data/expression-kinetics/decay_averages_all_for comparison_with_color.csv",header=TRUE)
 
-pos_sel_lam <- dat2[,c("sp",paste("s",meme$Codon, sep=""),"lambda")]
+
+#***********color
+table1 <- read.table(file="Table1.txt", sep="\t", header=TRUE) #Read again if not executed above
+tmpmerge <- merge(decay, table1, by='Species')
+lucNcolor <- merge(dat, tmpmerge, by='sp')
+pos_sel_col <- lucNcolor[,c("sp",paste("s",meme$Codon, sep=""),"Lmax_Mean", "FWHM_Mean")]
+remove_constant(pos_sel_col)->pos_sel_col ##Invariant sites because luc varies in spp without color data 
+
+options(na.action = "na.fail")
+#doesn't work inside lm function but can cut and paste manually -- no invariant sites for color
+paste(colnames(pos_sel_col)[3:ncol(pos_sel_col)-2], collapse=" + "   )
+colorlm <- lm(Lmax_Mean ~ s46 + s47 + s61 + s111 + s133 + s178 + s207 + s279 + s309 + s338 + s407 + s495 + s599, data=pos_sel_col)
+          
+mixnmatch_col <- dredge(colorlm,rank = "AIC",m.lim = c(0,2)) #2 seems like the maximum terms we can fit safely
+head(mixnmatch_col)
+av <- model.avg(mixnmatch_col)
+
+#Global model call: lm(formula = Lmax_Mean ~ s46 + s47 + s61 + s111 + s133 + s178 + 
+#    s207 + s279 + s309 + s338 + s407 + s495 + s599, data = pos_sel_col)
+#---
+#Model selection table 
+#     (Intrc) s111 s178 s279 s338 s407 s46 s47 s495 s599 s61 df logLik  AIC delta weight
+#66     462.5    +              +                             5 -9.993 30.0  0.00  0.197
+#4113   462.4              +                               +  8 -7.655 31.3  1.32  0.101
+#258    466.7    +                       +                    6 -9.791 31.6  1.60  0.088
+#5121   460.9                                     +        +  6 -9.861 31.7  1.74  0.083
+#4097   460.9                                              +  6 -9.861 31.7  1.74  0.083
+#4101   454.3         +                                    +  6 -9.861 31.7  1.74  0.083
+#4225   454.3                        +                     +  6 -9.861 31.7  1.74  0.083
+#6145   460.5                                          +   +  6 -9.861 31.7  1.74  0.083
+#4098   466.9    +                                         +  6 -9.861 31.7  1.74  0.083
+#4161   454.3                   +                          +  6 -9.861 31.7  1.74  0.083
+#4609   460.8                                +             +  7 -9.707 33.4  3.43  0.035
+
+
+
+
+#***********kinetics/decay
+### decay ANOVA for luciferase function paper ###
+#Now read decay data and merge -- decay column called lambda
+decay <- read.csv("Raw Data/expression-kinetics/decay_averages_all_for comparison_with_color.csv",header=TRUE)
+lucNkinetics <- merge(dat,decay,by="sp")
+pos_sel_lam <- lucNkinetics[,c("sp",paste("s",meme$Codon, sep=""),"lambda")]
 remove_constant(pos_sel_lam)->pos_sel_lam ##Invariant sites because luc varies in spp without decay data 
 
-library(MuMIn)
+
+
+
 options(na.action = "na.fail")
 #doesn't work inside lm function but can cut and paste manually
 #after removing invariant sites, which are 160, 303, 338
