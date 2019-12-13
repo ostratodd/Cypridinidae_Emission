@@ -1,4 +1,4 @@
-maindir <- "~/Documents/GitHub/Cypridinidae_Emission/"
+maindir <- "~/Documents/GitHub/Cypridinidae_EmissionSpectra/"
 setwd(maindir)
 
 source("1_Emission_Functions.R")
@@ -31,6 +31,9 @@ tt3 <- ttheme_default(
 grid.arrange(tableGrob(table1, theme=tt3))
 
 #Table 2 - ANOVA results for 5 ‘mutagenesis sites’ using all data from mutagenesis study and available species’ luciferases
+allmutsites <- c(38, 45, 75, 79, 87, 126, 167, 170, 178, 191, 197, 223, 258, 276, 280, 372, 375, 403, 404, 405, 406, 407, 479)
+mutsites <- c(38, 178, 375, 404, 405) #Cypridina numbering
+cyptoalign$Aligned[match(allmutsites,cyptoalign$Cypridina_noctiluca_BBG57195)]
 anova(lm(lmax ~ X38 * X178 * X375 * X404 * X405, data=cn)) -> table2
 write.table(table2, file = "Table2.txt", sep="\t")
 
@@ -125,105 +128,147 @@ plot(lprl, show.tip.label=TRUE, cex=.8, x.lim=2)
 #Created with prettyplot
 
 ############
-#Supplemental Figure S3
-### decay ANOVA for luciferase function paper ###
-# using codon-aligned translations from AliView given THO's dNds output
+#Figure XX - Do + selected sites predict color or kinetics?
+library(gridExtra); library(grid); require(janitor);
+library(MuMIn);
 
-dat <- read.csv("Raw Data/expression-kinetics/clipboard-alignment_4671897282832913936.translated.csv",header=FALSE, stringsAsFactors=FALSE, colClasses = c("character"))
-#sites from positive selection scan are:
-# 93
-# 115
-# 142
-# 152
-# 160
-# 189
-# 261
-# 285
-# 320
-# 371
-# 389
-# 477
-# 506
-# 581
-
-#sites from color data converted to this alignment are, converted to CNO alignment:
-# 38 --> 64
-# 87 --> 115
-# 178 --> 207
-# 375 --> 406
-# 404 --> 435
-# 405 --> 436 ##invariant in decay dataset
-
+#Read in luciferase alignment and sites under selection
+dat <- read.csv("LuciferaseTree_dNds/results/combined_aa.csv",header=FALSE, stringsAsFactors=FALSE, colClasses = c("character"))
+#Columns are +1 compared to meme due to sp colum
+#Next command alters numbers by 1 to account for this
+colnames(dat)[2:ncol(dat)] <- paste("s",seq(1,(ncol(dat)-1)),sep="")
+#Here is aligned amino acid file used for codon alignment. 
+#Read results in csv from meme selection analysis, including positively selected sites
+meme <- read.csv("LuciferaseTree_dNds/results/hyphy/lucclade.meme.csv",header=TRUE)
 #naming all columns properly
 colnames(dat)[1] <- "sp"
-colnames(dat)[589] <- "decay"
-<<<<<<< HEAD
+#Pull positively selected sites using vector of output table from meme
+pos_sel <- dat[,c("sp",paste("s",meme$Codon, sep=""))]
+#decay file has translation of different codes between datasets
+decay <- read.csv("Raw Data/expression-kinetics/decay_averages_all_for comparison_with_color.csv",header=TRUE)
 
-#sites that are invariant in the list above are:
-# 64
-# 115
-# 142
-# 285
-# 320
-# 371
-# 406
-# 506
-library(gridExtra); library(grid);
-dat[,154]
 
-dat2 <- subset.data.frame(dat,dat$sp != "Vargula_tsujii_sequenced")
+#***********color
+table1 <- read.table(file="Table1.txt", sep="\t", header=TRUE) #Read again if not executed above
+tmpmerge <- merge(decay, table1, by='Species')
+lucNcolor <- merge(dat, tmpmerge, by='sp')
+pos_sel_col <- lucNcolor[,c("sp",paste("s",meme$Codon, sep=""),"Lmax_Mean", "FWHM_Mean")]
+remove_constant(pos_sel_col)->pos_sel_col ##Invariant sites because luc varies in spp without color data 
 
-#add one for each to account for species names in first column
-#Positive selection sites -- 390 causes error
-m.1 <- lm(decay~ (V94 + V116 + V143 + V153 + V161 + V190 + V262 + V286 + V321 + V372 + V478 + V507 + V582),data=dat2)
-anova(m.1)
-
-m.2 <- lm(decay ~ V94 + V153 + V190 + V478,data=dat2)
-anova(m.2)
-=======
-colnames(dat)[2:588] <- paste("V",seq(1,587),sep="")
-dat2 <- dat[-c(2,8),]
-dat2 <- dat2[,c("sp","V93","V115","V142","V152","V160","V189","V261","V285",
-               "V320","V371","V389","V477","V506","V581","decay")]
-
-library(MuMIn)
 options(na.action = "na.fail")
-glb1 <- lm(decay ~ V93 + V115 + V152 + V160 + V189 + V261 + V371 + V389 + V477 + V506 + V581, data = dat2)
-mixnmatch <- dredge(glb1,rank = "AIC",m.lim = c(0,5)) #5 seems like the maximum terms we can fit safely
+#doesn't work inside lm function but can cut and paste manually -- no invariant sites for color
+paste(colnames(pos_sel_col)[3:ncol(pos_sel_col)-2], collapse=" + "   )
+colorlm <- lm(Lmax_Mean ~ s46 + s47 + s61 + s111 + s133 + s178 + s207 + s279 + s309 + s338 + s407 + s495 + s599, data=pos_sel_col)
+          
+mixnmatch_col <- dredge(colorlm,rank = "AIC",m.lim = c(0,2)) #2 seems like the maximum terms we can fit safely
+head(mixnmatch_col, 12)
+av <- model.avg(mixnmatch_col)
+
+#Global model call: lm(formula = Lmax_Mean ~ s46 + s47 + s61 + s111 + s133 + s178 + 
+#    s207 + s279 + s309 + s338 + s407 + s495 + s599, data = pos_sel_col)
+#---
+#Model selection table 
+#     (Intrc) s111 s178 s279 s338 s407 s46 s47 s495 s599 s61 df logLik  AIC delta weight
+#66     462.5    +              +                             5 -9.993 30.0  0.00  0.197
+#4113   462.4              +                               +  8 -7.655 31.3  1.32  0.101
+#258    466.7    +                       +                    6 -9.791 31.6  1.60  0.088
+#5121   460.9                                     +        +  6 -9.861 31.7  1.74  0.083
+#4097   460.9                                              +  6 -9.861 31.7  1.74  0.083
+#4101   454.3         +                                    +  6 -9.861 31.7  1.74  0.083
+#4225   454.3                        +                     +  6 -9.861 31.7  1.74  0.083
+#6145   460.5                                          +   +  6 -9.861 31.7  1.74  0.083
+#4098   466.9    +                                         +  6 -9.861 31.7  1.74  0.083
+#4161   454.3                   +                          +  6 -9.861 31.7  1.74  0.083
+#4609   460.8                                +             +  7 -9.707 33.4  3.43  0.035
+
+
+
+
+#***********kinetics/decay
+### decay ANOVA  ###
+#Now read decay data and merge -- decay column called lambda
+decay <- read.csv("Raw Data/expression-kinetics/decay_averages_all_for comparison_with_color.csv",header=TRUE)
+lucNkinetics <- merge(dat,decay,by="sp")
+pos_sel_lam <- lucNkinetics[,c("sp",paste("s",meme$Codon, sep=""),"lambda")]
+remove_constant(pos_sel_lam)->pos_sel_lam ##Invariant sites because luc varies in spp without decay data 
+
+
+
+
+options(na.action = "na.fail")
+#doesn't work inside lm function but can cut and paste manually
+#after removing invariant sites, which are 160, 303, 338
+paste(colnames(pos_sel_lam)[3:ncol(pos_sel_lam)-1], collapse=" + "   ) -> modelsitesdecay
+glb1 <- lm(lambda ~ s46 + s47 + s61 + s111 + s133 + s178 + s207 + s279 + s309 + s407 + s495 + s599, data=pos_sel_lam)
+          
+mixnmatch <- dredge(glb1,rank = "AIC",m.lim = c(0,6)) #6 seems like the maximum terms we can fit safely
 av <- model.avg(mixnmatch)
 
-# Model selection table
-#       (Intrc) V115 V152 V160 V189 V261 V371 V389 V477 V506 V581 V93 df  logLik  AIC
-# 219   7.0960         +         +    +         +    +               11  13.741 -5.5
-# 603  13.9700         +         +    +         +              +     11  13.741 -5.5
-# 92    7.0960    +    +         +    +         +                    11  13.741 -5.5
+#Model selection table 
+#      (Intrc) s111 s133 s178 s207 s279 s309 s407 s46 s47 s495 s599 s61 df logLik  AIC delta weight
+#61    7.40400              +    +    +    +                            10 -0.690 21.4  0.00  0.008
+#573   7.40400              +    +    +    +                 +          10 -0.690 21.4  0.00  0.008
+#1085  7.40400              +    +    +    +                      +     10 -0.690 21.4  0.00  0.008
+#1597  7.40400              +    +    +    +                 +    +     10 -0.690 21.4  0.00  0.008
+#2109  7.40400              +    +    +    +                          + 10 -0.690 21.4  0.00  0.008
+#2621  7.40400              +    +    +    +                 +        + 10 -0.690 21.4  0.00  0.008
+#3133  7.40400              +    +    +    +                      +   + 10 -0.690 21.4  0.00  0.008
+#2073  5.72000                   +    +                               + 10 -0.690 21.4  0.00  0.008
+#1049  5.72000                   +    +                           +     10 -0.690 21.4  0.00  0.008
+#3097  5.72000                   +    +                           +   + 10 -0.690 21.4  0.00  0.008
+#2585  5.72000                   +    +                      +        + 10 -0.690 21.4  0.00  0.008
+#1561  5.72000                   +    +                      +    +     10 -0.690 21.4  0.00  0.008
+#3609  5.72000                   +    +                      +    +   + 10 -0.690 21.4  0.00  0.008
+#1565  8.95300              +    +    +                      +    +     10 -0.690 21.4  0.00  0.008
+#2589  7.40400              +    +    +                      +        + 10 -0.690 21.4  0.00  0.008
+#3613  8.95300              +    +    +                      +    +   + 10 -0.690 21.4  0.00  0.008
+#59    5.72000         +         +    +    +                            10 -0.690 21.4  0.00  0.008
+#63    5.72000         +    +    +    +    +                            10 -0.690 21.4  0.00  0.008
+#571   5.72000         +         +    +    +                 +          10 -0.690 21.4  0.00  0.008
+#575   5.72000         +    +    +    +    +                 +          10 -0.690 21.4  0.00  0.008
+#1051  5.72000         +         +    +                           +     10 -0.690 21.4  0.00  0.008
+#1055  5.72000         +    +    +    +                           +     10 -0.690 21.4  0.00  0.008
+#1083  5.72000         +         +    +    +                      +     10 -0.690 21.4  0.00  0.008
+#1087  5.72000         +    +    +    +    +                      +     10 -0.690 21.4  0.00  0.008
+#1563  5.72000         +         +    +                      +    +     10 -0.690 21.4  0.00  0.008
+#1567  5.72000         +    +    +    +                      +    +     10 -0.690 21.4  0.00  0.008
+#1595  5.72000         +         +    +    +                 +    +     10 -0.690 21.4  0.00  0.008
+#2075  5.72000         +         +    +                               + 10 -0.690 21.4  0.00  0.008
+#2079  5.72000         +    +    +    +                               + 10 -0.690 21.4  0.00  0.008
+#2107  5.72000         +         +    +    +                          + 10 -0.690 21.4  0.00  0.008
+#2111  5.72000         +    +    +    +    +                          + 10 -0.690 21.4  0.00  0.008
+#2587  5.72000         +         +    +                      +        + 10 -0.690 21.4  0.00  0.008
+#2591  5.72000         +    +    +    +                      +        + 10 -0.690 21.4  0.00  0.008
+#2619  5.72000         +         +    +    +                 +        + 10 -0.690 21.4  0.00  0.008
+#3099  5.72000         +         +    +                           +   + 10 -0.690 21.4  0.00  0.008
+#3103  5.72000         +    +    +    +                           +   + 10 -0.690 21.4  0.00  0.008
+#3131  5.72000         +         +    +    +                      +   + 10 -0.690 21.4  0.00  0.008
+#3611  5.72000         +         +    +                      +    +   + 10 -0.690 21.4  0.00  0.008
 
 #use this function to look at each model
-summary(eval(getCall(mixnmatch,219))) #581
-summary(eval(getCall(mixnmatch,603)))
-summary(eval(getCall(mixnmatch,92))) #261, 371, 581
+summary(eval(getCall(mixnmatch,61))) #111, 207, 279, 61
+summary(eval(getCall(mixnmatch,1597))) #none
+summary(eval(getCall(mixnmatch,1049))) #none
+summary(eval(getCall(mixnmatch,63))) #111, 207 ,279, 310
+summary(eval(getCall(mixnmatch,575))) #207
 
-#477 and 506 may co-vary with other sites that are significant within certain seq
 
-#looking at the four sites are that ALWAYS present
-m_always <- lm(decay ~ V152 + V189 + V261 + V389,data=dat2)
+#looking at the two sites are that ALWAYS present
+m_always <- lm(lambda ~ s207 + s279,data=pos_sel_lam)
 anova(m_always)
 
-#looking at the sites are are variably present
-m_some <- lm(decay ~ V115 + V142 + V285 + V320 + V477 + V581,data=dat2)
-anova(m_some)
-
-#looking at the sites are never present
-m_never <- lm(decay ~ V93 + V160 + V371 + V506,data=dat2)
-anova(m_never) #371
+#m_some <- lm(lambda ~ V134 + V179 + V310 + V496 + V600 + V62,data=pos_sel_lam)
+#anova(m_some)
+#
+#m_never <- lm(lambda ~ V112 + V47+ V48,data=pos_sel_lam)
+#anova(m_never)
 
 #looking at a model that has all sites that appeared significant in at least one of the top models / comparisons above
-mixer <- lm(decay ~ V115 + V189 + V261 + V371 + V477 + V581,data=dat2)
-#from the above model, we have evidence to suggest that 115, 189, and 261 effect decay rates
-
+#mixer <- lm(decay ~ V189 + V371 + V477 + V506 + V581,data=dat2)
 #site identity is correlated b/c limited sequence diversity
 >>>>>>> 22d14059627d67655e952a4e3f935ac2d3d20bee
 
+#############################
 ## plot of lamda max and decay
 table1 <- read.table(file="Table1.txt", sep="\t", header=TRUE) #Read again if not executed above
 decay <- read.csv("Raw Data/expression-kinetics/decay_averages_all_for comparison_with_color.csv",header=TRUE)

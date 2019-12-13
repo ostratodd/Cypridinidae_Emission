@@ -1,0 +1,45 @@
+"Gene"	"X38"	"X45"	"X75"	"X79"	"X87"	"X126"	"X167"	"X170"	"X178"	"X191"	"X197"	"X223"	"X258"	"X276"	"X280"	"X372"	"X375"	"X403"	"X404"	"X405"	"X406"	"X407"	"X479"	"lmax"	"Nsubs"	"X"	"X.1"
+"1"	"M178R/L191Q/Y280D/R372L/Q403P/N404G/T405M"	"K"	"S"	"V"	"R"	"R"	"K"	"T"	"E"	"R"	"Q"	"L"	"M"	"V"	"I"	"D"	"L"	"K"	"P"	"G"	"M"	"S"	"I"	"E"	435	7	NA	NA
+"2"	"M178K/L197P"	"K"	"S"	"V"	"R"	"R"	"K"	"T"	"E"	"K"	"L"	"P"	"M"	"V"	"I"	"Y"	"R"	"K"	"Q"	"N"	"T"	"S"	"I"	"E"	447	2	NA	NA
+"3"	"CnWT"	"K"	"S"	"V"	"R"	"R"	"K"	"T"	"E"	"M"	"L"	"L"	"M"	"V"	"I"	"Y"	"R"	"K"	"Q"	"N"	"T"	"S"	"I"	"E"	454	0	NA	NA
+"4"	"Cn375N"	"K"	"S"	"V"	"R"	"R"	"K"	"T"	"E"	"M"	"L"	"L"	"M"	"V"	"I"	"Y"	"R"	"Y"	"Q"	"N"	"T"	"S"	"I"	"E"	457	1	NA	NA
+"5"	"Cn405M"	"K"	"S"	"V"	"R"	"R"	"K"	"T"	"E"	"M"	"L"	"L"	"M"	"V"	"I"	"Y"	"R"	"K"	"Q"	"N"	"M"	"S"	"I"	"E"	457	1	NA	NA
+"6"	"CN404G"	"K"	"S"	"V"	"R"	"R"	"K"	"T"	"E"	"M"	"L"	"L"	"M"	"V"	"I"	"Y"	"R"	"K"	"Q"	"G"	"T"	"S"	"I"	"E"	458	1	NA	NA
+"7"	"N404S"	"K"	"S"	"V"	"R"	"R"	"K"	"T"	"E"	"M"	"L"	"L"	"M"	"V"	"I"	"Y"	"R"	"K"	"Q"	"S"	"T"	"S"	"I"	"E"	458	1	NA	NA
+"8"	"T167K/Q403P"	"K"	"S"	"V"	"R"	"R"	"K"	"K"	"E"	"M"	"L"	"L"	"M"	"V"	"I"	"Y"	"R"	"K"	"P"	"N"	"T"	"S"	"I"	"E"	458	2	NA	NA
+"9"	"Q403P/T405I"	"K"	"S"	"V"	"R"	"R"	"K"	"T"	"E"	"M"	"L"	"L"	"M"	"V"	"I"	"Y"	"R"	"K"	"P"	"N"	"I"	"S"	"I"	"E"	459	2	NA	NA
+"10"	"Vargula hilgendorfii"	"K"	"T"	"V"	"R"	"R"	"K"	"T"	"E"	"I"	"L"	"L"	"M"	"I"	"I"	"Y"	"T"	"K"	"E"	"N"	"T"	"S"	"I"	"E"	459	NA	NA	NA
+"11"	"Cn406L"	"K"	"S"	"V"	"R"	"R"	"K"	"T"	"E"	"M"	"L"	"L"	"M"	"V"	"I"	"Y"	"R"	"K"	"Q"	"N"	"T"	"L"	"I"	"E"	460	1	NA	NA
+"12"	"Cn407A"	"K"	"S"	"V"	"R"	"R"	"K"	"T"	"E"	"M"	"L"	"L"	"M"	"V"	"I"	"Y"	"R"	"K"	"Q"	"N"	"T"	"S"	"A"	"E"	460	1	NA	NA
+"13"	"T167K/K375R"	"K"	"S"	"V"	"R"	"R"	"K"	"K"	"E"	"M"	"L"	"L"	"M"	"V"	"I"	"Y"	"R"	"R"	"Q"	"N"	"T"	"S"	"I"	"E"	460	2	NA	NA
+"14"	"T167K/N404G"	"K"	"S"	"V"	"R"	"R"	"K"	"K"	"E"	"M"	"L"	"L"	"M"	"V"	"I"	"Y"	"R"	"K"	"Q"	"G"	"T"	"S"	"I"	"E"	460	2	NA	NA
+"15"	"T167K/T405I"	"K"	"S"	"V"	"R"	"R"	"K"	"K"	"E"	"M"	"L"	"L"	"M"	"V"	"I"	"Y"	"R"	"K"	"Q"	"N"	"I"	"S"	"I"	"E"	460	2	NA	NA
+"16"	"K375R/Q403P"	"K"	"S"	"V"	"R"	"R"	"K"	"T"	"E"	"M"	"L"	"L"	"M"	"V"	"I"	"Y"	"R"	"R"	"P"	"N"	"T"	"S"	"I"	"E"	460	2	NA	NA
+"17"	"Q403P/N404G/T405M/S406L/I407A"	"K"	"S"	"V"	"R"	"R"	"K"	"T"	"E"	"M"	"L"	"L"	"M"	"V"	"I"	"Y"	"R"	"K"	"P"	"G"	"M"	"L"	"A"	"E"	460	5	NA	NA
+"18"	"K375R/Q403P/N404G/T405M/S406L/I407A"	"K"	"S"	"V"	"R"	"R"	"K"	"T"	"E"	"M"	"L"	"L"	"M"	"V"	"I"	"Y"	"R"	"R"	"P"	"G"	"M"	"L"	"A"	"E"	460	6	NA	NA
+"19"	"K375R/N404G"	"K"	"S"	"V"	"R"	"R"	"K"	"T"	"E"	"M"	"L"	"L"	"M"	"V"	"I"	"Y"	"R"	"R"	"Q"	"G"	"T"	"S"	"I"	"E"	461	2	NA	NA
+"20"	"N404G/T405I"	"K"	"S"	"V"	"R"	"R"	"K"	"T"	"E"	"M"	"L"	"L"	"M"	"V"	"I"	"Y"	"R"	"K"	"Q"	"G"	"I"	"S"	"I"	"E"	461	2	NA	NA
+"21"	"T167K/Q403P/N404G/T405M/S406L/I407A"	"K"	"S"	"V"	"R"	"R"	"K"	"K"	"E"	"M"	"L"	"L"	"M"	"V"	"I"	"Y"	"R"	"R"	"Q"	"G"	"M"	"L"	"A"	"E"	461	6	NA	NA
+"22"	"T167K/K375R/Q403P/N404G/T405M/S406L/I407A"	"K"	"S"	"V"	"R"	"R"	"K"	"K"	"E"	"M"	"L"	"L"	"M"	"V"	"I"	"Y"	"R"	"R"	"P"	"G"	"M"	"L"	"A"	"E"	461	7	NA	NA
+"23"	"Vargula tsujii"	"L"	"S"	"I"	"R"	"H"	"K"	"S"	"D"	"T"	"L"	"L"	"S"	"V"	"V"	"T"	"T"	"Y"	"G"	"D"	"T"	"S"	"I"	"A"	461	NA	NA	NA
+"24"	"Maristella chicoi"	"I"	"S"	"I"	"R"	"H"	"K"	"S"	"D"	"T"	"L"	"L"	"S"	"I"	"V"	"T"	"T"	"Y"	"G"	"D"	"T"	"S"	"I"	"A"	461	NA	NA	NA
+"25"	"Maristella SVU"	"I"	"S"	"I"	"R"	"H"	"K"	"S"	"D"	"T"	"L"	"L"	"S"	"V"	"V"	"T"	"T"	"Y"	"G"	"D"	"T"	"S"	"I"	"A"	461	NA	NA	NA
+"26"	"Kornickeria hastingsi carriebowae"	"Q"	"S"	"I"	"R"	"T"	"K"	"S"	"D"	"T"	"L"	"I"	"S"	"V"	"V"	"T"	"T"	"Y"	"G"	"D"	"T"	"S"	"I"	"A"	461	NA	NA	NA
+"27"	"Q403P/N404G"	"K"	"S"	"V"	"R"	"R"	"K"	"T"	"E"	"M"	"L"	"L"	"M"	"V"	"I"	"Y"	"R"	"K"	"P"	"G"	"T"	"S"	"I"	"E"	462	2	NA	NA
+"28"	"Q403P/N404G/T405I"	"K"	"S"	"V"	"R"	"R"	"K"	"T"	"E"	"M"	"L"	"L"	"M"	"V"	"I"	"Y"	"R"	"K"	"P"	"G"	"I"	"S"	"I"	"E"	462	3	NA	NA
+"29"	"Q403P/N404G/T405M"	"K"	"S"	"V"	"R"	"R"	"K"	"T"	"E"	"M"	"L"	"L"	"M"	"V"	"I"	"Y"	"R"	"K"	"P"	"G"	"M"	"S"	"I"	"E"	462	3	NA	NA
+"30"	"I276N/Q403P/N404G/T405M"	"K"	"S"	"V"	"R"	"R"	"K"	"T"	"E"	"M"	"L"	"L"	"M"	"V"	"N"	"Y"	"R"	"K"	"P"	"G"	"M"	"S"	"I"	"E"	462	4	NA	NA
+"31"	"Y280D/R372L/Q403P/N404G/T405M"	"K"	"S"	"V"	"R"	"R"	"K"	"T"	"E"	"M"	"L"	"L"	"M"	"V"	"I"	"D"	"L"	"K"	"P"	"G"	"M"	"S"	"I"	"E"	462	5	NA	NA
+"32"	"K38R/R79S/Y280D/R372L/Q403P/N404G/T405M"	"R"	"S"	"V"	"S"	"R"	"K"	"T"	"E"	"M"	"L"	"L"	"M"	"V"	"I"	"D"	"L"	"K"	"P"	"G"	"M"	"S"	"I"	"E"	462	7	NA	NA
+"33"	"Cn375R"	"K"	"S"	"V"	"R"	"R"	"K"	"T"	"E"	"M"	"L"	"L"	"M"	"V"	"I"	"Y"	"R"	"R"	"Q"	"N"	"T"	"S"	"I"	"E"	463	1	NA	NA
+"34"	"K375R/T405I"	"K"	"S"	"V"	"R"	"R"	"K"	"T"	"E"	"M"	"L"	"L"	"M"	"V"	"I"	"Y"	"R"	"R"	"Q"	"N"	"I"	"S"	"I"	"E"	463	2	NA	NA
+"35"	"V258A/Y280D/R372L/Q403P/N404G/T405M/E479V"	"K"	"S"	"V"	"R"	"R"	"K"	"T"	"E"	"M"	"L"	"L"	"M"	"A"	"I"	"D"	"L"	"K"	"P"	"G"	"M"	"S"	"I"	"V"	463	7	NA	NA
+"36"	"K38I/Y280D/R372L/Q403P/N404G/T405M"	"I"	"S"	"V"	"R"	"R"	"K"	"T"	"E"	"M"	"L"	"L"	"M"	"V"	"I"	"D"	"L"	"K"	"P"	"G"	"M"	"S"	"I"	"E"	463	6	NA	NA
+"37"	"R87S/Y280D/R372L/Q403P/N404G/T405M"	"K"	"S"	"V"	"R"	"S"	"K"	"T"	"E"	"M"	"L"	"L"	"M"	"V"	"I"	"D"	"L"	"K"	"P"	"G"	"M"	"S"	"I"	"E"	464	6	435	463
+"38"	"L191Q/Y280D/R372L/Q403P/N404G/T405M"	"K"	"S"	"V"	"R"	"R"	"K"	"T"	"E"	"M"	"Q"	"L"	"M"	"V"	"I"	"D"	"L"	"K"	"P"	"G"	"M"	"S"	"I"	"E"	464	6	NA	NA
+"39"	"S45G/E170G/Y280D/R372L/Q403P/N404G/T405M"	"K"	"G"	"V"	"R"	"R"	"K"	"T"	"G"	"M"	"L"	"L"	"M"	"V"	"I"	"D"	"L"	"K"	"P"	"G"	"M"	"S"	"I"	"E"	464	7	NA	NA
+"40"	"V75E/K126E/M223I/Y280D/R372L/Q403P/N404G/T405M"	"K"	"S"	"E"	"R"	"R"	"E"	"T"	"E"	"M"	"L"	"L"	"I"	"V"	"I"	"D"	"L"	"K"	"P"	"G"	"M"	"S"	"I"	"E"	465	8	NA	NA
+"41"	"L191Q/Q235R/Y280D/R372L/Q403P/N404G/T405M"	"K"	"S"	"V"	"R"	"R"	"K"	"T"	"E"	"M"	"Q"	"L"	"M"	"V"	"I"	"D"	"L"	"K"	"P"	"G"	"M"	"S"	"I"	"E"	466	7	NA	NA
+"42"	"Photeros WLU"	"Q"	"S"	"V"	"R"	"T"	"K"	"S"	"D"	"P"	"I"	"I"	"T"	"V"	"I"	"T"	"T"	"Y"	"A"	"D"	"T"	"S"	"V"	"A"	466	NA	NA	NA
+"43"	"Photeros morini"	"Q"	"P"	"V"	"R"	"T"	"K"	"S"	"D"	"P"	"I"	"I"	"T"	"V"	"I"	"T"	"T"	"Y"	"A"	"D"	"T"	"S"	"I"	"A"	466	NA	NA	NA
+"44"	"Photeros annecohenae"	"Q"	"S"	"V"	"R"	"T"	"K"	"S"	"D"	"P"	"I"	"I"	"T"	"V"	"I"	"T"	"T"	"Y"	"A"	"D"	"T"	"S"	"I"	"A"	469	NA	NA	NA

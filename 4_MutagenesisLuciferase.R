@@ -7,7 +7,5 @@ read.csv(file="Cypridina only.csv") -> cn
 read.csv(file="Cypridina mutagenesis.csv") -> cnplus
 read.csv(file="NonCypridina only.csv") -> nc
 
-
-
-
-
+#conversion table for sites corresponding between Cypridina and present alignment
+read.csv(file="../LuciferaseTree_dNds/results/CypSites.csv")->cyptoalign
