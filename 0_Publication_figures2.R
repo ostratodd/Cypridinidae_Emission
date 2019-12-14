@@ -30,11 +30,13 @@ tt3 <- ttheme_default(
   rowhead=list(fg_params=list(col="white")));
 grid.arrange(tableGrob(table1, theme=tt3))
 
+################
 #Table 2 - ANOVA results for 5 ‘mutagenesis sites’ using all data from mutagenesis study and available species’ luciferases
 allmutsites <- c(38, 45, 75, 79, 87, 126, 167, 170, 178, 191, 197, 223, 258, 276, 280, 372, 375, 403, 404, 405, 406, 407, 479)
-mutsites <- c(38, 178, 375, 404, 405) #Cypridina numbering
-cyptoalign$Aligned[match(allmutsites,cyptoalign$Cypridina_noctiluca_BBG57195)]
-anova(lm(lmax ~ X38 * X178 * X375 * X404 * X405, data=cn)) -> table2
+mutsites <- c(38, 178, 375, 404, 405) #Cypridina numbering sites with 3 states
+psmutsites <-c(45, 87)	#These are positively selected and were mutagenized
+cyptoalign$Aligned[match(allmutsites,cyptoalign$Cypridina_noctiluca_BAD08210)]
+anova(lm(lmax ~ X38 * X45 * X87 * X178 * X375 * X404 * X405, data=cn)) -> table2
 write.table(table2, file = "Table2.txt", sep="\t")
 
 #*************************************************Main Figures
@@ -199,51 +201,13 @@ options(na.action = "na.fail")
 #doesn't work inside lm function but can cut and paste manually
 #after removing invariant sites, which are 160, 303, 338
 paste(colnames(pos_sel_lam)[3:ncol(pos_sel_lam)-1], collapse=" + "   ) -> modelsitesdecay
-glb1 <- lm(lambda ~ s46 + s47 + s61 + s111 + s133 + s178 + s207 + s279 + s309 + s407 + s495 + s599, data=pos_sel_lam)
+
+#IF sites change copy/paste from result of above command
+glb1 <- lm(lambda ~ s71 + s93 + s102 + s115 + s160 + s189 + s261 + s291 + s389 + s417 + s477 + s581, data=pos_sel_lam)
           
 mixnmatch <- dredge(glb1,rank = "AIC",m.lim = c(0,6)) #6 seems like the maximum terms we can fit safely
 av <- model.avg(mixnmatch)
 
-#Model selection table 
-#      (Intrc) s111 s133 s178 s207 s279 s309 s407 s46 s47 s495 s599 s61 df logLik  AIC delta weight
-#61    7.40400              +    +    +    +                            10 -0.690 21.4  0.00  0.008
-#573   7.40400              +    +    +    +                 +          10 -0.690 21.4  0.00  0.008
-#1085  7.40400              +    +    +    +                      +     10 -0.690 21.4  0.00  0.008
-#1597  7.40400              +    +    +    +                 +    +     10 -0.690 21.4  0.00  0.008
-#2109  7.40400              +    +    +    +                          + 10 -0.690 21.4  0.00  0.008
-#2621  7.40400              +    +    +    +                 +        + 10 -0.690 21.4  0.00  0.008
-#3133  7.40400              +    +    +    +                      +   + 10 -0.690 21.4  0.00  0.008
-#2073  5.72000                   +    +                               + 10 -0.690 21.4  0.00  0.008
-#1049  5.72000                   +    +                           +     10 -0.690 21.4  0.00  0.008
-#3097  5.72000                   +    +                           +   + 10 -0.690 21.4  0.00  0.008
-#2585  5.72000                   +    +                      +        + 10 -0.690 21.4  0.00  0.008
-#1561  5.72000                   +    +                      +    +     10 -0.690 21.4  0.00  0.008
-#3609  5.72000                   +    +                      +    +   + 10 -0.690 21.4  0.00  0.008
-#1565  8.95300              +    +    +                      +    +     10 -0.690 21.4  0.00  0.008
-#2589  7.40400              +    +    +                      +        + 10 -0.690 21.4  0.00  0.008
-#3613  8.95300              +    +    +                      +    +   + 10 -0.690 21.4  0.00  0.008
-#59    5.72000         +         +    +    +                            10 -0.690 21.4  0.00  0.008
-#63    5.72000         +    +    +    +    +                            10 -0.690 21.4  0.00  0.008
-#571   5.72000         +         +    +    +                 +          10 -0.690 21.4  0.00  0.008
-#575   5.72000         +    +    +    +    +                 +          10 -0.690 21.4  0.00  0.008
-#1051  5.72000         +         +    +                           +     10 -0.690 21.4  0.00  0.008
-#1055  5.72000         +    +    +    +                           +     10 -0.690 21.4  0.00  0.008
-#1083  5.72000         +         +    +    +                      +     10 -0.690 21.4  0.00  0.008
-#1087  5.72000         +    +    +    +    +                      +     10 -0.690 21.4  0.00  0.008
-#1563  5.72000         +         +    +                      +    +     10 -0.690 21.4  0.00  0.008
-#1567  5.72000         +    +    +    +                      +    +     10 -0.690 21.4  0.00  0.008
-#1595  5.72000         +         +    +    +                 +    +     10 -0.690 21.4  0.00  0.008
-#2075  5.72000         +         +    +                               + 10 -0.690 21.4  0.00  0.008
-#2079  5.72000         +    +    +    +                               + 10 -0.690 21.4  0.00  0.008
-#2107  5.72000         +         +    +    +                          + 10 -0.690 21.4  0.00  0.008
-#2111  5.72000         +    +    +    +    +                          + 10 -0.690 21.4  0.00  0.008
-#2587  5.72000         +         +    +                      +        + 10 -0.690 21.4  0.00  0.008
-#2591  5.72000         +    +    +    +                      +        + 10 -0.690 21.4  0.00  0.008
-#2619  5.72000         +         +    +    +                 +        + 10 -0.690 21.4  0.00  0.008
-#3099  5.72000         +         +    +                           +   + 10 -0.690 21.4  0.00  0.008
-#3103  5.72000         +    +    +    +                           +   + 10 -0.690 21.4  0.00  0.008
-#3131  5.72000         +         +    +    +                      +   + 10 -0.690 21.4  0.00  0.008
-#3611  5.72000         +         +    +                      +    +   + 10 -0.690 21.4  0.00  0.008
 
 #use this function to look at each model
 summary(eval(getCall(mixnmatch,61))) #111, 207, 279, 61
