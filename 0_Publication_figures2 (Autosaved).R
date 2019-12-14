@@ -166,7 +166,8 @@ options(na.action = "na.fail")
 #doesn't work inside lm function but can cut and paste manually -- no invariant sites for color
 paste(colnames(pos_sel_col)[4:ncol(pos_sel_col)-2], collapse=" + "   )
 colorlm <- lm(Lmax_Mean ~ s71 + s93 + s102 + s115 + s160 + s189 + s261 + s285 + s291 + s389 + s417 + s477 + s581, data=pos_sel_col)
-          
+fwhmlm <- lm(FWHM_Mean ~ s71 + s93 + s102 + s115 + s160 + s189 + s261 + s285 + s291 + s389 + s417 + s477 + s581, data=pos_sel_col)
+      
 mixnmatch_col <- dredge(colorlm,rank = "AIC",m.lim = c(0,3)) #3 seems like the maximum terms we can fit safely
 head(mixnmatch_col, 12)
 av <- model.avg(mixnmatch_col)
@@ -208,7 +209,7 @@ head(mixnmatch_lam, 114)
 summary(eval(getCall(mixnmatch,1811))) #111, 207, 279, 61
 
 #looking at the two sites are that ALWAYS present
-m_always <- lm(lambda ~ s207 + s279,data=pos_sel_lam)
+m_always <- lm(lambda ~ s71 + s93 + s102 + s115 + s160 + s189 ,data=pos_sel_lam)
 anova(m_always)
 
 #m_some <- lm(lambda ~ V134 + V179 + V310 + V496 + V600 + V62,data=pos_sel_lam)
