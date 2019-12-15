@@ -1,4 +1,9 @@
-cat sequences/sequenced/sequenced_aa.fa sequences/published/published_aa.fa > sequences/nontranscriptome_aa.fa
+
+
+cat sequences/sequenced/sequenced_aa.fa results/blast/*luc_aa* sequences/published/published_aa.fa > sequences/nontranscriptome_aa.fa
+
+#Below incorporates Sanger sequences - above uses these to search x-tomes and use cap3 to assemble
+#cat sequences/sequenced/sequenced_aa.fa sequences/published/published_aa.fa > sequences/nontranscriptome_aa.fa
 
 #removing incomplete lucs with phenotype data - only CMU in the end
 #cat sequences/nontranscriptome_aa.fa results/blast/besthits.fasta  results/blast/phenotype_besthits.fasta > sequences/all_aa.fa

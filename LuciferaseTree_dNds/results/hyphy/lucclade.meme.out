@@ -28,7 +28,7 @@ _PLoS Genet_ 8(7): e1002764.
 
 >code –> Universal
 
->Loaded a multiple sequence alignment with **15** sequences, **587** codons, and **1** partitions from `/home/oakley/projects/Cypridinidae_Emission/LuciferaseTree_dNds/results/combined_codonaligned.fa`
+>Loaded a multiple sequence alignment with **14** sequences, **610** codons, and **1** partitions from `/home/oakley/projects/Cypridinidae_Emission/LuciferaseTree_dNds/results/combined_codonaligned.fa`
 
 >branches –> All
 
@@ -37,38 +37,38 @@ _PLoS Genet_ 8(7): e1002764.
 
 
 ### Branches to include in the MEME analysis
-Selected 27 branches to include in the MEME analysis: `Vargula_hilgendorfii_AAA30332, Cypridina_noctiluca_BAD08210, Kornickeria_hastingsi_sequenced, Maristella_chicoi_sequenced, Maristella_sp_SVD_sequenced, Maristella_sp_ODH_DN60908_c36_g8_i1, Maristella_sp_VAD_DN92476_c5_g4_i1, Node12, Node10, Node8, Maristella_sp_SVU_sequenced, Maristella_sp_AG_DN382219_c2_g1_i4, Maristella_sp_IR_DN50846_c6_g1_i1, Node17, Node15, Node7, Vargula_tsujii_sequenced, Node6, Photeros_morini_sequenced, Photeros_annecohenae_DN96747_c10_g3_i3, Node23, Photeros_macelroyi_DN131343_c2_g2_i4, Node22, Photeros_sp_WLU_DN218316_c2_g1_i3, Node21, Node5, Node3`
+Selected 25 branches to include in the MEME analysis: `Vargula_hilgendorfii_AAA30332, Cypridina_noctiluca_BAD08210, Kornickeria_hastingsi_cap3, Maristella_chicoi_cap3, Maristella_sp_SVD_cap3, Maristella_sp_VAD_DN92476_c5_g4_i1, Node11, Maristella_sp_ODH_DN60908_c36_g8_i1, Node10, Node8, Maristella_sp_AG_DN382219_c2_g1_i4, Maristella_sp_IR_DN50846_c6_g1_i1, Node15, Node7, Maristella_sp_SVU_cap3, Node6, Photeros_morini_cap3, Photeros_annecohenae_DN96747_c10_g3_i3, Node21, Photeros_macelroyi_DN131343_c2_g2_i4, Node20, Photeros_sp_WLU_DN218316_c2_g1_i3, Node19, Node5, Node3`
 
 
 ### Obtaining branch lengths and nucleotide substitution biases under the nucleotide GTR model
-* Log(L) = -9543.06, AIC-c = 19156.22 (35 estimated parameters)
+* Log(L) = -9663.10, AIC-c = 19392.29 (33 estimated parameters)
 
 ### Obtaining the global omega estimate based on relative GTR branch lengths and nucleotide substitution biases
-* Log(L) = -9044.66, AIC-c = 18173.73 (42 estimated parameters)
-* non-synonymous/synonymous rate ratio for *test* =   0.2365
+* Log(L) = -9167.34, AIC-c = 18415.06 (40 estimated parameters)
+* non-synonymous/synonymous rate ratio for *test* =   0.2395
 
 ### Improving branch lengths, nucleotide substitution biases, and global dN/dS ratios under a full codon model
-* Log(L) = -8987.91
-* non-synonymous/synonymous rate ratio for *test* =   0.1760
+* Log(L) = -9110.44
+* non-synonymous/synonymous rate ratio for *test* =   0.1779
 
 ### For partition 1 these sites are significant at p <=0.1
 
 |   Codon    | Partition  |   alpha    |   beta+    |     p+     |    LRT     |Episodic selection detected?| # branches |
 |:----------:|:----------:|:----------:|:----------:|:----------:|:----------:|:--------------------------:|:----------:|
-|     71     |     1      |    0.000   |   22.731   |    0.166   |    3.693   |      Yes, p =  0.0743      |     3      |
-|     93     |     1      |    0.000   |  923.445   |    0.116   |   13.624   |      Yes, p =  0.0005      |     3      |
-|    102     |     1      |    0.000   |   81.868   |    0.086   |    3.173   |      Yes, p =  0.0975      |     2      |
-|    115     |     1      |    0.100   |    4.221   |    0.170   |    3.462   |      Yes, p =  0.0838      |     1      |
-|    142     |     1      |    0.000   |   18.970   |    0.058   |   11.203   |      Yes, p =  0.0016      |     1      |
-|    160     |     1      |    0.000   |    1.793   |    0.160   |    3.878   |      Yes, p =  0.0674      |     1      |
-|    189     |     1      |    0.422   |    8.254   |    0.436   |    3.454   |      Yes, p =  0.0841      |     2      |
-|    261     |     1      |    0.117   |  132.382   |    0.067   |   12.575   |      Yes, p =  0.0008      |     1      |
-|    285     |     1      |    0.000   |    4.098   |    0.104   |    6.558   |      Yes, p =  0.0169      |     1      |
-|    291     |     1      |    0.000   |   10.771   |    0.228   |    3.145   |      Yes, p =  0.0989      |     0      |
-|    320     |     1      |    0.000   |    2.269   |    0.158   |    4.237   |      Yes, p =  0.0559      |     1      |
-|    389     |     1      |    0.302   |  114.948   |    0.046   |   11.421   |      Yes, p =  0.0014      |     1      |
-|    417     |     1      |    0.721   |    6.059   |    0.344   |    3.292   |      Yes, p =  0.0916      |     0      |
-|    477     |     1      |    0.454   |    8.109   |    0.077   |    3.633   |      Yes, p =  0.0766      |     1      |
-|    581     |     1      |    0.000   |    9.855   |    0.166   |    3.845   |      Yes, p =  0.0686      |     2      |
+|     93     |     1      |    0.000   |  690.514   |    0.169   |   10.352   |      Yes, p =  0.0025      |     3      |
+|    102     |     1      |    0.000   |   85.776   |    0.091   |    3.392   |      Yes, p =  0.0869      |     2      |
+|    142     |     1      |    0.000   |   18.606   |    0.061   |   11.134   |      Yes, p =  0.0017      |     1      |
+|    160     |     1      |    0.000   |    1.804   |    0.161   |    3.882   |      Yes, p =  0.0673      |     1      |
+|    177     |     1      |    0.000   |   12.184   |    0.364   |    6.091   |      Yes, p =  0.0215      |     1      |
+|    211     |     1      |    1.780   |   54.095   |    0.122   |    6.806   |      Yes, p =  0.0149      |     1      |
+|    240     |     1      |    0.000   |   20.857   |    0.122   |    3.366   |      Yes, p =  0.0881      |     2      |
+|    261     |     1      |    0.082   |  151.227   |    0.044   |   13.083   |      Yes, p =  0.0006      |     1      |
+|    285     |     1      |    0.000   |    4.058   |    0.107   |    6.498   |      Yes, p =  0.0175      |     1      |
+|    291     |     1      |    0.000   |   12.439   |    0.225   |    3.511   |      Yes, p =  0.0816      |     0      |
+|    320     |     1      |    0.000   |    2.307   |    0.156   |    4.224   |      Yes, p =  0.0563      |     1      |
+|    371     |     1      |    0.000   |   11.782   |    0.064   |    3.146   |      Yes, p =  0.0989      |     1      |
+|    389     |     1      |    0.302   |  121.003   |    0.049   |   11.753   |      Yes, p =  0.0012      |     1      |
+|    477     |     1      |    0.462   |    7.102   |    0.083   |    3.175   |      Yes, p =  0.0974      |     1      |
+|    581     |     1      |    0.000   |    8.124   |    0.182   |    3.677   |      Yes, p =  0.0749      |     2      |
 
 ### ** Found _15_ sites under episodic diversifying positive selection at p <= 0.1**

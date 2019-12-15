@@ -51,6 +51,9 @@ sub cap4lucs {
 	my $getnt = "getorf results/blast/".$abbr.".fa.cap.contigs results/blast/".$abbr."_luc_aa.fa -minsize 1400 -find $aa";
 	system($getnt);
 
-	my $getaa = "getorf results/blast/".$abbr.".fa.cap.contigs ".$abbr."_luc_nt.fa -minsize 1400 -find $dna";
+	my $getaa = "getorf results/blast/".$abbr.".fa.cap.contigs results/blast/".$abbr."_luc_nt.fa -minsize 1400 -find $dna";
 	system($getaa);
+
+	my $convertnames = "perl -pi -e 's/\>/\>".$abbr."_cap3 /g' results/blast/".$abbr."_luc_*";
+	system($convertnames);
 }
