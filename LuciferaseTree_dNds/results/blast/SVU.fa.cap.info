@@ -1,0 +1,60 @@
+No file of quality values (.qual) is found
+No file of constraints (.con) is found.
+No overlap is found in the given 5' clipping range for read SVU__DN30165_c1_g2_i1
+  5' clipping ranges for overlaps: 297  297  297  
+No overlap is found in the given 3' clipping range for read SVU__DN30165_c1_g1_i3
+  3' clipping ranges for overlaps: 145  210  210  
+No overlap is found in the given 5' clipping range for read SVU__DN25484_c0_g1_i2
+  5' clipping ranges for overlaps: 103  
+No overlap is found in the given 3' clipping range for read SVU_25Feb2019_y_c25
+  3' clipping ranges for overlaps: 143  143  143  
+Number of overlaps saved: 72
+ComputeOverlap done
+IdentifyChimeras done
+Overlap SVU__DN22987_c0_g1_i1+ and SVU__DN3914_c0_g1_i1+  P  lengths of diffs and sims: upper left 0  upper right 15  middle 50
+Overlap SVU__DN22987_c0_g1_i1+ and SVU__DN28955_c0_g1_i3+  C  qualscore     0  score   2030  identity 0.86
+Overlap SVU__DN22987_c0_g1_i1+ and SVU__DN28955_c0_g1_i2+  C  qualscore     0  score   2030  identity 0.86
+Overlap SVU__DN22987_c0_g1_i1+ and SVU__DN28955_c0_g1_i1+  C  qualscore     0  score   2030  identity 0.86
+Overlap SVU__DN22987_c0_g1_i1+ and SVU__DN28871_c0_g2_i1+  C  lengths of diffs and sims: upper left 141  upper right 12  middle 49
+Overlap SVU__DN22987_c0_g1_i1- and SVU__DN30165_c1_g1_i5+  C  lengths of diffs and sims: upper left 0  upper right 60  middle 142
+Overlap SVU__DN22987_c0_g1_i1- and SVU__DN30165_c1_g1_i4+  C  lengths of diffs and sims: upper left 27  upper right 33  middle 142
+Overlap SVU__DN22987_c0_g1_i1- and SVU__DN30165_c1_g1_i2+  C  lengths of diffs and sims: upper left 27  upper right 33  middle 142
+Overlap SVU__DN22987_c0_g2_i1+ and SVU__DN3914_c0_g1_i1+  P  lengths of diffs and sims: upper left 0  upper right 15  middle 50
+Overlap SVU__DN22987_c0_g2_i1+ and SVU__DN28871_c0_g2_i1+  P  lengths of diffs and sims: upper left 183  upper right 12  middle 49
+Overlap SVU__DN22987_c0_g2_i1- and SVU__DN30165_c1_g1_i4+  C  lengths of diffs and sims: upper left 27  upper right 186  middle 112
+Overlap SVU__DN22987_c0_g2_i1- and SVU__DN30165_c1_g1_i2+  C  lengths of diffs and sims: upper left 228  upper right 9  middle 88
+Overlap SVU__DN28871_c0_g2_i1+ and SVU__DN3914_c0_g1_i1+  P  qualscore     0  score   1400  identity 0.87
+Overlap SVU__DN28871_c0_g2_i1+ and SVU__DN28955_c0_g1_i3+  C  qualscore     0  score   3020  identity 0.86
+Overlap SVU__DN28871_c0_g2_i1+ and SVU__DN28955_c0_g1_i2+  C  qualscore     0  score   3090  identity 0.86
+Overlap SVU__DN28871_c0_g2_i1+ and SVU__DN28955_c0_g1_i1+  C  qualscore     0  score   3090  identity 0.86
+Overlap SVU__DN28871_c0_g2_i1- and SVU__DN30165_c1_g1_i5+  P  lengths of diffs and sims: upper left 207  upper right 0  middle 58
+Overlap SVU__DN28871_c0_g2_i1- and SVU__DN30165_c1_g1_i4+  C  qualscore     0  score   3580  identity 0.88
+Overlap SVU__DN28871_c0_g2_i1- and SVU__DN30165_c1_g1_i2+  C  qualscore     0  score   3580  identity 0.88
+Overlap SVU__DN24373_c0_g2_i1+ and SVU__DN30165_c1_g1_i2+  C  qualscore     0  score   2570  identity 0.87
+Overlap SVU__DN24373_c0_g2_i1+ and SVU__DN24373_c0_g5_i1+  P  lengths of diffs and sims: upper left 0  upper right 105  middle 124
+Overlap SVU__DN24373_c0_g5_i1+ and SVU__DN30165_c1_g1_i2+  C  qualscore     0  score   4410  identity 0.88
+Overlap SVU__DN30165_c1_g1_i1+ and SVU__DN30165_c1_g1_i5+  P  lengths of diffs and sims: upper left 48  upper right 0  middle 116
+Overlap SVU__DN30165_c1_g1_i1+ and SVU__DN28871_c0_g2_i1-  P  qualscore     0  score   2120  identity 0.86
+Overlap SVU__DN30165_c1_g1_i1+ and SVU__DN22987_c0_g2_i1-  P  lengths of diffs and sims: upper left 27  upper right 4  middle 112
+Overlap SVU__DN30165_c1_g1_i1+ and SVU__DN22987_c0_g1_i1-  P  lengths of diffs and sims: upper left 27  upper right 1  middle 115
+Overlap SVU__DN30165_c1_g1_i5- and SVU__DN3914_c0_g1_i1+  P  lengths of diffs and sims: upper left 0  upper right 36  middle 50
+Overlap SVU__DN30165_c1_g1_i5+ and SVU__DN30165_c1_g1_i4+  C  lengths of diffs and sims: upper left 48  upper right 0  middle 232
+Overlap SVU__DN30165_c1_g1_i5+ and SVU__DN30165_c1_g1_i2+  C  lengths of diffs and sims: upper left 48  upper right 0  middle 232
+Overlap SVU__DN30165_c1_g1_i5+ and SVU__DN22987_c0_g2_i1-  P  lengths of diffs and sims: upper left 0  upper right 120  middle 139
+Overlap SVU__DN28955_c0_g1_i1+ and SVU__DN3914_c0_g1_i1+  P  qualscore     0  score   1290  identity 0.85
+Overlap SVU__DN25484_c0_g1_i1+ and SVU__DN24373_c0_g5_i1-  P  qualscore     0  score   1780  identity 0.88
+Overlap SVU__DN3914_c0_g1_i1+ and SVU__DN28955_c0_g1_i2+  C  qualscore     0  score   1510  identity 0.85
+Number of overlaps removed: 62
+RemovePoorOverlaps done
+ASSEM done
+ComputDistForContigs done
+PresentLayout done
+Clip SVU__DN22987_c0_g2_i1 left clip: 1, right clip: 326,  length: 328,  right size 2
+Clip SVU__DN22987_c0_g1_i1 left clip: 3, right clip: 205,  length: 205,  right size 0
+Clip SVU__DN30165_c1_g1_i1 left clip: 1, right clip: 498,  length: 528,  right size 30
+Clip SVU__DN3914_c0_g1_i1 left clip: 1, right clip: 156,  length: 215,  right size 59
+Clip SVU__DN30165_c1_g1_i2 left clip: 1, right clip: 1895,  length: 1992,  right size 97
+Clip SVU__DN30165_c1_g1_i4 left clip: 1, right clip: 508,  length: 538,  right size 30
+Clip SVU__DN28955_c0_g1_i1 left clip: 1, right clip: 336,  length: 405,  right size 69
+Clip SVU__DN28955_c0_g1_i2 left clip: 1, right clip: 454,  length: 454,  right size 0
+Clip SVU__DN28955_c0_g1_i3 left clip: 1, right clip: 351,  length: 428,  right size 77

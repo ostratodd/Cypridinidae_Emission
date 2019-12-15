@@ -1,0 +1,675 @@
+Number of segment pairs = 812; number of pairwise comparisons = 200
+'+' means given segment; '-' means reverse complement
+
+Overlaps            Containments  No. of Constraints Supporting Overlap
+
+******************* Contig 1 ********************
+SVD__DN25061_c2_g1_i1+
+SVD__DN25061_c2_g4_i2+
+SVD__DN25061_c2_g5_i1+
+******************* Contig 2 ********************
+SVD__DN25061_c2_g3_i2+
+                    SVD__DN25061_c2_g3_i3+ is in SVD__DN25061_c2_g3_i2+
+SVD_25Feb2019_y_c52-
+                    SVD__DN25061_c2_g6_i1- is in SVD_25Feb2019_y_c52-
+                    SVD__DN25061_c2_g4_i1- is in SVD_25Feb2019_y_c52-
+                    SVD__DN25349_c0_g7_i1+ is in SVD_25Feb2019_y_c52-
+                    SVD__DN25349_c0_g10_i1+ is in SVD__DN25349_c0_g7_i1+
+                    SVD__DN25349_c0_g9_i4+ is in SVD_25Feb2019_y_c52-
+                    SVD__DN25349_c0_g9_i2+ is in SVD__DN25349_c0_g9_i4+
+                    SVD__DN25349_c0_g9_i3+ is in SVD_25Feb2019_y_c52-
+                    SVD__DN25349_c0_g9_i5+ is in SVD__DN25349_c0_g9_i3+
+                    SVD__DN25349_c0_g9_i7+ is in SVD_25Feb2019_y_c52-
+SVD__DN25349_c0_g9_i1+
+******************* Contig 3 ********************
+SVD__DN25061_c2_g3_i4+
+SVD__DN25061_c2_g3_i1+
+                    SVD__DN25061_c2_g2_i2+ is in SVD__DN25061_c2_g3_i1+
+******************* Contig 4 ********************
+SVD__DN24990_c0_g1_i4+
+                    SVD__DN24990_c0_g1_i5+ is in SVD__DN24990_c0_g1_i4+
+******************* Contig 5 ********************
+SVD__DN24990_c0_g1_i7+
+                    SVD__DN24990_c0_g5_i1+ is in SVD__DN24990_c0_g1_i7+
+                    SVD__DN24990_c0_g1_i6+ is in SVD__DN24990_c0_g1_i7+
+                    SVD__DN24990_c0_g1_i1+ is in SVD__DN24990_c0_g1_i6+
+
+DETAILED DISPLAY OF CONTIGS
+******************* Contig 1 ********************
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN25061_c2_g1_i+ TGTATCAACGAGGACGATGTTCACTTCGGTAGGTGCCTGGACGCGTGCGCACTGGCCTAC
+SVD__DN25061_c2_g4_i+ TGTATCAACGAGGACGATGTTCACTTCGGTAGGTGCCTGGACGCGTGCGCACTGGCCTAC
+SVD__DN25061_c2_g5_i+ TGTATCAACGAGGACGATGTTCACTTCGGTAGGTGCCTGGACGCGTGCGCACTGGCCTAC
+                      ____________________________________________________________
+consensus             TGTATCAACGAGGACGATGTTCACTTCGGTAGGTGCCTGGACGCGTGCGCACTGGCCTAC
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN25061_c2_g1_i+ TGCATGGGCGGCGACGATAGAGTGGAGGATGTCATTTTT-GAATACGCTGAAGCCTGTGT
+SVD__DN25061_c2_g4_i+ TGCATGGGCGGCGACGATAGAGTGGAGGATGTCATTTTTTGAATACGCTGAAGCCTGTGT
+SVD__DN25061_c2_g5_i+ TGCATGGGCGGCGACGATAGAGTGGAGGATGTCATTTTT-GAATACGCTGAAGCCTGTGT
+                      ____________________________________________________________
+consensus             TGCATGGGCGGCGACGATAGAGTGGAGGATGTCATTTTT-GAATACGCTGAAGCCTGTGT
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN25061_c2_g1_i+ TGAACCAATCGGAAGAGCAACCTGCGTCATGAATGGACACACGTACTATGACACATTCGA
+SVD__DN25061_c2_g4_i+ TGAACCAATCGGAAGAGCAACCTGCGTCATGAATGGACACACGTACTATGACACATTCGA
+SVD__DN25061_c2_g5_i+ TGAACCAATCGGAAGAGCAACCTGCGTCATGAATGGACACACGTACTATGACACATTCGA
+                      ____________________________________________________________
+consensus             TGAACCAATCGGAAGAGCAACCTGCGTCATGAATGGACACACGTACTATGACACATTCGA
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN25061_c2_g1_i+ CAAAACAAGTTATCAGTTTCAGGCACCTTGTAA                       
+SVD__DN25061_c2_g4_i+ CAAAACAAGTTATCAGTTTCAGGCACCTTGTAAGGTTCTATTCGCAAAAGA     
+SVD__DN25061_c2_g5_i+ CAAAACAAGTTATCAGTTTCAGGCACCTTGTAAGGTTCTATTCGCAAAAGACTGTA
+                      ____________________________________________________________
+consensus             CAAAACAAGTTATCAGTTTCAGGCACCTTGTAAGGTTCTATTCGCAAAAGACTGTA
+
+******************* Contig 2 ********************
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN25061_c2_g3_i+ TTTTTAAAATGCTAAATGCTTTATAAGATAATATTACCAATACATATAATATTTGTATGT
+                      ____________________________________________________________
+consensus             TTTTTAAAATGCTAAATGCTTTATAAGATAATATTACCAATACATATAATATTTGTATGT
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN25061_c2_g3_i+ AACAATTTATATAACAGTAATATTGAATACTACATCGTCTTTATATATACACAAAAGCAT
+SVD__DN25061_c2_g3_i+                                              TATACACAAAGGCAT
+                      ____________________________________________________________
+consensus             AACAATTTATATAACAGTAATATTGAATACTACATCGTCTTTATATATACACAAAAGCAT
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN25061_c2_g3_i+ ATTAAACATATTAAAGATGCACATTTTTTTGTGCACAATAAACCATAGTGTAGTTGGTAC
+SVD__DN25061_c2_g3_i+ ATTAAACATTTTAAAGATGCACATTTTTG-GTGCACAATAAACCATAGTGTAGTTGGTAC
+                      ____________________________________________________________
+consensus             ATTAAACATATTAAAGATGCACATTTTTGTGTGCACAATAAACCATAGTGTAGTTGGTAC
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN25061_c2_g3_i+ AGTTCACTAAAGTGTTTCATTTACACTGAGGTGGATACTGTAGGTCGTCTCCGTGCCTCA
+SVD__DN25061_c2_g3_i+ AGTTCACTCATGTGTTTCATTTACACTGAGGTGGATACTGTAGGTCGTCTCCGTGCCTCA
+SVD_25Feb2019_y_c52-                     TTTACACTGAGGTGGATACTGTAGGTCGTCTCCGTGCCTCA
+                      ____________________________________________________________
+consensus             AGTTCACTAAAGTGTTTCATTTACACTGAGGTGGATACTGTAGGTCGTCTCCGTGCCTCA
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN25061_c2_g3_i+ CGAAGCATTCATCGATGACGGTACCAGCATGTTGACAGAATCCTTCCAGACCACCAAGAC
+SVD__DN25061_c2_g3_i+ CGAAGCATTCATCGATGACGGTACCAGCATGTTGACAGAATCCTTCCAGACCACCAAGAC
+SVD_25Feb2019_y_c52-  CGAAGCATTCATCGATGACGGTACCAGCATGTTGACAGAATCCTTCCAGACCACCAAGAC
+                      ____________________________________________________________
+consensus             CGAAGCATTCATCGATGACGGTACCAGCATGTTGACAGAATCCTTCCAGACCACCAAGAC
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN25061_c2_g3_i+ AGTACTCATACATACAGCGCTCAACACGGTCAGCCTTGTAGCAGATGTCACATTCGTCGT
+SVD__DN25061_c2_g3_i+ AGTACTCATACATACAGCGCTCAACACGGTCAGCCTTGTAGCAGATGTCACATTCGTCGT
+SVD_25Feb2019_y_c52-  AGTACTCATACATACAGCGCTCAACACGGTCAGCCTTGTAGCAGATGTCACATTCGTCGT
+                      ____________________________________________________________
+consensus             AGTACTCATACATACAGCGCTCAACACGGTCAGCCTTGTAGCAGATGTCACATTCGTCGT
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN25061_c2_g3_i+ CGATAGAAGCAGGAAACATATTCTGACAGAGTTCTCTAGCTTCAGCTTCTTTGTCAGCAG
+SVD__DN25061_c2_g3_i+ CGATAGAAGCAGGAAACATATTCTGACAGAGTTCTCTAGCTTCAGCCTCTTTGTCAGCAG
+SVD_25Feb2019_y_c52-  CGATAGAAGCAGGAAACATATTCTGACAGAGTTCTCTAGCTTCAGCTTCTTTGTCAGCAG
+                      ____________________________________________________________
+consensus             CGATAGAAGCAGGAAACATATTCTGACAGAGTTCTCTAGCTTCAGCTTCTTTGTCAGCAG
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN25061_c2_g3_i+ TGCATGTTGGAGGGTTGGGAGTTGGTTCACAATCTACATACTGAGTATCAGGACCGTCAT
+SVD__DN25061_c2_g3_i+ TGCATGTTGGAGGGTTGGGAGTTGGTTCACAATCTGCATACTGAGTATCAGGACCATCAT
+SVD_25Feb2019_y_c52-  TGCATGTTGGAGGGTTGGGAGTTGGTTCACAATCTACATACTGAGTATCAGGACCGTCAT
+                      ____________________________________________________________
+consensus             TGCATGTTGGAGGGTTGGGAGTTGGTTCACAATCTACATACTGAGTATCAGGACCGTCAT
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN25061_c2_g3_i+ TAGATTTATCCAAATCCCAAATACCACATAAACCACAGCTGTCTGCTTCATATGGATCTC
+SVD__DN25061_c2_g3_i+ TAGATTTATCCAAATCCCAGATGCCACACAAGCCACAGCTGTCTGCTTCATATGGATCTC
+SVD_25Feb2019_y_c52-  TAGATTTATCCAAATCCCAAATACCACATAAACCACAGCTGTCTGCTTCATATGGATCTC
+                      ____________________________________________________________
+consensus             TAGATTTATCCAAATCCCAAATACCACATAAACCACAGCTGTCTGCTTCATATGGATCTC
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN25061_c2_g3_i+ TGATGTGTAGAGCCAACATCTGCGCGAAATTGTATTTGACAACCACTGCTCCTGGTAGAA
+SVD__DN25061_c2_g3_i+ TGATGTGTAGAGCCAACATCTGCGCGAAATTGTATTTGACAACCACTGCT          
+SVD_25Feb2019_y_c52-  TGATGTGTAGAGCCAACATCTGCGCGAAATTGTATTTGACAACCACTGCTCCTGGTAGAA
+                      ____________________________________________________________
+consensus             TGATGTGTAGAGCCAACATCTGCGCGAAATTGTATTTGACAACCACTGCTCCTGGTAGAA
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN25061_c2_g3_i+ CTGCTGTAGTTATTAAGTTATCATACATGTATATAGATGTATCTCCATAGTTGTAAGGGA
+SVD_25Feb2019_y_c52-  CTGCTGTAGTTATTAAGTTATCATACATGTATATAGATGTATCTCCATAGTTGTAAGGGA
+                      ____________________________________________________________
+consensus             CTGCTGTAGTTATTAAGTTATCATACATGTATATAGATGTATCTCCATAGTTGTAAGGGA
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN25061_c2_g3_i+ CACTCACTTCAGTTCCATTAACGAAAACTTTCTTATTCTCCGCTACCAGATCAATCAAGG
+SVD_25Feb2019_y_c52-  CACTCACTTCAGTTCTATTAACGAAAACTTTCTTATTCTCCGCTACCAGATCAATCAAGG
+                      ____________________________________________________________
+consensus             CACTCACTTCAGTTCCATTAACGAAAACTTTCTTATTCTCCGCTACCAGATCAATCAAGG
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN25061_c2_g3_i+ TTTGGAAATACCGGACGGTGACCTTTTCTACTTCAGTATATTCTCCAGCTGCTTTATGAA
+SVD_25Feb2019_y_c52-  TTTGGAAATACCGGACGGTGACCTTTTCTACTTCAGTATATTCTCCAGCTGCTTTATGAA
+                      ____________________________________________________________
+consensus             TTTGGAAATACCGGACGGTGACCTTTTCTACTTCAGTATATTCTCCAGCTGCTTTATGAA
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN25061_c2_g3_i+ CAATAGTTACTTCCCAATCATCATCTGTACAGTCTTTTGCGAATAGAACCTT        
+SVD_25Feb2019_y_c52-  CAATAGTTACTTCCCAATCATCATCTGTACAGTCTTTTGCGAATAGAACCTTACAAGGTG
+SVD__DN25061_c2_g6_i-                                 TCTTTTGCGAATAGAACCTTACAAGGTG
+SVD__DN25061_c2_g4_i-                                 TCTTTTGCGAATAGAACCTTACAAGGTG
+                      ____________________________________________________________
+consensus             CAATAGTTACTTCCCAATCATCATCTGTACAGTCTTTTGCGAATAGAACCTTACAAGGTG
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD_25Feb2019_y_c52-  CCTGAAACTGATAACTTGTTTTGTCGAATGTGTCATAGTACGTGTGTCCATTCATGACGC
+SVD__DN25061_c2_g6_i- CCTGAAACTGATAGCTTGTTTTGTCGAATGTGTCATAGTACGTGTGTCCATTCATGACGC
+SVD__DN25061_c2_g4_i- CCTGAAACTGATAACTTGTTTTGTCGAATGTGTCATAGTACGTGTGTCCATTCATGACGC
+SVD__DN25349_c0_g7_i+                                                    TCATGACGC
+SVD__DN25349_c0_g10_+                                                    TCATGACGC
+SVD__DN25349_c0_g9_i+                                                    TCATGACGC
+                      ____________________________________________________________
+consensus             CCTGAAACTGATAACTTGTTTTGTCGAATGTGTCATAGTACGTGTGTCCATTCATGACGC
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD_25Feb2019_y_c52-  AGGTTGCTCTTCCGATTGGTTCAACACAGGCTTCAGCGTATTCAAAAATGACATCCTCCA
+SVD__DN25061_c2_g6_i- ATGTTGCTCTACCGATTGGTTCAACGCAGGCTTCAGCGTATTCAAAAATAACATCCTCTA
+SVD__DN25061_c2_g4_i- AGGTTGCTCTACCGATTGGTTCAACGCAGGCTTCAGCGTATTCAAAAATAACATCCTCTA
+SVD__DN25349_c0_g7_i+ AGGTTGCTCTTCCGATTGGTTCAACACAGGCTTCAGCGTATTCAAAAATGACATCCTCCA
+SVD__DN25349_c0_g10_+ AGGTTGCTCTTCCGATTGGTTCAACACAGGCTTCAGCGTATTCAAAAATGACATCCTCCA
+SVD__DN25349_c0_g9_i+                TTGGTTCAACACAGGCTTCAGCGTATTCAAAAATGACATCCTCCA
+SVD__DN25349_c0_g9_i+                                   AGCGTATTCAAAAATGACATCCTCCA
+SVD__DN25349_c0_g9_i+ AGGTTGCTCTTCCGATTGGTTCAACACAGGCTTCAGCGTATTCAAAAATGACATCCTCCA
+                      ____________________________________________________________
+consensus             AGGTTGCTCTTCCGATTGGTTCAACACAGGCTTCAGCGTATTCAAAAATGACATCCTCCA
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD_25Feb2019_y_c52-  CTCTATCGTCGCCGCCCATGCAGTAGGCCAGTGCGCACGCGTACAGGTAGGTACCGAAGT
+SVD__DN25061_c2_g6_i- CTCTGTCATCGCCGCCCATGCAGTAGGCAAGGGCGCATGCGTACAGGTAGGTACCGAAGT
+SVD__DN25061_c2_g4_i- CTCTGTCATCGCCGCCCATGCAGTAGGCAAGGGCGCATGCGTACAGGTAGGTACCGAAGT
+SVD__DN25349_c0_g7_i+ CTCTATCGTCGCCGCCCATGCAGTAGGCCAGTGCGCACGCGTACAGGTAGGTACCGAAGT
+SVD__DN25349_c0_g10_+ CTCTATCGTCGCCGCCCATGCGGTCGGCCAGTGCGCACGCGTACAGGTAGGTACCGAAGT
+SVD__DN25349_c0_g9_i+ CTCTATCGTCGCCGCCCATGCAGTAGGCCAGTGCGCACGCGTACAGGTAAGTACCAAAGT
+SVD__DN25349_c0_g9_i+ CTCTATCGTCGCCGCCCATGCAGTAGGCGAGTGCGCATGCGTACAGGTAAGTACCAAAGT
+SVD__DN25349_c0_g9_i+ CTCTATCGTCGCCGCCCATGCAGTAGGCAAGTGCGCATGCGTACAGGTAGGTACCGAAGT
+                      ____________________________________________________________
+consensus             CTCTATCGTCGCCGCCCATGCAGTAGGCCAGTGCGCACGCGTACAGGTAGGTACCGAAGT
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD_25Feb2019_y_c52-  GAACATCGTTCTTGTTGATACAGCCGTCCTTATATGGCTGCATCTTATTCACGCAATATT
+SVD__DN25061_c2_g6_i- GAACATCGTTCTTGTTAATACAGC                                    
+SVD__DN25061_c2_g4_i- GAACATCGTTCTTGTTAATACAGC                                    
+SVD__DN25349_c0_g7_i+ GAACATCGTTCTTGTTGATACAGCCGTCCTTATATGGCTGCATCTTATTCACGCAATATT
+SVD__DN25349_c0_g10_+ GAACATCGTTCTTGTTGATACAGCCGTCCTTATATGGCTGCATCTTATTCACGCAATATT
+SVD__DN25349_c0_g9_i+ GAACATCGTTCTTGTTAATACAGCTGTCCTTATATGGCTGCATCTTATTCACGCAATATT
+SVD__DN25349_c0_g9_i+ GAACATCGTTCTTGTTAATACAGCCGTCCTTAAATGGCTGCATCTTATTCAAGCAATATT
+SVD__DN25349_c0_g9_i+                             CTTATATGGCTGCATCTTATTCACGCAATATT
+SVD__DN25349_c0_g9_i+ GAACATCGTTCTTGTTGATACAGCCGTCCTTATATGGCTGCATCTTATTCAAGCAATATT
+                      ____________________________________________________________
+consensus             GAACATCGTTCTTGTTAATACAGCCGTCCTTATATGGCTGCATCTTATTCACGCAATATT
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD_25Feb2019_y_c52-  CGATGTCAGAAGGATTTCCAGATAGTGGGCAGCCTTCTACGTCTTGGTTCATTAGGTCTT
+SVD__DN25349_c0_g7_i+ CGATGTCAGAAGGATTTCCAGATAGTGGGCAGCCTTCTACGTCTTGGTTC          
+SVD__DN25349_c0_g10_+ CGATGTCAGAAGGAT                                             
+SVD__DN25349_c0_g9_i+ CGATGTCAGAAGGATTTCCAGATAGTGGGCAGCCTTCTACGTCTTGGTTCATTAGGTCTT
+SVD__DN25349_c0_g9_i+ CAACGTCAGAAGGATTTCCAGATAGTGGGCAGCCTTCTACGTCTTGGTTCATTAGGTCTT
+SVD__DN25349_c0_g9_i+ CGATGTCAGAAGGATTTCCAGATAGTGGGCAGCCTTCTACGTCTTGGTTCATTAGGTCTT
+SVD__DN25349_c0_g9_i+                                                          CTT
+SVD__DN25349_c0_g9_i+ CAACGTCAGAAGGATTTCCAGATAGTGGGCAGCCTTCTACATCTTGATTCATCAGGTCTT
+                      ____________________________________________________________
+consensus             CGATGTCAGAAGGATTTCCAGATAGTGGGCAGCCTTCTACGTCTTGGTTCATTAGGTCTT
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD_25Feb2019_y_c52-  GGATCGCAAGTTGATCTGGATTGTCAATAAAATCAGAAGGTTCATCGGACATCAGTCCAC
+SVD__DN25349_c0_g9_i+ GGATCGCAAGTTGATCTGGATTGTCAATAAAATCAGAAGGT                   
+SVD__DN25349_c0_g9_i+ GGATCGCAAGTTGATCTGGATTGTCAAT                                
+SVD__DN25349_c0_g9_i+ GGATCGCAAGTTGATCTGGATTGTCAATAAAATCAGAAGGTTCATCGGACATCAGTCCAC
+SVD__DN25349_c0_g9_i+ GGATTGCAAGTTGATCTGGATTGTCAATAAAATCAGAAGGTTCATCGGACATCACTCCAC
+SVD__DN25349_c0_g9_i+ GGATTGCAAGTTGATCTGGATTGTGAATAAAATCAGAAGGTTCTTGTGACATCACTCCAC
+                      ____________________________________________________________
+consensus             GGATCGCAAGTTGATCTGGATTGTCAATAAAATCAGAAGGTTCATCGGACATCAGTCCAC
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD_25Feb2019_y_c52-  ATAAACCACAGGTCCTGTCAGCGTATAAGAAGTCTGGAGCAAGTCGGAAAGCTCTGCCTT
+SVD__DN25349_c0_g9_i+ ATAAACCACAGGTCCTGTCAGCGTATAAGAAGTCTGGAGCAAGTCGGAAAGCTCTGCCTT
+SVD__DN25349_c0_g9_i+ ATAAGCCACAGGTCCTGTCAGCGTATAAGAAGTCTGGAGCAAGTCGGAAAGCTCTGCCTT
+SVD__DN25349_c0_g9_i+ ATAAGCCACAGGTCCTGTCAGCGTATAAGAAGTCTGGAGCAAGTCGAAAAGCTCTGCCTT
+SVD__DN25349_c0_g9_i+                                                AAAGCTCTGCCTT
+                      ____________________________________________________________
+consensus             ATAAACCACAGGTCCTGTCAGCGTATAAGAAGTCTGGAGCAAGTCGGAAAGCTCTGCCTT
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD_25Feb2019_y_c52-  GTAAGATATCAAATGTAACAAGCTTAAGAAACTCGATTACGGAGACGTCGAAGAAAGGAG
+SVD__DN25349_c0_g9_i+ GTAAGATATCAAATGTAACAAGCTTAAGAAACTCGATTACGGAGACGTCGAAGAAAGGAG
+SVD__DN25349_c0_g9_i+ GTAAGATATCAAATGTAACAAGCTTAAGAAACTCGATTACGGAGACGTCGAAGAAAGGAG
+SVD__DN25349_c0_g9_i+ GTAAGATATCAAATGTAACAAGCTTAAGAAACTCGATTACGGAGACACTAAAGTAAGGAG
+SVD__DN25349_c0_g9_i+ GTAAGATATCAAATGTAACAAGCTTAAGAAACTCGATTACGGAGACGTCGAAGAAAGGAG
+                      ____________________________________________________________
+consensus             GTAAGATATCAAATGTAACAAGCTTAAGAAACTCGATTACGGAGACGTCGAAGAAAGGAG
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD_25Feb2019_y_c52-  TGTGTACGATGGCGATGGTGACGTCACCGATAGAGAATGGATTGCTGTCGATATCAACGG
+SVD__DN25349_c0_g9_i+ TGTGTACGATGGCGATGGTGACGTCACCGATAGAGAA                       
+SVD__DN25349_c0_g9_i+ TGTGTACGATGGCGATGGTGAC                                      
+SVD__DN25349_c0_g9_i+ TGTATACGATGGCGATGGTGACGTCAC                                 
+SVD__DN25349_c0_g9_i+ TGTGTACGATGGCGATGGTGACGTCACCGATAGAGAATGGATTGCTGTCGATATCAACGG
+                      ____________________________________________________________
+consensus             TGTGTACGATGGCGATGGTGACGTCACCGATAGAGAATGGATTGCTGTCGATATCAACGG
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD_25Feb2019_y_c52-  TACCTCCATTTACCGTAATAGATGCAACTTTCTGCTTAATATCTAAAGTTACGTCTCCAA
+SVD__DN25349_c0_g9_i+ TACCTCCATTTACCGTAATAGATGCAACTTTCTGCTTAATATCTAAAGTTACGTCTCCAA
+                      ____________________________________________________________
+consensus             TACCTCCATTTACCGTAATAGATGCAACTTTCTGCTTAATATCTAAAGTTACGTCTCCAA
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD_25Feb2019_y_c52-  CAACCATCTTAACGGAGTCTAAAACTGCTCCCTTCTCTCCTTCTACATTTGCCAGGTTAA
+SVD__DN25349_c0_g9_i+ CAACCATCTTAACGGAGTCTAAAACTGCTCCCTTCTCTCCTTCTACATTTGCCAGGTTAA
+                      ____________________________________________________________
+consensus             CAACCATCTTAACGGAGTCTAAAACTGCTCCCTTCTCTCCTTCTACATTTGCCAGGTTAA
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD_25Feb2019_y_c52-  CATAAAGAGACCATAGTCCTCCCACGCAGTCTTCACTCAGCAGATAGGTCCCTGGTACCT
+SVD__DN25349_c0_g9_i+ CATAAAGAGACCATAGTCCTCCCACGCAGTCTTCACTCAGCAGATAGGTCCCTGGTACCT
+                      ____________________________________________________________
+consensus             CATAAAGAGACCATAGTCCTCCCACGCAGTCTTCACTCAGCAGATAGGTCCCTGGTACCT
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD_25Feb2019_y_c52-  GGAGATTGAATCTCTGCCCATAGAACGTGTGAAAAAATCCAGCTGCTGAAGCTCTGCACC
+SVD__DN25349_c0_g9_i+ GGAGATTGAATCTCTGCCCATAGAACGTGTGAAAAAATCCAGCTGCTGAAGCTCTGCACC
+                      ____________________________________________________________
+consensus             GGAGATTGAATCTCTGCCCATAGAACGTGTGAAAAAATCCAGCTGCTGAAGCTCTGCACC
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD_25Feb2019_y_c52-  TGACGATTTCTGGGCAATCTCTACAGCACTTGGGAGATGCTCCTCCAGCATTTTCACACA
+SVD__DN25349_c0_g9_i+ TGACGATTTCTGGGCAATCTCTACAGCACTTGGGAGATGCTCCTCCAGCATTTTCACACA
+                      ____________________________________________________________
+consensus             TGACGATTTCTGGGCAATCTCTACAGCACTTGGGAGATGCTCCTCCAGCATTTTCACACA
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD_25Feb2019_y_c52-  ATCCATCGCCAAACAGAACTTGGTCACAGCTACCGCACGCAGAGTCTACACATCTTCCGT
+SVD__DN25349_c0_g9_i+ ATCCATCGCCAAACAGAACTTGGTCACAGCTACCGCACGCAGAGTCTACACATCTTCCGT
+                      ____________________________________________________________
+consensus             ATCCATCGCCAAACAGAACTTGGTCACAGCTACCGCACGCAGAGTCTACACATCTTCCGT
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD_25Feb2019_y_c52-  TTATAGCTTCGCATGAAGATGGATAATCATTCGAAGCCCATG                  
+SVD__DN25349_c0_g9_i+ TTATAGCTTCGCATGAAGATGGATAATCATTCGAAGCCCATGTGAATTCATAACAATCTT
+                      ____________________________________________________________
+consensus             TTATAGCTTCGCATGAAGATGGATAATCATTCGAAGCCCATGTGAATTCATAACAATCTT
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN25349_c0_g9_i+ CGCCTGCAGAAAAGCAGATTCCTGCTAACAATAGTAAACTTTGTAACCACATTATCCCTG
+                      ____________________________________________________________
+consensus             CGCCTGCAGAAAAGCAGATTCCTGCTAACAATAGTAAACTTTGTAACCACATTATCCCTG
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN25349_c0_g9_i+ CCCGTGTCTCGGCTGATCACAAAAGCACTGTGCGGCTTAAGTCCATTCCATGCTCTATAT
+                      ____________________________________________________________
+consensus             CCCGTGTCTCGGCTGATCACAAAAGCACTGTGCGGCTTAAGTCCATTCCATGCTCTATAT
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN25349_c0_g9_i+ ATATATAAATGTACACGTATTATACACGCGTGTTCTATATTTAATGTCCTTACTTCTTTA
+                      ____________________________________________________________
+consensus             ATATATAAATGTACACGTATTATACACGCGTGTTCTATATTTAATGTCCTTACTTCTTTA
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN25349_c0_g9_i+ TATACACGTGCCAATTTAAGTAGTTTGGCTAACGTCTTAA
+                      ____________________________________________________________
+consensus             TATACACGTGCCAATTTAAGTAGTTTGGCTAACGTCTTAA
+
+******************* Contig 3 ********************
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN25061_c2_g3_i+ TTTTTAAAATGCTAAATGCTTTATAAGATAATATTACCAATACATATAATATTTGTATGT
+                      ____________________________________________________________
+consensus             TTTTTAAAATGCTAAATGCTTTATAAGATAATATTACCAATACATATAATATTTGTATGT
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN25061_c2_g3_i+ AACAATTTATATAACAGTAATATTGAATACTACATCGTCTTTATATATACACAAAAGCAT
+SVD__DN25061_c2_g3_i+                                              TATACACAAAGGCAT
+                      ____________________________________________________________
+consensus             AACAATTTATATAACAGTAATATTGAATACTACATCGTCTTTATATATACACAAAAGCAT
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN25061_c2_g3_i+ ATTAAACATATTAAAGATGCACATTTTTTTGTGCACAATAAACCATAGTGTAGTTGGTAC
+SVD__DN25061_c2_g3_i+ ATTAAACATTTTAAAGATGCACATTTTTG-GTGCACAATAAACCATAGTGTAGTTGGTAC
+                      ____________________________________________________________
+consensus             ATTAAACATATTAAAGATGCACATTTTTGTGTGCACAATAAACCATAGTGTAGTTGGTAC
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN25061_c2_g3_i+ AGTTCACTAAAGTGTTTCATTTACACTGAGGTGGATACTGTAGGTCGTCTCCGTGCCTCA
+SVD__DN25061_c2_g3_i+ AGTTCACTCATGTGTTTCATTTACACTGAGGTGGATACTGTAGGTCGTCTCCGTGCCTCA
+                      ____________________________________________________________
+consensus             AGTTCACTAAAGTGTTTCATTTACACTGAGGTGGATACTGTAGGTCGTCTCCGTGCCTCA
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN25061_c2_g3_i+ CGAAGCATTCATCGATGACGGTACCAGCATGTTGACAGAATCCTTCCAGACCACCAAGAC
+SVD__DN25061_c2_g3_i+ CGAAGCATTCATCGATGACGGTACCAGCATGTTGACAGAATCCTTCCAGACCACCAAGAC
+                      ____________________________________________________________
+consensus             CGAAGCATTCATCGATGACGGTACCAGCATGTTGACAGAATCCTTCCAGACCACCAAGAC
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN25061_c2_g3_i+ AGTACTCATACATACAGCGCTCAACACGGTCAGCCTTGTAGCAGATGTCACATTCGTCGT
+SVD__DN25061_c2_g3_i+ AGTACTCATACATACAGCGCTCAACACGGTCAGCCTTGTAGCAGATGTCACATTCGTCGT
+                      ____________________________________________________________
+consensus             AGTACTCATACATACAGCGCTCAACACGGTCAGCCTTGTAGCAGATGTCACATTCGTCGT
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN25061_c2_g3_i+ CGATAGAAGCAGGAAACATATTCTTAAACAAAATGCATTGATATAAATATCATATACTGA
+SVD__DN25061_c2_g3_i+ CGATAGAAGCAGGAAACATATTCTTAAACAAAATGCATTGATATAAATATCATATACTGA
+                      ____________________________________________________________
+consensus             CGATAGAAGCAGGAAACATATTCTTAAACAAAATGCATTGATATAAATATCATATACTGA
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN25061_c2_g3_i+ CTCATCAAAGAAACTAATAAGGTGAATGATATATGGATGAAAGACAACCGAGGCAAAAAG
+SVD__DN25061_c2_g3_i+ CTCATCAAAGAAACTAATAAGGTGAATGATATATGGATGAAAGACAACCGAGGCAAAAAG
+                      ____________________________________________________________
+consensus             CTCATCAAAGAAACTAATAAGGTGAATGATATATGGATGAAAGACAACCGAGGCAAAAAG
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN25061_c2_g3_i+ TGCCATTACACACACACACACACCGCTTCGTCAGCTCTACATATTGGAGTGCTGGTGGTC
+SVD__DN25061_c2_g3_i+ TGCCATTACACACACACACACACCGCTTCGTCAGCTCTACATATTGGAGTGCTGGTGGTC
+                      ____________________________________________________________
+consensus             TGCCATTACACACACACACACACCGCTTCGTCAGCTCTACATATTGGAGTGCTGGTGGTC
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN25061_c2_g3_i+ AGTTGACGCTTTGCATATAGGGTTTTACTCTTACTTTCAAAGTTCCCTTAGTTCAGCCTG
+SVD__DN25061_c2_g3_i+ AGTTGACGCTTTGCATATAGGGTTTTACTCTTACTTTCAAAGTTCCCTTAGTTCAGCCTG
+                      ____________________________________________________________
+consensus             AGTTGACGCTTTGCATATAGGGTTTTACTCTTACTTTCAAAGTTCCCTTAGTTCAGCCTG
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN25061_c2_g3_i+ TTTGTCATTTGTACATTTTGGAGCTTTCTGAATGCTTTCACAATCTACATATAGAGCTTC
+SVD__DN25061_c2_g3_i+ TTTGTCATTTGTACATTTTGGAGCTTTCTGAATGCTTTCACAATCTACATATAGAGCTTC
+                      ____________________________________________________________
+consensus             TTTGTCATTTGTACATTTTGGAGCTTTCTGAATGCTTTCACAATCTACATATAGAGCTTC
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN25061_c2_g3_i+ ACGTTTGCCTGGCATAGTCCCCTTGCTTCAGCCTCTCTGTCAGCAGTCCATATTGGGGAG
+SVD__DN25061_c2_g3_i+ ACGTTTGCCTGGCATAGTCCCCTTGCTTCAGCCTCTCTGTCAGCAGTCCATATTGGGGAG
+                      ____________________________________________________________
+consensus             ACGTTTGCCTGGCATAGTCCCCTTGCTTCAGCCTCTCTGTCAGCAGTCCATATTGGGGAG
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN25061_c2_g3_i+ TTGAGAGTTGGTTAACTTTCTACATATAGAGCTTTAATCTTACCTGGCATAGTACCCTTG
+SVD__DN25061_c2_g3_i+ TTGAGAGTTGGTTAACTTTCTACATATAGAGCTTTAATCTTACCTGGCATAGTACCCTTG
+                      ____________________________________________________________
+consensus             TTGAGAGTTGGTTAACTTTCTACATATAGAGCTTTAATCTTACCTGGCATAGTACCCTTG
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN25061_c2_g3_i+ CTTCAGCCTCTTTGTCGGCAGTGCATATTTTGGGGTTGACGGTTGATTAAATATCTACAT
+SVD__DN25061_c2_g3_i+ CTTCAGCCTCTTTGTCGGCAGTGCATATTTTGGGGTTGACGGTTGATTAAATATCTACAT
+                      ____________________________________________________________
+consensus             CTTCAGCCTCTTTGTCGGCAGTGCATATTTTGGGGTTGACGGTTGATTAAATATCTACAT
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN25061_c2_g3_i+ ATAGAAATTTAATCTTACCTGACAGAGTTCTCTAGCTTCAGCCTCTTTGTCAGCAGTGCA
+SVD__DN25061_c2_g3_i+ ATAGAGATCTAATCTTACCTGACAGAGTTCTCTAGCTTCAGCTTCTTTGTCAGCAGTGCA
+                      ____________________________________________________________
+consensus             ATAGAAATCTAATCTTACCTGACAGAGTTCTCTAGCTTCAGCCTCTTTGTCAGCAGTGCA
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN25061_c2_g3_i+ TGTTGGAGGGTTGGGAGTTGGTTCACAATCTGCATACTGAGTATCAGGACCATCATTAGA
+SVD__DN25061_c2_g3_i+ TGTTGGAGGGTTGGGAGTTGGTTCACAATCTACATACTGAGTATCAGGACCGTCATTAGA
+                      ____________________________________________________________
+consensus             TGTTGGAGGGTTGGGAGTTGGTTCACAATCTACATACTGAGTATCAGGACCATCATTAGA
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN25061_c2_g3_i+ TTTATCCAAATCCCAGATGCCACACAAGCCACAGCTGTCTGCTTCATATGGATCTCTGAT
+SVD__DN25061_c2_g3_i+ TTTATCCAAATCCCAAATACCACATAAACCACAGCTGTCTGCTTCATATGGATCTCTGAT
+                      ____________________________________________________________
+consensus             TTTATCCAAATCCCAAATACCACACAAACCACAGCTGTCTGCTTCATATGGATCTCTGAT
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN25061_c2_g3_i+ GTGTAGAGCCAACATCTGCTCGAAGTTGTATTTGATGACCACTGCTCCTGGTAGAACTGC
+SVD__DN25061_c2_g3_i+ GTGTAGAGCCAACATCTGCGCGAAATTGTATTTGACAACCACTGCTCCTGGTAGAACTGC
+SVD__DN25061_c2_g2_i+                                                        ACTGC
+                      ____________________________________________________________
+consensus             GTGTAGAGCCAACATCTGCGCGAAATTGTATTTGACAACCACTGCTCCTGGTAGAACTGC
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN25061_c2_g3_i+ TGTAGTTATTAAGTTATCGTACATGTATATAGACGTATCTCCATAGTTGTAAGGTACGCT
+SVD__DN25061_c2_g3_i+ TGTAGTTATTAAGTTATCATACATGTATATAGATGTATCTCCATAGTTGTAAGGGACACT
+SVD__DN25061_c2_g2_i+ TGTAGTTATTAAGTTATCATACATGTATATAGATGTATCTCCATAGTTGTAAGGGACGCT
+                      ____________________________________________________________
+consensus             TGTAGTTATTAAGTTATCATACATGTATATAGATGTATCTCCATAGTTGTAAGGGACGCT
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN25061_c2_g3_i+ TACTTCCGTTCCATTAACCAGAACCTTTTTACCTTCTGATATCAGATCAATCAAAGTTTG
+SVD__DN25061_c2_g3_i+ CACTTCAGTTCCATTAACGAAAACTTTCTTATTCTCCGCTACCAGATCAATCAAGGTTTG
+SVD__DN25061_c2_g2_i+ CACTTCAGTTCCATTAACGAAAACTTTCTTATTCTCCGATATCAGATCAATCAAGGTTTG
+                      ____________________________________________________________
+consensus             CACTTCAGTTCCATTAACGAAAACTTTCTTATTCTCCGATATCAGATCAATCAAGGTTTG
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN25061_c2_g3_i+ GAAGTACCGAACGGTGACCTTTTCTACTTCAGTATATTCTCCAGCTGCTTTATGA     
+SVD__DN25061_c2_g3_i+ GAAATACCGGACGGTGACCTTTTCTACTTCAGTATATTCTCCAGCTGCTTTATGAACAAT
+SVD__DN25061_c2_g2_i+ GAAATACCGGACGGTGACCTTCTCTACTTCAGTATATTCTCCTGCTGCCTTATGAGTAAT
+                      ____________________________________________________________
+consensus             GAAATACCGGACGGTGACCTTTTCTACTTCAGTATATTCTCCAGCTGCTTTATGAACAAT
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN25061_c2_g3_i+ AGTTACTTCCCAATCATCATCTGTACAGTCTTTTGCGAATAGAACCTT
+SVD__DN25061_c2_g2_i+ GGATACTTCCCAATCATCATCTGTACAGTCTTTTGCGAATAGAACCTT
+                      ____________________________________________________________
+consensus             AGATACTTCCCAATCATCATCTGTACAGTCTTTTGCGAATAGAACCTT
+
+******************* Contig 4 ********************
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN24990_c0_g1_i+ AAGAATGTGTGGAGACATCATGGGCTTCCAATGATTTTCCGTCTTCATGTGAAGCTCTAA
+SVD__DN24990_c0_g1_i+ AAGAATGTGTGGAGACATCATGGGCTTCCAATGATTTTCCGTCTTCATGTGAAGCTCTAA
+                      ____________________________________________________________
+consensus             AAGAATGTGTGGAGACATCATGGGCTTCCAATGATTTTCCGTCTTCATGTGAAGCTCTAA
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN24990_c0_g1_i+ ACGGAAGATGTGTAGACTCTGCGTGCGGTAGCTGTGACGAAGTTCTGTTTGGAGATGGAT
+SVD__DN24990_c0_g1_i+ ACGGAAGATGTGTAGACTCTGCGTGCGGTAGCTGTGACGAAGTTCTATTTGGAGAAGGAT
+                      ____________________________________________________________
+consensus             ACGGAAGATGTGTAGACTCTGCGTGCGGTAGCTGTGACGAAGTTCTATTTGGAGAAGGAT
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN24990_c0_g1_i+ TGTGTGAGAACTCCGGAGGAGCAACTCCAAAGTGTTGCAGAGATTGTCCAGAAATCATCA
+SVD__DN24990_c0_g1_i+ TGTGTGAGAACTCCGGAGGAGCAGCTCCTAAGTGCTGTAGAGATTGTCCGGAAATCGTGA
+                      ____________________________________________________________
+consensus             TGTGTGAGAACTCCGGAGGAGCAACTCCAAAGTGCTGCAGAGATTGTCCAGAAATCATCA
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN24990_c0_g1_i+ GATGCAGAGCTTCAGCAGCTGGGTTCTTCCACACGTTCTACGGGCAAAGATTCAATCTTC
+SVD__DN24990_c0_g1_i+ GATGCAGAGCTTCAGCCGCTGGATACTTCCATACATTCTATGGTCAGAGATTCAATTTAC
+                      ____________________________________________________________
+consensus             GATGCAGAGCTTCAGCAGCTGGATACTTCCACACATTCTACGGGCAAAGATTCAATCTAC
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN24990_c0_g1_i+ AGGTACCAGGAACCTATCTACTTAGTGAAGACTGCGTTGGAGGACTGTGGTCTCTATATG
+SVD__DN24990_c0_g1_i+ AGGTACCGGGAACCTATCTACTAAGTGAAGACTGCGTGGGAGGACTGTGGTCTCTATATG
+                      ____________________________________________________________
+consensus             AGGTACCAGGAACCTATCTACTAAGTGAAGACTGCGTGGGAGGACTGTGGTCTCTATATG
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN24990_c0_g1_i+ TTAACTTGGCAAATATAGAAGGAGAAAAGGGAGCTGTTCTGGAATCCGTCAAGATGGTTG
+SVD__DN24990_c0_g1_i+ TTAACTTGGCAAATATAGAAGGAGAAAAGGGAGCTGTTCTGGAATCCGTCAAGATGGTTG
+                      ____________________________________________________________
+consensus             TTAACTTGGCAAATATAGAAGGAGAAAAGGGAGCTGTTCTGGAATCCGTCAAGATGGTTG
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN24990_c0_g1_i+ TTGGAGACGTAACTGTAGACATCACACAAAAAGTTGGAGCTGTTACAGTAAATGGAGGTT
+SVD__DN24990_c0_g1_i+ TTGGAGACGTAACTGTAGACATCACACAAAAAGTTGGAGCTGTTACAGTAAATGGAGGTT
+                      ____________________________________________________________
+consensus             TTGGAGACGTAACTGTAGACATCACACAAAAAGTTGGAGCTGTTACAGTAAATGGAGGTT
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN24990_c0_g1_i+ CCGTTGAAATCGACAGCAACCCCTTCTCCATCGGTGACGTCACCATTGCCATCGTACATA
+SVD__DN24990_c0_g1_i+ CCGTTGAAATCGACAGCAACCCCTTCTCCATCGGTGACGTCACCATTGCCATCGTACATA
+                      ____________________________________________________________
+consensus             CCGTTGAAATCGACAGCAACCCCTTCTCCATCGGTGACGTCACCATTGCCATCGTACATA
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN24990_c0_g1_i+ CACCCAACTTCGATGTCTCTGTCATCGAGTTTCTGAAACTCGTAACATTTGATATCTTAC
+SVD__DN24990_c0_g1_i+ CACCCAACTTCGATGTCTCTGTCATCGAGTTTCTGAAACTCGTAACATTTGATATCTTAC
+                      ____________________________________________________________
+consensus             CACCCAACTTCGATGTCTCTGTCATCGAGTTTCTGAAACTCGTAACATTTGATATCTTAC
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN24990_c0_g1_i+ AAGGAAGAGCTTTCAGACTTGCTCCAGACTTCTTGTACGCGGACAGGACCTGTGGTTTAT
+SVD__DN24990_c0_g1_i+ AAGGAAGAGCTTTCAGACTTGCTCCAGACTTCTTGTACGCGGACAGGACCTGTGGTTTAT
+                      ____________________________________________________________
+consensus             AAGGAAGAGCTTTCAGACTTGCTCCAGACTTCTTGTACGCGGACAGGACCTGTGGTTTAT
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN24990_c0_g1_i+ GCGGTGTGATGTCAGATGAACCTTCTGATTTTATTGACAATCCAGATCAACTTGCAATCC
+SVD__DN24990_c0_g1_i+ GCGGTGTGATGTCAGATGAACCTTCTGATTTTATTGACAATCCAGATCAACTTGCAATCC
+                      ____________________________________________________________
+consensus             GCGGTGTGATGTCAGATGAACCTTCTGATTTTATTGACAATCCAGATCAACTTGCAATCC
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN24990_c0_g1_i+ AAGACCTGATGAACCAAGATGTAGAAGGATGCCCACTTTCTGGAAATCCTTCTGACGTCG
+SVD__DN24990_c0_g1_i+ AAGACCTGATGAACCAAGATGTAGAAGGATGCCCACTTTCTGGAAATCCTTCTGACGTCG
+                      ____________________________________________________________
+consensus             AAGACCTGATGAACCAAGATGTAGAAGGATGCCCACTTTCTGGAAATCCTTCTGACGTCG
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN24990_c0_g1_i+ AGTATTGCGTGAATAAGATGCAACCCTACAAGGATGGCTGCATAAACAAAAACGATGTTC
+SVD__DN24990_c0_g1_i+ AGTATTGCGTGAATAAGATGCAACCCTACAAGGATGGCTGCATAAACAAAAACGATGTTC
+                      ____________________________________________________________
+consensus             AGTATTGCGTGAATAAGATGCAACCCTACAAGGATGGCTGCATAAACAAAAACGATGTTC
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN24990_c0_g1_i+ ACTTTGGTACCTACTTGTACGCATGCGCGCTAGCTTACTGTATGGGCGGCGACGATAGAG
+SVD__DN24990_c0_g1_i+ ACTTTGGTACCTACTTGTACGCATGCGCGCTAGCTTACTGTATGGGCGGCGACGATAGAG
+                      ____________________________________________________________
+consensus             ACTTTGGTACCTACTTGTACGCATGCGCGCTAGCTTACTGTATGGGCGGCGACGATAGAG
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN24990_c0_g1_i+ TGGAAGATGTTATCTTTGAGTATGCAGAAGCATGCGTAGAACCGATCGGTAGAGCCACAT
+SVD__DN24990_c0_g1_i+ TGGAAGATGTTATCTTTGAGTATGCAGAAGCATGCGTAGAACCGATCGGTAGAGCCACAT
+                      ____________________________________________________________
+consensus             TGGAAGATGTTATCTTTGAGTATGCAGAAGCATGCGTAGAACCGATCGGTAGAGCCACAT
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN24990_c0_g1_i+ GTGTTATGAATGGACACACATACTATGACACATTCGATAAGACAAGTTATCAATTTCAGG
+SVD__DN24990_c0_g1_i+ GTGTTATGAATGGACACACATACTATGACACATTCGATAAGACAAGTTATCAATTTCAGG
+                      ____________________________________________________________
+consensus             GTGTTATGAATGGACACACATACTATGACACATTCGATAAGACAAGTTATCAATTTCAGG
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN24990_c0_g1_i+ CACCGTGCAAGGTTCTATTCGCTAAAGACTGTACTGATGATGATTGGGAAGTAACCATTA
+SVD__DN24990_c0_g1_i+ CACCGTGCAAGGTTCTATTCGCTAAAGACTGTACTGATGATGATTGGGAAGTAACCATTA
+                      ____________________________________________________________
+consensus             CACCGTGCAAGGTTCTATTCGCTAAAGACTGTACTGATGATGATTGGGAAGTAACCATTA
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN24990_c0_g1_i+ CTCACAAGGCAGCTGGGGAATAT
+SVD__DN24990_c0_g1_i+ CTCACAAGGCAGCTGGGGAATAT
+                      ____________________________________________________________
+consensus             CTCACAAGGCAGCTGGGGAATAT
+
+******************* Contig 5 ********************
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN24990_c0_g1_i+ AAGAATGTGTGGAGACATCATGGGCTTCCAATGATTTTCCGTCTTCATGTGAAGCTCTAA
+SVD__DN24990_c0_g5_i+ AAGAATGTGTGGAGACATCATGGGCTTCCAATGATTTTCCGTCTTCATGTGAAGCTCTAA
+                      ____________________________________________________________
+consensus             AAGAATGTGTGGAGACATCATGGGCTTCCAATGATTTTCCGTCTTCATGTGAAGCTCTAA
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN24990_c0_g1_i+ ACGGAAGATGTGTAGACTCTGCGTGCGGTAGCTGTGACGAAGTTCTGTTTGGAGATGGAT
+SVD__DN24990_c0_g5_i+ ACGGAAGATGTGTAGACTCTGCGTGCGGTAGCTGTGACGAAGTTCTGTTTGGAGATGGAT
+SVD__DN24990_c0_g1_i+                                    GACGAAGTTCTGTTTGGAGATGGAT
+                      ____________________________________________________________
+consensus             ACGGAAGATGTGTAGACTCTGCGTGCGGTAGCTGTGACGAAGTTCTGTTTGGAGATGGAT
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN24990_c0_g1_i+ TGTGTGAAAATGCAGGAGGAGCGTCTCCAAAGTGCTGTAGAGATTGTCCGGAGATCGTCA
+SVD__DN24990_c0_g5_i+ TGTGTGAAAATGCAGGAGGAGCATCTCCAAAGTGCTGTAGAGATTGCCCGGAGATCGTCA
+SVD__DN24990_c0_g1_i+ TGTGTGAAAATGCAGGAGGAGCATCTCCAAAGTGCTGTAGAGATTGTCCGGAGATCGTCA
+                      ____________________________________________________________
+consensus             TGTGTGAAAATGCAGGAGGAGCATCTCCAAAGTGCTGTAGAGATTGTCCGGAGATCGTCA
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN24990_c0_g1_i+ GGTGCAGAGCTTCAGCCGCTGGATACTTCCATACGTTCTACGGCCAGAGGTTCAACTTAC
+SVD__DN24990_c0_g5_i+ GATGCAGAGCTTCAGCCGCTGGATACTTCCATACGTTCTACGGCCAGAGATTCAATTTAC
+SVD__DN24990_c0_g1_i+ GGTGCAGAGCTTCAGCCGCTGGATACTTCCATACGTTCTACGGCCAGAGATTCAACTTAC
+                      ____________________________________________________________
+consensus             GGTGCAGAGCTTCAGCCGCTGGATACTTCCATACGTTCTACGGCCAGAGATTCAACTTAC
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN24990_c0_g1_i+ AGGTACCAGGGACCTATCTGTTAAGCGAAGACTGCGTTGGAGGACTGTGGTCTCTATATG
+SVD__DN24990_c0_g5_i+ AGGTACCAGGAACCTATCTGTTGAGCGAAGACTGCGTTGGAGGACT              
+SVD__DN24990_c0_g1_i+ AGGTACCAGGGACCTATCTGTTAAGCGAAGACTGCGTTGGAGGACTGTGGTCTCTATATG
+SVD__DN24990_c0_g1_i+            ACCTATCTGTTGAGCGAAGACTGCGTTGGAGGACTGTGGTCTCTATATG
+                      ____________________________________________________________
+consensus             AGGTACCAGGGACCTATCTGTTAAGCGAAGACTGCGTTGGAGGACTGTGGTCTCTATATG
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN24990_c0_g1_i+ TTAACTTGGCCAACATCGATGGAGAAAAGGGAGCGGTGTTGGACTCCGTCAAGATGGTTG
+SVD__DN24990_c0_g1_i+ TTAACTTGGCCAACATCGATGGAGAAAAGGGAGCGGTGTTGGACTCCGTCAAGATGGTTG
+SVD__DN24990_c0_g1_i+ TTAACTTGGCCAACATCGATGGAGAAAAGGGAGCGGTGTTAGACTCCGTCAAGATGGTTG
+                      ____________________________________________________________
+consensus             TTAACTTGGCCAACATCGATGGAGAAAAGGGAGCGGTGTTGGACTCCGTCAAGATGGTTG
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN24990_c0_g1_i+ TCGGAGACGTAACTGTTGATATTAAACAGAAAGTTGGAGCTGTTACTGTAAATGGAGGTT
+SVD__DN24990_c0_g1_i+ TCGGAGACGTAACTGTTGATATTAAACAGAAAGTTGGAGCTGTTACTGTAAATGGAGGTT
+SVD__DN24990_c0_g1_i+ TTGGGGATGTAACTGTAGATATTAAACAGAAAGTTGGAGCTGTTACTGTAAATGGAGGCT
+                      ____________________________________________________________
+consensus             TCGGAGACGTAACTGTTGATATTAAACAGAAAGTTGGAGCTGTTACTGTAAATGGAGGTT
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN24990_c0_g1_i+ CCGTTGAAATCGACAGCAACCCCTTCTCCATCGGTGACGTCACTATTGCCATCGTACACA
+SVD__DN24990_c0_g1_i+ CCGTTGAAATCGACAGCAACCCCTTCTCCATCGGTGACGTCACTATTGCCATCGTACACA
+SVD__DN24990_c0_g1_i+ CCGTTGAAATCGACAGCAACCCCTTCTCCATCGGTGACGTCACTATTGCCATCGTACACA
+                      ____________________________________________________________
+consensus             CCGTTGAAATCGACAGCAACCCCTTCTCCATCGGTGACGTCACTATTGCCATCGTACACA
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN24990_c0_g1_i+ CTCCCAACTTTGACGTCTCCGTCATTGAGTTTCTTAAACTGGTGACATTTGATATCTTAC
+SVD__DN24990_c0_g1_i+ CTCCCAACTTTGACGTCTCTGTCATTGAGTTTCTTAAGCTTGTGACATTTGATATTTTAC
+SVD__DN24990_c0_g1_i+ CTCCCAACTTTGACGTCTCCGTCATTGAGTTTCTTAAGCTTGTGACATTTGATATTTTAC
+                      ____________________________________________________________
+consensus             CTCCCAACTTTGACGTCTCCGTCATTGAGTTTCTTAAGCTTGTGACATTTGATATTTTAC
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN24990_c0_g1_i+ AAGGCAGAGCTTTCCGATTGGCTCCAGATTTCTTGTATGCAGACAGGACCTGCGGTTTAT
+SVD__DN24990_c0_g1_i+ AAGGCAGAGCTTTCCGACTGGCTCCAGATTTCTTGTATGCAGACAGGACATGTGGATTAT
+SVD__DN24990_c0_g1_i+ AAGGCAGAGCTTTCCGACT                                         
+                      ____________________________________________________________
+consensus             AAGGCAGAGCTTTCCGACTGGCTCCAGATTTCTTGTATGCAGACAGGACATGCGGATTAT
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN24990_c0_g1_i+ GCGGTATTATGTCAGATGAGCCTTCTGATTTTACTGACAATCCAGACCAACTTGCTATCC
+SVD__DN24990_c0_g1_i+ GCGGTATCATGTCAGATGAGCCTTCTGACTTTATTGATAATCCAGATCAACTTGCAATTC
+                      ____________________________________________________________
+consensus             GCGGTATCATGTCAGATGAGCCTTCTGACTTTACTGACAATCCAGACCAACTTGCAATCC
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN24990_c0_g1_i+ AAGACCAAATGAATCAAGATGTAGAAGGTTGCCCACTTTCTGGAAATCCTTCGGATGTCG
+SVD__DN24990_c0_g1_i+ AAGATCAAATGAACCAAGATGTAGAAGGTTGTCCACTTTCTGGAAATCCTTCGGACGTCG
+                      ____________________________________________________________
+consensus             AAGACCAAATGAACCAAGATGTAGAAGGTTGCCCACTTTCTGGAAATCCTTCGGACGTCG
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN24990_c0_g1_i+ AATACTGTAAGAATAAGATGCAACCATTCAAGGACGGATGCATAAACAAGAATGATGTTC
+SVD__DN24990_c0_g1_i+ AATACTGTAAGAATAAGATGCAACCATTCAAGGACGGATGCATAAACAAGAATGATGTTC
+                      ____________________________________________________________
+consensus             AATACTGTAAGAATAAGATGCAACCATTCAAGGACGGATGCATAAACAAGAATGATGTTC
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN24990_c0_g1_i+ ACTTCGGTACCTACCTGTACGCCTGCGCACTGGCTTACTGTATGGGCGGCGACGATAGAG
+SVD__DN24990_c0_g1_i+ ACTTCGGTACCTACCTGTACGCCTGCGCACTGGCTTACTGTATGGGCGGCGACGATAGAG
+                      ____________________________________________________________
+consensus             ACTTCGGTACCTACCTGTACGCCTGCGCACTGGCTTACTGTATGGGCGGCGACGATAGAG
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN24990_c0_g1_i+ TGGAAGATGTGATCTTTGAATACGCAGAAGCCTGCGTAGAACCCATCGGTAGAGCCACCT
+SVD__DN24990_c0_g1_i+ TGGAAGATGTGATTTTTGAATACGCAGAAGCTTGCGTAGAACCCATCGGTAGAGCCACCT
+                      ____________________________________________________________
+consensus             TGGAAGATGTGATCTTTGAATACGCAGAAGCCTGCGTAGAACCCATCGGTAGAGCCACCT
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN24990_c0_g1_i+ GCGTCATGAATGGACACACCTACTATGACACATTCGACAAAACAAGTTACCAGTTTCAGG
+SVD__DN24990_c0_g1_i+ GCGTCATGAATGGACACACCTACTATGACACATTCGACAAAACAAGTTACCAGTTTCAGG
+                      ____________________________________________________________
+consensus             GCGTCATGAATGGACACACCTACTATGACACATTCGACAAAACAAGTTACCAGTTTCAGG
+
+                          .    :    .    :    .    :    .    :    .    :    .    :
+SVD__DN24990_c0_g1_i+ CACCTTGTAAGGTTCTCTTCGCTAAGGACTGTACAG--
+SVD__DN24990_c0_g1_i+ CACCTTGTAAGGTTCTCTTCGCTAAGGACTGTACAG  
+                      ____________________________________________________________
+consensus             CACCTTGTAAGGTTCTCTTCGCTAAGGACTGTACAG--
+

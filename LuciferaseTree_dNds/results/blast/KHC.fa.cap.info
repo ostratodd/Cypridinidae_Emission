@@ -1,0 +1,109 @@
+No file of quality values (.qual) is found
+No file of constraints (.con) is found.
+Number of overlaps saved: 184
+ComputeOverlap done
+IdentifyChimeras done
+Overlap KHA__DN55844_c5_g1_i1+ and KHA__DN68220_c136_g14_i1+  C  lengths of diffs and sims: upper left 20  upper right 249  middle 100
+Overlap KHA__DN55844_c5_g1_i1+ and KHA__DN55844_c5_g7_i1+  P  lengths of diffs and sims: upper left 57  upper right 0  middle 115
+Overlap KHA__DN55844_c5_g1_i1- and KHC_25Feb2019_y_c39+  C  lengths of diffs and sims: upper left 0  upper right 143  middle 226
+Overlap KHA__DN55844_c5_g1_i1- and KHA__DN54135_c0_g1_i1+  P  qualscore     0  score   2280  identity 0.89
+Overlap KHA__DN58296_c2_g1_i1- and KHA__DN68220_c136_g10_i3+  C  qualscore     0  score   2700  identity 0.88
+Overlap KHA__DN37697_c0_g1_i1+ and KHA__DN68220_c136_g18_i1+  P  lengths of diffs and sims: upper left 39  upper right 0  middle 140
+Overlap KHA__DN37697_c0_g1_i1+ and KHA__DN68220_c136_g14_i1+  C  qualscore     0  score   3180  identity 0.89
+Overlap KHA__DN37697_c0_g1_i1+ and KHA__DN68220_c136_g6_i1+  P  lengths of diffs and sims: upper left 39  upper right 0  middle 140
+Overlap KHA__DN54135_c0_g1_i1- and KHA__DN68220_c136_g14_i2+  P  lengths of diffs and sims: upper left 140  upper right 21  middle 85
+Overlap KHA__DN54135_c0_g1_i1- and KHA__DN68220_c136_g14_i1+  P  lengths of diffs and sims: upper left 140  upper right 21  middle 85
+Overlap KHA__DN54135_c0_g2_i1- and KHA__DN68220_c136_g15_i1+  C  lengths of diffs and sims: upper left 55  upper right 113  middle 64
+Overlap KHA__DN54135_c0_g2_i1- and KHA__DN68220_c136_g14_i2+  P  qualscore     0  score   1890  identity 0.90
+Overlap KHA__DN54135_c0_g2_i1- and KHA__DN68220_c136_g14_i1+  P  qualscore     0  score   1890  identity 0.90
+Overlap KHA__DN54135_c0_g2_i1- and KHA__DN68220_c136_g13_i1+  C  lengths of diffs and sims: upper left 5  upper right 113  middle 114
+Overlap KHA__DN54135_c0_g2_i1- and KHA__DN68220_c136_g12_i1+  C  lengths of diffs and sims: upper left 55  upper right 113  middle 64
+Overlap KHA__DN54135_c0_g2_i1- and KHA__DN68220_c136_g3_i1+  C  lengths of diffs and sims: upper left 55  upper right 113  middle 64
+Overlap KHA__DN54135_c0_g2_i1- and KHA__DN68220_c136_g1_i2+  C  qualscore     0  score   2910  identity 0.89
+Overlap KHA__DN54135_c0_g2_i1- and KHA__DN68220_c136_g1_i1+  C  qualscore     0  score   2910  identity 0.89
+Overlap KHA__DN68220_c136_g1_i1+ and KHA__DN45338_c0_g3_i2+  P  qualscore     0  score   1090  identity 0.87
+Overlap KHA__DN68220_c136_g1_i1+ and KHA__DN45338_c0_g1_i1+  P  qualscore     0  score   1480  identity 0.90
+Overlap KHA__DN68220_c136_g1_i1- and KHC_25Feb2019_y_c39+  C  erri 0.01 errj 0.01 error 0.07
+Overlap KHA__DN68220_c136_g1_i1+ and KHA__DN54135_c0_g1_i1-  P  lengths of diffs and sims: upper left 55  upper right 99  middle 91
+Overlap KHA__DN68220_c136_g1_i1+ and KHA__DN55844_c5_g1_i1+  P  lengths of diffs and sims: upper left 20  upper right 0  middle 76
+Overlap KHA__DN68220_c136_g1_i2+ and KHA__DN45338_c0_g3_i2+  P  qualscore     0  score   1090  identity 0.87
+Overlap KHA__DN68220_c136_g1_i2+ and KHA__DN45338_c0_g1_i1+  P  qualscore     0  score   1480  identity 0.90
+Overlap KHA__DN68220_c136_g1_i2- and KHC_25Feb2019_y_c39+  C  erri 0.02 errj 0.01 error 0.09
+Overlap KHA__DN68220_c136_g1_i2+ and KHA__DN54135_c0_g1_i1-  P  lengths of diffs and sims: upper left 55  upper right 99  middle 91
+Overlap KHA__DN68220_c136_g1_i2+ and KHA__DN55844_c5_g1_i1+  P  lengths of diffs and sims: upper left 20  upper right 0  middle 76
+Overlap KHA__DN68220_c136_g3_i1+ and KHA__DN45338_c0_g3_i2+  P  qualscore     0  score   1090  identity 0.87
+Overlap KHA__DN68220_c136_g3_i1+ and KHA__DN45338_c0_g1_i1+  P  qualscore     0  score   1480  identity 0.90
+Overlap KHA__DN68220_c136_g3_i1- and KHC_25Feb2019_y_c39+  C  erri 0.01 errj 0.01 error 0.08
+Overlap KHA__DN68220_c136_g3_i1+ and KHA__DN54135_c0_g1_i1-  P  lengths of diffs and sims: upper left 55  upper right 99  middle 91
+Overlap KHA__DN68220_c136_g3_i1+ and KHA__DN55844_c5_g1_i1+  P  lengths of diffs and sims: upper left 20  upper right 0  middle 76
+Overlap KHA__DN68220_c136_g6_i1+ and KHA__DN68220_c136_g10_i4+  P  lengths of diffs and sims: upper left 24  upper right 0  middle 92
+Overlap KHA__DN68220_c136_g6_i1+ and KHA__DN68220_c136_g10_i3+  P  lengths of diffs and sims: upper left 24  upper right 0  middle 92
+Overlap KHA__DN68220_c136_g6_i1+ and KHA__DN68220_c136_g10_i2+  P  lengths of diffs and sims: upper left 24  upper right 0  middle 92
+Overlap KHA__DN68220_c136_g8_i5- and KHA__DN59327_c3_g3_i1+  P  lengths of diffs and sims: upper left 0  upper right 48  middle 205
+Overlap KHA__DN68220_c136_g10_i2+ and KHA__DN58296_c2_g1_i1-  P  lengths of diffs and sims: upper left 66  upper right 29  middle 58
+Overlap KHA__DN68220_c136_g10_i4+ and KHA__DN58296_c2_g1_i1-  P  lengths of diffs and sims: upper left 1  upper right 88  middle 123
+Overlap KHA__DN68220_c136_g12_i1+ and KHA__DN45338_c0_g3_i2+  P  qualscore     0  score   1090  identity 0.87
+Overlap KHA__DN68220_c136_g12_i1+ and KHA__DN45338_c0_g1_i1+  P  qualscore     0  score   1480  identity 0.90
+Overlap KHA__DN68220_c136_g12_i1- and KHC_25Feb2019_y_c39+  C  lengths of diffs and sims: upper left 99  upper right 12  middle 199
+Overlap KHA__DN68220_c136_g12_i1+ and KHA__DN54135_c0_g1_i1-  P  lengths of diffs and sims: upper left 55  upper right 99  middle 91
+Overlap KHA__DN68220_c136_g12_i1+ and KHA__DN55844_c5_g1_i1+  P  lengths of diffs and sims: upper left 20  upper right 0  middle 76
+Overlap KHA__DN68220_c136_g13_i1+ and KHA__DN45338_c0_g3_i2+  P  qualscore     0  score   1090  identity 0.87
+Overlap KHA__DN68220_c136_g13_i1+ and KHA__DN45338_c0_g1_i1+  P  qualscore     0  score   1480  identity 0.90
+Overlap KHA__DN68220_c136_g13_i1- and KHC_25Feb2019_y_c39+  C  lengths of diffs and sims: upper left 99  upper right 9  middle 412
+Overlap KHA__DN68220_c136_g13_i1+ and KHA__DN54135_c0_g1_i1-  P  lengths of diffs and sims: upper left 5  upper right 99  middle 141
+Overlap KHA__DN68220_c136_g13_i1+ and KHA__DN55844_c5_g1_i1+  P  lengths of diffs and sims: upper left 20  upper right 0  middle 76
+Overlap KHA__DN68220_c136_g14_i1+ and KHA__DN59524_c4_g1_i2-  P  lengths of diffs and sims: upper left 29  upper right 0  middle 112
+Overlap KHA__DN68220_c136_g14_i1+ and KHA__DN59524_c4_g1_i1-  P  lengths of diffs and sims: upper left 30  upper right 0  middle 106
+Overlap KHA__DN68220_c136_g14_i2- and KHC_25Feb2019_y_c39+  C  lengths of diffs and sims: upper left 72  upper right 0  middle 327
+Overlap KHA__DN68220_c136_g14_i2+ and KHA__DN55844_c5_g7_i1+  P  lengths of diffs and sims: upper left 0  upper right 72  middle 67
+Overlap KHA__DN68220_c136_g14_i2+ and KHA__DN55844_c5_g1_i1+  P  lengths of diffs and sims: upper left 20  upper right 171  middle 145
+Overlap KHA__DN68220_c136_g15_i1+ and KHA__DN45338_c0_g3_i2+  P  qualscore     0  score   1090  identity 0.87
+Overlap KHA__DN68220_c136_g15_i1+ and KHA__DN45338_c0_g1_i1+  P  qualscore     0  score   1480  identity 0.90
+Overlap KHA__DN68220_c136_g15_i1- and KHC_25Feb2019_y_c39+  C  lengths of diffs and sims: upper left 99  upper right 27  middle 214
+Overlap KHA__DN68220_c136_g15_i1+ and KHA__DN54135_c0_g1_i1-  P  lengths of diffs and sims: upper left 55  upper right 99  middle 91
+Overlap KHA__DN68220_c136_g15_i1+ and KHA__DN55844_c5_g1_i1+  P  lengths of diffs and sims: upper left 20  upper right 0  middle 76
+Overlap KHA__DN68220_c136_g16_i1+ and KHA__DN68220_c136_g1_i2+  P  lengths of diffs and sims: upper left 0  upper right 27  middle 85
+Overlap KHA__DN68220_c136_g18_i1+ and KHA__DN59524_c4_g1_i2-  P  lengths of diffs and sims: upper left 29  upper right 0  middle 112
+Overlap KHA__DN68220_c136_g18_i1+ and KHA__DN59524_c4_g1_i1-  P  lengths of diffs and sims: upper left 30  upper right 0  middle 106
+Overlap KHA__DN45338_c0_g1_i1+ and KHA__DN68220_c136_g14_i2+  C  lengths of diffs and sims: upper left 96  upper right 2  middle 133
+Overlap KHA__DN45338_c0_g1_i1+ and KHA__DN68220_c136_g14_i1+  C  lengths of diffs and sims: upper left 96  upper right 0  middle 135
+Overlap KHA__DN45338_c0_g1_i1+ and KHA__DN55844_c5_g1_i1+  P  lengths of diffs and sims: upper left 77  upper right 92  middle 43
+Overlap KHA__DN45338_c0_g2_i1+ and KHA__DN68220_c136_g14_i2+  C  lengths of diffs and sims: upper left 55  upper right 0  middle 168
+Overlap KHA__DN45338_c0_g2_i1+ and KHA__DN68220_c136_g14_i1+  C  lengths of diffs and sims: upper left 55  upper right 0  middle 168
+Overlap KHA__DN45338_c0_g2_i1+ and KHA__DN55844_c5_g1_i1+  C  qualscore     0  score   2800  identity 0.89
+Overlap KHA__DN45338_c0_g3_i2+ and KHA__DN68220_c136_g14_i2+  C  lengths of diffs and sims: upper left 80  upper right 0  middle 168
+Overlap KHA__DN45338_c0_g3_i2+ and KHA__DN68220_c136_g14_i1+  C  lengths of diffs and sims: upper left 80  upper right 0  middle 168
+Overlap KHA__DN45338_c0_g3_i2+ and KHA__DN55844_c5_g1_i1+  P  qualscore     0  score   3100  identity 0.89
+Number of overlaps removed: 71
+RemovePoorOverlaps done
+ASSEM done
+ComputDistForContigs done
+PresentLayout done
+Clip KHA__DN68220_c136_g1_i1 left clip: 1, right clip: 596,  length: 596,  right size 0
+Clip KHA__DN68220_c136_g13_i1 left clip: 1, right clip: 521,  length: 521,  right size 0
+Clip KHA__DN68220_c136_g1_i2 left clip: 1, right clip: 521,  length: 523,  right size 2
+Clip KHA__DN68220_c136_g12_i1 left clip: 1, right clip: 311,  length: 311,  right size 0
+Clip KHA__DN68220_c136_g3_i1 left clip: 1, right clip: 455,  length: 457,  right size 2
+Clip KHA__DN68220_c136_g15_i1 left clip: 1, right clip: 341,  length: 341,  right size 0
+Clip KHC_25Feb2019_y_c39 left clip: 98, right clip: 1679,  length: 1679,  right size 0
+Clip KHA__DN45338_c0_g2_i1 left clip: 1, right clip: 224,  length: 227,  right size 3
+Clip KHA__DN55844_c5_g7_i1 left clip: 1, right clip: 225,  length: 227,  right size 2
+Clip KHA__DN37697_c0_g1_i1 left clip: 1, right clip: 257,  length: 259,  right size 2
+Clip KHA__DN59327_c3_g7_i1 left clip: 1, right clip: 272,  length: 274,  right size 2
+Clip KHA__DN59327_c3_g10_i1 left clip: 1, right clip: 272,  length: 274,  right size 2
+Clip KHA__DN45338_c0_g1_i1 left clip: 1, right clip: 232,  length: 232,  right size 0
+Clip KHA__DN54135_c0_g2_i1 left clip: 1, right clip: 233,  length: 235,  right size 2
+Clip KHA__DN59327_c3_g3_i1 left clip: 1, right clip: 275,  length: 277,  right size 2
+Clip KHA__DN68220_c136_g10_i2 left clip: 1, right clip: 306,  length: 314,  right size 8
+Clip KHA__DN45338_c0_g3_i2 left clip: 1, right clip: 249,  length: 250,  right size 1
+Clip KHA__DN59524_c4_g1_i2 left clip: 1, right clip: 276,  length: 279,  right size 3
+Clip KHA__DN59524_c4_g1_i1 left clip: 1, right clip: 260,  length: 260,  right size 0
+Clip KHA__DN68220_c136_g18_i1 left clip: 4, right clip: 272,  length: 274,  right size 2
+Clip KHA__DN68220_c136_g8_i5 left clip: 1, right clip: 293,  length: 295,  right size 2
+Clip KHA__DN68220_c136_g16_i1 left clip: 1, right clip: 269,  length: 271,  right size 2
+Clip KHA__DN54135_c0_g1_i1 left clip: 1, right clip: 333,  length: 333,  right size 0
+Clip KHA__DN68220_c136_g14_i1 left clip: 1, right clip: 766,  length: 766,  right size 0
+Clip KHA__DN68220_c136_g6_i1 left clip: 4, right clip: 252,  length: 254,  right size 2
+Clip KHA__DN68220_c136_g14_i2 left clip: 1, right clip: 400,  length: 401,  right size 1
+Clip KHA__DN68220_c136_g10_i3 left clip: 1, right clip: 512,  length: 512,  right size 0
+Clip KHA__DN68220_c136_g10_i4 left clip: 1, right clip: 365,  length: 369,  right size 4
