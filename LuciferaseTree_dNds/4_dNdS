@@ -1,6 +1,6 @@
 
-cat sequences/published/published_aa.fa results/blast/*luc_aa.fa > sequences/nonxtome_aa.fa
-cat sequences/published/published_nt.fa results/blast/*luc_nt.fa > sequences/nonxtome_nt.fa
+cat sequences/sequenced/VTS_aa.fa sequences/published/published_aa.fa results/blast/*luc_aa.fa > sequences/nonxtome_aa.fa
+cat sequences/sequenced/VTS_nt.fa sequences/published/published_nt.fa results/blast/*luc_nt.fa > sequences/nonxtome_nt.fa
 
 #cat sequences/published/published_aa.fa sequences/sequenced/sequenced_aa.fa > sequences/nonxtome_aa.fa
 #cat sequences/published/published_nt.fa sequences/sequenced/sequenced_nt.fa > sequences/nonxtome_nt.fa
