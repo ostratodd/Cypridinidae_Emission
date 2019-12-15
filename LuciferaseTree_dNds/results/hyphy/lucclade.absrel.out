@@ -1,0 +1,128 @@
+
+Analysis Description
+--------------------
+aBSREL (Adaptive branch-site random effects likelihood) uses an adaptive
+random effects branch-site model framework to test whether each branch
+has evolved under positive selection, using a procedure which infers an
+optimal number of rate categories per branch.
+
+- __Requirements__: in-frame codon alignment and a phylogenetic tree
+
+- __Citation__: Less Is More: An Adaptive Branch-Site Random Effects Model for Efficient
+Detection of Episodic Diversifying Selection (2015). Mol Biol Evol 32
+(5): 1342-1353
+
+- __Written by__: Sergei L Kosakovsky Pond, Ben Murrell, Steven Weaver and Temple iGEM /
+UCSD viral evolution group
+
+- __Contact Information__: spond@temple.edu
+
+- __Analysis Version__: 2.1
+
+
+>code –> Universal
+
+>Loaded a multiple sequence alignment with **15** sequences, **610** codons, and **1** partitions from `/home/oakley/projects/Cypridinidae_Emission/LuciferaseTree_dNds/results/combined_codonaligned.fa`
+
+>branches –> All
+
+
+### * Selected 27 branches for testing: `Vargula_tsujii_sequenced, Maristella_chicoi_cap3, Maristella_sp_SVD_cap3, Maristella_sp_VAD_DN92476_c5_g4_i1, Node10, Maristella_sp_ODH_DN60908_c36_g8_i1, Node9, Node7, Maristella_sp_AG_DN382219_c2_g1_i4, Maristella_sp_IR_DN50846_c6_g1_i1, Node14, Node6, Maristella_sp_SVU_cap3, Node5, Node3, Photeros_morini_cap3, Photeros_annecohenae_DN96747_c10_g3_i3, Node20, Photeros_macelroyi_DN131343_c2_g2_i4, Node19, Photeros_sp_WLU_DN218316_c2_g1_i3, Node18, Node2, Kornickeria_hastingsi_cap3, Node1, Vargula_hilgendorfii_AAA30332, Cypridina_noctiluca_BAD08210`
+
+
+### Obtaining branch lengths and nucleotide substitution biases under the nucleotide GTR model
+* Log(L) = -10086.00, AIC-c = 20242.09 (35 estimated parameters)
+
+### Fitting the baseline model with a single dN/dS class per branch, and no site-to-site variation. 
+* Log(L) = -9487.74, AIC-c = 19112.51 (68 estimated parameters)
+* Branch-level non-synonymous/synonymous rate ratio distribution has median  0.22, and 95% of the weight in  0.00 - 10000000000.00
+
+### Determining the optimal number of rate classes per branch using a step up procedure
+
+|              Branch               |  Length  |  Rates   |     Max. dN/dS     |    Log(L)     |     AIC-c     |Best AIC-c so far|
+|-----------------------------------|----------|----------|--------------------|---------------|---------------|-----------------|
+|               Node1               |   0.51   |    2     |    2.42 (36.21%)   |   -9457.35    |   19055.79    |    19055.79     |
+|               Node1               |   0.51   |    3     |    3.00 (26.78%)   |   -9457.33    |   19059.82    |    19055.79     |
+|              Node18               |   0.23   |    2     |    1.53 (37.72%)   |   -9438.53    |   19022.22    |    19022.22     |
+|              Node18               |   0.23   |    3     |    2.16 (20.84%)   |   -9438.51    |   19026.25    |    19022.22     |
+|   Cypridina_noctiluca_BAD08210    |   0.18   |    2     |    9.80 ( 6.32%)   |   -9405.74    |   18960.71    |    18960.71     |
+|   Cypridina_noctiluca_BAD08210    |   0.18   |    3     |    9.78 ( 6.30%)   |   -9405.74    |   18964.78    |    18960.71     |
+|    Kornickeria_hastingsi_cap3     |   0.16   |    2     |   12.61 ( 3.62%)   |   -9387.01    |   18927.32    |    18927.32     |
+|    Kornickeria_hastingsi_cap3     |   0.16   |    3     |   12.83 ( 3.57%)   |   -9387.01    |   18931.39    |    18927.32     |
+|   Vargula_hilgendorfii_AAA30332   |   0.11   |    2     |    0.39 (38.47%)   |   -9386.42    |   18930.20    |    18927.32     |
+|               Node3               |   0.10   |    2     |    9.14 ( 5.23%)   |   -9364.56    |   18886.49    |    18886.49     |
+|               Node3               |   0.10   |    3     |    9.18 ( 5.19%)   |   -9364.56    |   18890.56    |    18886.49     |
+|      Maristella_sp_SVU_cap3       |   0.05   |    2     |   >1000 ( 0.37%)   |   -9358.66    |   18878.75    |    18878.75     |
+|      Maristella_sp_SVU_cap3       |   0.05   |    3     |   >1000 ( 0.29%)   |   -9358.06    |   18881.63    |    18878.75     |
+|     Vargula_tsujii_sequenced      |   0.04   |    2     |    0.09 (43.62%)   |   -9358.66    |   18882.82    |    18878.75     |
+|      Maristella_chicoi_cap3       |   0.03   |    2     |   >1000 ( 0.99%)   |   -9334.24    |   18833.98    |    18833.98     |
+|      Maristella_chicoi_cap3       |   0.03   |    3     |   >1000 ( 0.99%)   |   -9334.24    |   18838.05    |    18833.98     |
+|Maristella_sp_ODH_DN60908_c36_g8...|   0.02   |    2     |    0.13 ( 0.00%)   |   -9334.23    |   18838.04    |    18833.98     |
+|              Node14               |   0.02   |    2     |    9.52 ( 4.75%)   |   -9330.57    |   18830.71    |    18830.71     |
+|              Node14               |   0.02   |    3     |    9.96 ( 4.58%)   |   -9330.56    |   18834.78    |    18830.71     |
+|               Node5               |   0.02   |    2     |    7.49 ( 3.21%)   |   -9329.78    |   18833.21    |    18830.71     |
+|Maristella_sp_VAD_DN92476_c5_g4_...|   0.02   |    2     |    0.19 (92.14%)   |   -9330.57    |   18834.78    |    18830.71     |
+|               Node6               |   0.02   |    2     |   19.39 ( 2.20%)   |   -9327.98    |   18829.61    |    18829.61     |
+|               Node6               |   0.02   |    3     |   18.64 ( 2.30%)   |   -9327.98    |   18833.69    |    18829.61     |
+|               Node2               |   0.01   |    2     |    1.00 (67.64%)   |   -9327.64    |   18833.00    |    18829.61     |
+|               Node7               |   0.01   |    2     |   10.08 ( 5.06%)   |   -9326.69    |   18831.12    |    18829.61     |
+|      Maristella_sp_SVD_cap3       |   0.01   |    2     |    0.24 (49.40%)   |   -9327.98    |   18833.68    |    18829.61     |
+|       Photeros_morini_cap3        |   0.01   |    2     |    1.31 (17.12%)   |   -9327.98    |   18833.69    |    18829.61     |
+|Photeros_macelroyi_DN131343_c2_g...|   0.01   |    2     |   >1000 ( 0.45%)   |   -9317.31    |   18812.35    |    18812.35     |
+|Photeros_macelroyi_DN131343_c2_g...|   0.01   |    3     |   >1000 ( 0.44%)   |   -9317.31    |   18816.43    |    18812.35     |
+|Photeros_sp_WLU_DN218316_c2_g1_i...|   0.01   |    2     |   26.68 ( 3.57%)   |   -9315.25    |   18812.31    |    18812.31     |
+|Photeros_sp_WLU_DN218316_c2_g1_i...|   0.01   |    3     |   28.06 ( 3.50%)   |   -9315.25    |   18816.39    |    18812.31     |
+|               Node9               |   0.01   |    2     |   68.28 ( 0.54%)   |   -9310.45    |   18806.78    |    18806.78     |
+|               Node9               |   0.01   |    3     |   70.53 ( 0.53%)   |   -9310.44    |   18810.86    |    18806.78     |
+|Photeros_annecohenae_DN96747_c10...|   0.01   |    2     |    0.49 (24.77%)   |   -9310.44    |   18810.85    |    18806.78     |
+|              Node19               |   0.00   |    2     |   84.48 ( 0.95%)   |   -9306.83    |   18803.63    |    18803.63     |
+|              Node19               |   0.00   |    3     |   92.24 ( 0.88%)   |   -9306.83    |   18807.71    |    18803.63     |
+|              Node10               |   0.00   |    2     |    0.55 (10.09%)   |   -9306.82    |   18807.69    |    18803.63     |
+|              Node20               |   0.00   |    2     |    1.99 (49.50%)   |   -9306.83    |   18807.72    |    18803.63     |
+|Maristella_sp_AG_DN382219_c2_g1_...|   0.00   |    2     |    0.24 ( 0.00%)   |   -9306.83    |   18807.72    |    18803.63     |
+|Maristella_sp_IR_DN50846_c6_g1_i...|   0.00   |    2     |    0.00 (93.91%)   |   -9306.83    |   18807.72    |    18803.63     |
+
+### Rate class analyses summary
+*  13 branches with **2** rate classes
+*  14 branches with **1** rate classes
+
+### Improving parameter estimates of the adaptive rate class model
+* Log(L) = -9271.81, AIC-c = 18733.60 (94 estimated parameters)
+
+### Testing selected branches for selection
+
+|              Branch               |  Rates   |     Max. dN/dS     |      Test LRT      |Uncorrected p-value |
+|-----------------------------------|----------|--------------------|--------------------|--------------------|
+|               Node1               |     2    |    1.25 (53.55%)   |        0.63        |       0.30452      |
+|              Node18               |     2    |    1.99 (21.35%)   |        1.31        |       0.20601      |
+|   Cypridina_noctiluca_BAD08210    |     2    |    5.00 ( 6.70%)   |        8.15        |       0.00596      |
+|    Kornickeria_hastingsi_cap3     |     2    |    8.84 ( 3.14%)   |        3.54        |       0.06317      |
+|   Vargula_hilgendorfii_AAA30332   |     1    |   0.15 (100.00%)   |        0.00        |       1.00000      |
+|               Node3               |     2    |    6.08 ( 5.58%)   |       10.08        |       0.00224      |
+|      Maristella_sp_SVU_cap3       |     2    |   >1000 ( 0.37%)   |        4.94        |       0.03061      |
+|     Vargula_tsujii_sequenced      |     1    |   0.05 (100.00%)   |        0.00        |       1.00000      |
+|      Maristella_chicoi_cap3       |     2    |   >1000 ( 0.95%)   |       32.71        |       0.00000      |
+|Maristella_sp_ODH_DN60908_c36_g8...|     1    |   0.08 (100.00%)   |        0.00        |       1.00000      |
+|              Node14               |     2    |    8.56 ( 4.27%)   |        3.94        |       0.05130      |
+|               Node5               |     1    |   0.19 (100.00%)   |        0.00        |       1.00000      |
+|Maristella_sp_VAD_DN92476_c5_g4_...|     1    |   0.15 (100.00%)   |        0.00        |       1.00000      |
+|               Node6               |     2    |   22.54 ( 1.93%)   |        4.66        |       0.03542      |
+|               Node2               |     1    |   1.75 (100.00%)   |        0.01        |       0.48224      |
+|               Node7               |     1    |   0.43 (100.00%)   |        0.00        |       1.00000      |
+|      Maristella_sp_SVD_cap3       |     1    |   0.10 (100.00%)   |        0.00        |       1.00000      |
+|       Photeros_morini_cap3        |     1    |   0.77 (100.00%)   |        0.00        |       1.00000      |
+|Photeros_macelroyi_DN131343_c2_g...|     2    |   >1000 ( 0.43%)   |       17.47        |       0.00005      |
+|Photeros_sp_WLU_DN218316_c2_g1_i...|     2    |    0.81 (22.45%)   |        0.00        |       1.00000      |
+|               Node9               |     2    |   66.39 ( 0.50%)   |        6.22        |       0.01587      |
+|Photeros_annecohenae_DN96747_c10...|     1    |   0.22 (100.00%)   |        0.00        |       1.00000      |
+|              Node19               |     2    |   77.77 ( 0.97%)   |        7.37        |       0.00884      |
+|              Node10               |     1    |   0.20 (100.00%)   |        0.00        |       1.00000      |
+|              Node20               |     1    |   1.04 (100.00%)   |       -0.00        |       0.50000      |
+|Maristella_sp_AG_DN382219_c2_g1_...|     1    |   0.00 (100.00%)   |        0.00        |       1.00000      |
+|Maristella_sp_IR_DN50846_c6_g1_i...|     1    |   0.00 (100.00%)   |        0.00        |       1.00000      |
+----
+### Adaptive branch site random effects likelihood test 
+Likelihood ratio test for episodic diversifying positive selection at Holm-Bonferroni corrected _p =   0.0500_ found **2** branches under selection among **27** tested.
+
+* Maristella_chicoi_cap3, p-value =  0.00000
+* Photeros_macelroyi_DN131343_c2_g2_i4, p-value =  0.00140
