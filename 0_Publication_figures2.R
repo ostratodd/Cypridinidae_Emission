@@ -36,7 +36,7 @@ allmutsites <- c(38, 45, 75, 79, 87, 126, 167, 170, 178, 191, 197, 223, 258, 276
 mutsites <- c(38, 178, 375, 404, 405) #Cypridina numbering sites with 3 states
 psmutsites <-c(45, 87)	#These are positively selected and were mutagenized
 cyptoalign$Aligned[match(allmutsites,cyptoalign$Cypridina_noctiluca_BAD08210)] -> cypridina_numbers
-anova(lm(lmax ~ X38 * X45 * X87 * X178 * X375 * X404 * X405, data=cn)) -> table2
+anova(lm(lmax ~ X38 * X178 * X375 * X404 * X405, data=cn)) -> table2
 write.table(table2, file = "Table2.txt", sep="\t")
 table2
 print("Tranlastion of Alingment sites to Cypridina site numbers")
@@ -165,23 +165,49 @@ remove_constant(pos_sel_col)->pos_sel_col ##Invariant sites because luc varies i
 options(na.action = "na.fail")
 #doesn't work inside lm function but can cut and paste manually -- no invariant sites for color
 paste(colnames(pos_sel_col)[4:ncol(pos_sel_col)-2], collapse=" + "   )
-colorlm <- lm(Lmax_Mean ~ s71 + s93 + s102 + s115 + s160 + s189 + s261 + s285 + s291 + s389 + s417 + s477 + s581, data=pos_sel_col)
-          
+colorlm <- lm(Lmax_Mean ~ s93 + s102 + s142 + s160 + s177 + s211 + s240 + s261 + s285 + s291 + s320 + s371 + s389 + s477 + s581, data=pos_sel_col)
+fwhmlm <- lm(FWHM_Mean ~ s93 + s102 + s142 + s160 + s177 + s211 + s240 + s261 + s285 + s291 + s320 + s371 + s389 + s477 + s581, data=pos_sel_col)
+      
 mixnmatch_col <- dredge(colorlm,rank = "AIC",m.lim = c(0,3)) #3 seems like the maximum terms we can fit safely
 head(mixnmatch_col, 12)
 av <- model.avg(mixnmatch_col)
 
-#Global model call: lm(formula = Lmax_Mean ~ s71 + s93 + s102 + s115 + s160 + s189 + 
-#    s261 + s285 + s291 + s389 + s417 + s477 + s581, data = pos_sel_col)
+#Global model call: lm(formula = Lmax_Mean ~ s93 + s102 + s142 + s160 + s177 + s211 + 
+#    s240 + s261 + s285 + s291 + s320 + s371 + s389 + s477 + s581, 
+#    data = pos_sel_col)
 #---
 #Model selection table 
-#     (Intrc) s102 s160 s189 s261 s285 s291 s389 s581 s71 s93 df logLik  AIC delta weight
-#42     458.8    +         +         +                         9 10.990 -4.0  0.00  0.499
-#2058   467.6    +         +                            +      9 10.990 -4.0  0.00  0.499
-#3074   460.9    +                                  +   +      8  3.556  8.9 12.87  0.001
+#     (Intrc) s102 s142 s160 s211 s261 s285 s320 s371 s581 df logLik  AIC delta weight
+#1043   456.4         +         +                   +       8  2.064 11.9  0.00  0.333
+#1169   456.4                   +         +         +       8  2.064 11.9  0.00  0.333
+#1553   456.4                   +              +    +       8  2.064 11.9  0.00  0.333
+#8385   457.6                        +    +              +  7 -7.657 29.3 17.44  0.000
 
 summary(eval(getCall(mixnmatch_col,42))) #189, 93
 summary(eval(getCall(mixnmatch_col, 2058))) #ERROR model 2058 doesn't seem to exist
+lmax_anova <- lm(FWHM_Mean ~ s142 + s211 + s261 + s285 + s371 + s581,data=pos_sel_col)
+anova(lmax_anova)
+
+#FWHM
+mixnmatch_fw <- dredge(fwhmlm,rank = "AIC",m.lim = c(0,3)) #3 seems like the maximum terms we can fit safely
+head(mixnmatch_fw, 12)
+
+#Global model call: lm(formula = FWHM_Mean ~ s93 + s102 + s142 + s160 + s177 + s211 + 
+#    s240 + s261 + s285 + s291 + s320 + s371 + s389 + s477 + s581, 
+#    data = pos_sel_col)
+#---
+#Model selection table 
+#     (Intrc) s102 s160 s177 s211 s240 s261 s371 s389 s477 df  logLik  AIC delta weight
+#1049   77.98              +    +              +           10   1.955 16.1  0.00  0.999
+#1034   85.44    +         +                   +            8  -7.768 31.5 15.44  0.000
+#1097   85.44              +              +    +            8  -7.768 31.5 15.44  0.000
+#77     78.72         +    +              +                 7 -14.335 42.7 26.58  0.000
+#10     83.50    +         +                                7 -14.335 42.7 26.58  0.000
+
+fwhm_anova <- lm(FWHM_Mean ~ s177 + s211 + s371 ,data=pos_sel_col)
+anova(fwhm_anova)
+
+
 
 #***********kinetics/decay
 ### decay ANOVA  ###
@@ -198,29 +224,38 @@ options(na.action = "na.fail")
 #after removing invariant sites, which are 160, 303, 338
 paste(colnames(pos_sel_lam)[3:ncol(pos_sel_lam)-1], collapse=" + "   )
 #IF sites change copy/paste from result of above command
-glb1 <- lm(lambda ~ s71 + s93 + s102 + s115 + s160 + s189 + s261 + s291 + s389 + s417 + s477 + s581, data=pos_sel_lam)
+glb1 <- lm(lambda ~ s93 + s102 + s160 + s177 + s211 + s240 + s261 + s291 + s371 + s389 + s477 + s581, data=pos_sel_lam)
           
 mixnmatch_lam <- dredge(glb1,rank = "AIC",m.lim = c(0,6)) #6 seems like the maximum terms we can fit safely
 av <- model.avg(mixnmatch_lam)
-head(mixnmatch_lam, 114)
+head(mixnmatch_lam, 132)
+
+#Global model call: lm(formula = lambda ~ s93 + s102 + s160 + s177 + s211 + s240 + 
+#    s261 + s291 + s371 + s389 + s477 + s581, data = pos_sel_lam)
+#---
+#Model selection table 
+#     (Intrc) s102 s160 s177 s211 s240 s261 s291 s371 s389 s477 s581 s93 df logLik  AIC delta weight
+#1185  13.210                             +         +              +      7 -2.704 19.4  0.00  0.012
+#1697   5.555                             +         +         +    +      7 -2.704 19.4  0.00  0.012
+#1201   5.555                        +    +         +              +      7 -2.704 19.4  0.00  0.012
+#1713   5.555                        +    +         +         +    +      7 -2.704 19.4  0.00  0.012
+#1699   8.953         +                   +         +         +    +      7 -2.704 19.4  0.00  0.012
+#1187   8.953         +                   +         +              +      7 -2.704 19.4  0.00  0.012
+#1203   8.953         +              +    +         +              +      7 -2.704 19.4  0.00  0.012
+#1715   8.953         +              +    +         +         +    +      7 -2.704 19.4  0.00  0.012
+#3233  12.840                             +         +              +   +  9 -0.875 19.7  0.34  0.010
+#3745   5.273                             +         +         +    +   +  9 -0.875 19.7  0.34  0.010
+#3249   5.273                        +    +         +              +   +  9 -0.875 19.7  0.34  0.010
+#3761   5.273                        +    +         +         +    +   +  9 -0.875 19.7  0.34  0.010
+# 131 models are within 2 AIC
 
 #use this function to look at each model
-summary(eval(getCall(mixnmatch,1811))) #111, 207, 279, 61
+summary(eval(getCall(mixnmatch_lam,1699))) 
+
 
 #looking at the two sites are that ALWAYS present
-m_always <- lm(lambda ~ s207 + s279,data=pos_sel_lam)
-anova(m_always)
-
-#m_some <- lm(lambda ~ V134 + V179 + V310 + V496 + V600 + V62,data=pos_sel_lam)
-#anova(m_some)
-#
-#m_never <- lm(lambda ~ V112 + V47+ V48,data=pos_sel_lam)
-#anova(m_never)
-
-#looking at a model that has all sites that appeared significant in at least one of the top models / comparisons above
-#mixer <- lm(decay ~ V189 + V371 + V477 + V506 + V581,data=dat2)
-#site identity is correlated b/c limited sequence diversity
->>>>>>> 22d14059627d67655e952a4e3f935ac2d3d20bee
+decay_anova <- lm(lambda ~ s93 + s102 + s160 + s240 + s261 + s371 + s477 + s581,data=pos_sel_lam)
+anova(decay_anova)
 
 #############################
 ## plot of lamda max and decay

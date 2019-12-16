@@ -1,12 +1,12 @@
 sp,Species,PubName
-Kornickeria_hastingsi_sequenced,K_has,Bz KHC
+Kornickeria_hastingsi_cap3,K_has,Bz KHC
 ,,Bz LLC
-Maristella_chicoi_sequenced,M_chi,Bz MSH
+Maristella_chicoi_cap3,M_chi,Bz MSH
 Photeros_annecohenae_DN96747_c10_g3_i3,P_ann,Bz PAN
-Photeros_morini_sequenced,P_mor,Bz PMO
+Photeros_morini_cap3,P_mor,Bz PMO
 ,,Bz SRD
-Maristella_sp_SVD_sequenced,,Bz SVD
-Maristella_sp_SVU_sequenced,M_SVU,Bz SVU
+Maristella_sp_SVD_cap3,,Bz SVD
+Maristella_sp_SVU_cap3,M_SVU,Bz SVU
 ,,Bz VAD
 ,,Bz VSD
 ,,Ja LSZ
