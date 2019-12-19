@@ -7,5 +7,13 @@ read.csv(file="Cypridina only.csv") -> cn
 read.csv(file="Cypridina mutagenesis.csv") -> cnplus
 read.csv(file="NonCypridina only.csv") -> nc
 
+#csv file containing mutants and lmax data
+read.csv(file="../LuciferaseTree_dNds/results/Cypridina_mutations.csv")->mutseqs
+
+
+
 #conversion table for sites corresponding between Cypridina and present alignment
 read.csv(file="../LuciferaseTree_dNds/results/CypSites.csv")->cyptoalign
+
+maindir <- "~/Documents/GitHub/Cypridinidae_EmissionSpectra/"
+setwd(maindir)
