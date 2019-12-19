@@ -21,3 +21,9 @@ singularity exec $sing_image perl scripts/fasta2csv.pl $infile > results/combine
 
 #Correspondence table of aligned site to ref site, in this case using Cypridina
 ./scripts/make_seq_ref.pl sequences/combined_aa_ALN.fa Cypridina_noctiluca_BAD08210 > results/CypSites.csv
+
+mutfile="results/Cyprindina_mutations.fasta"
+
+scripts/run_makemuts.sh sequences/published/Cypridina_noctiluca_BAD08210.fasta sequences/kawasaki_mutations.txt 454 > $mutfile
+
+singularity exec $sing_image perl scripts/fasta2csv.pl $mutfile > results/Cypridina_mutations.csv
