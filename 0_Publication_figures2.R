@@ -108,32 +108,18 @@ grid.arrange(Figure3a, Figure3b, nrow = 1) -> Figure3
 
 #***************************Figure 4 Luciferase Tree and interesting sites
 ####################
-#BiocManager::install("ggtree")
-require(ggtree);
-library(gridExtra); library(grid);
 luc_tree <- read.newick(file="LuciferaseTree_dNds/results/phylogenies/combined_codon.treefile")
-root(luc_tree, c("Vargula_hilgendorfii_AAA30332", "Cypridina_noctiluca_BAD08210")) -> luc_tree_root
+#root(luc_tree, c("Vargula_hilgendorfii_AAA30332", "Cypridina_noctiluca_BAD08210"), resolve.root=TRUE) -> luc_tree_root
+ladderize(luc_tree, right=TRUE) -> luc_tree
+reroot(luc_tree, 17, resolve.root=TRUE, .5) -> luc_tree_root #root tree at midpoint of branch, which ape does not like to do
+
 #CURRENTLY must read positively selected site with code below
 
 data.frame(pos_sel[-1]) -> ps_df; ps_df->ps_df_named;
 rownames(ps_df_named) <- pos_sel$sp
-#need to order rows the same as tree
-ps_plot <- ggtree(luc_tree_root) + geom_tiplab(align=TRUE)
-
-mytheme <- gridExtra::ttheme_default(
-    core = list(fg_params=list(cex = 1)),
-    colhead = list(fg_params=list(cex = 1)),
-    rowhead = list(fg_params=list(cex = 1)))
-
-tt3 <- ttheme_default(
-  core=list(bg_params = list(fill = blues9[1:2], col=NA),
-            fg_params=list(fontface=1)),
-  colhead=list(fg_params=list(col="navyblue", fontface=1)),
-  rowhead=list(fg_params=list(col="white")));
-
-quartz("Figure 4", 15, 5) 
-tableGrob(ps_df_named, theme=mytheme)->ps_table
-grid.arrange(ps_plot, ps_table, ncol=2)
+source("plotTree.R")
+quartz("Figure 4", 10, 4)
+plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE, lwd=1, infoFile=ps_df_named, treeWidth=7,infoWidth=5, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
 
 
 
