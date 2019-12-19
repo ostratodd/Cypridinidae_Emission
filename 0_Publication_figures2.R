@@ -106,20 +106,25 @@ Figure3a <- ggplot(data=maxluc, aes(x=construct, y=log10(light), fill=construct)
 
 grid.arrange(Figure3a, Figure3b, nrow = 1) -> Figure3
 
-#***************************Figure 4 Luciferase Tree and interesting sites
+#***************************Figure 4 Luciferase Tree and positively selected sites
 ####################
 luc_tree <- read.newick(file="LuciferaseTree_dNds/results/phylogenies/combined_codon.treefile")
 #root(luc_tree, c("Vargula_hilgendorfii_AAA30332", "Cypridina_noctiluca_BAD08210"), resolve.root=TRUE) -> luc_tree_root
 ladderize(luc_tree, right=TRUE) -> luc_tree
 reroot(luc_tree, 17, resolve.root=TRUE, .5) -> luc_tree_root #root tree at midpoint of branch, which ape does not like to do
-
-#CURRENTLY must read positively selected site with code below
-
+#Here is aligned amino acid file used for codon alignment. 
+alignment <- read.csv("LuciferaseTree_dNds/results/combined_aa.csv",header=FALSE, stringsAsFactors=FALSE, colClasses = c("character"))
+#Columns are +1 compared to meme due to sp colum Next command alters numbers by 1 to account for this and name species column sp
+colnames(alignment)[2:ncol(alignment)] <- paste("s",seq(1,(ncol(alignment)-1)),sep=""); colnames(alignment)[1] <- "sp"
+#Read results in csv from meme selection analysis, including positively selected sites
+meme <- read.csv("LuciferaseTree_dNds/results/hyphy/lucclade.meme.csv",header=TRUE)
+#Pull positively selected sites using vector of output table from meme
+pos_sel <- alignment[,c("sp",paste("s",meme$Codon, sep=""))]
 data.frame(pos_sel[-1]) -> ps_df; ps_df->ps_df_named;
 rownames(ps_df_named) <- pos_sel$sp
 source("plotTree.R")
 quartz("Figure 4", 10, 4)
-plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE, lwd=1, infoFile=ps_df_named, treeWidth=7,infoWidth=5, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
+plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE, lwd=1, infoFile=ps_df_named, treeWidth=8,infoWidth=3, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
 
 
 
