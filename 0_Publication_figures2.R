@@ -84,18 +84,29 @@ head(mixnmatch_amut, 50)
 #51737    453.4              +    +                        +         +         +    +           12 -62.053 148.1  2.01  0.014
 
 vmutationslm <- lm(lmax ~ c38 + c178 + c375 + c404 + c405, data=mutated)
-mixnmatch_vmut <- dredge(	vmutationslm,rank = "AIC",m.lim = c(0,5)) #3 seems like the maximum terms we can fit safely
+mixnmatch_vmut <- dredge(vmutationslm,rank = "AIC",m.lim = c(0,5)) #3 seems like the maximum terms we can fit safely
 head(mixnmatch_vmut, 5)
 
 anova(lm(lmax ~ c38 * c178 * c375 * c404 * c405, data=mutated)) -> table2
 write.table(table2, file = "Table2.txt", sep="\t")
 table2
 
-
+#combine cypridina mutations with natural luciferases for mutated sites
 print("Tranlastion of Alingment sites to Cypridina site numbers")
 allmutsites
 alignment_numbers
-#rbind(allmutsites, alignment_numbers)
+cbind(dat$sp,dat[,alignment_numbers+1]) -> mut_natural
+table1 <- read.table(file="Table1.txt", sep="\t", header=TRUE) #Read again if not executed above
+translate <- read.csv("Raw Data/expression-kinetics/translate_lucname_decayname.csv",header=TRUE)
+tmpmerge <- merge(translate, table1, by='Species')
+lucNcolor <- merge(dat, tmpmerge, by='sp')
+natural_col <- merge(dat, tmpmerge, by='sp')
+cbind(natural_col$sp,natural_col[,alignment_numbers+1], natural_col$Lmax_Mean) -> mut_nat_col
+mutated
+colnames(mut_nat_col) <- colnames(mutated)
+rbind(mutated, mut_nat_col) -> all_col_mut
+allmutationslm <- lm(lmax ~ c38 + c178 + c375 + c404 + c405, data=all_col_mut)
+
 
 #*************************************************Main Figures
 ################
