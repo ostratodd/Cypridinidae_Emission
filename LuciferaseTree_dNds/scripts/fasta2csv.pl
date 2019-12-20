@@ -25,6 +25,7 @@ while ( my $seq = $seq_in->next_seq() ) {
 	my $csv = join ",", @residues;
 	print "$csv";
 	if($lmax){
-		print ",".$lmax."\n";
+		print ",".$lmax;
 	}
+	print "\n";
 }
