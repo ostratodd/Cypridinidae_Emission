@@ -36,6 +36,10 @@ allmutsites <- c(38, 45, 75, 79, 87, 126, 167, 170, 178, 191, 197, 223, 258, 276
 mutsites <- c(38, 178, 375, 404, 405) #Cypridina numbering sites with 3 states
 cyptoalign$Aligned[match(allmutsites,cyptoalign$Cypridina_noctiluca_BAD08210)] -> alignment_numbers
 anova(lm(lmax ~ X38 * X178 * X375 * X404 * X405, data=cn)) -> table2
+anova(lm(lmax ~ c38 * c178 * c375 * c404 * c405, data=mutated)) -> table2
+
+mutated <- data.frame(cbind(mutseqs$V1, mutseqs$c38))
+
 write.table(table2, file = "Table2.txt", sep="\t")
 table2
 
