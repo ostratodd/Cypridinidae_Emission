@@ -32,9 +32,6 @@ grid.arrange(tableGrob(table1, theme=tt3))
 
 ################
 #Table 2 - ANOVA results for 5 ‘mutagenesis sites’ using all data from mutagenesis study and available species’ luciferases
-allmutsites <- c(38, 45, 75, 79, 87, 126, 167, 170, 178, 191, 197, 223, 258, 276, 280, 372, 375, 403, 404, 405, 406, 407, 479)
-mutsites <- c(38, 178, 375, 404, 405) #Cypridina numbering sites with 3 states
-cyptoalign$Aligned[match(allmutsites,cyptoalign$Cypridina_noctiluca_BAD08210)] -> alignment_numbers
 
 amutationslm <- lm(lmax ~ c38+ c45+ c75+ c79+ c87+ c126+ c167+ c170+ c178+ c191+ c197+ c223+ c258+ c276+ c280+ c372+ c375+ c403+ c404+ c405+ c406+ c407+ c479, data=mutated)
 mixnmatch_amut <- dredge(amutationslm,rank = "AIC",m.lim = c(0,2)) 
@@ -91,26 +88,10 @@ anova(lm(lmax ~ c38 * c178 * c375 * c404 * c405, data=mutated)) -> table2
 write.table(table2, file = "Table2.txt", sep="\t")
 table2
 
-#combine cypridina mutations with natural luciferases for mutated sites
-print("Tranlastion of Alingment sites to Cypridina site numbers")
-allmutsites
-alignment_numbers
-cbind(dat$sp,dat[,alignment_numbers+1]) -> mut_natural
-table1 <- read.table(file="Table1.txt", sep="\t", header=TRUE) #Read again if not executed above
-translate <- read.csv("Raw Data/expression-kinetics/translate_lucname_decayname.csv",header=TRUE)
-tmpmerge <- merge(translate, table1, by='Species')
-lucNcolor <- merge(dat, tmpmerge, by='sp')
-natural_col <- merge(dat, tmpmerge, by='sp')
-cbind(natural_col$sp,natural_col[,alignment_numbers+1], natural_col$Lmax_Mean) -> mut_nat_col
-mutated
-colnames(mut_nat_col) <- colnames(mutated)
-rbind(mutated, mut_nat_col) -> all_col_mut
-allmutationslm <- lm(lmax ~ c38 + c178 + c375 + c404 + c405, data=all_col_mut)
-
 
 #*************************************************Main Figures
 ################
-#Figure 1 - Box plot of all lmax of species
+#Figure 1 - Variation in Lambda-max of emission spectra
 require(ggplot2)
 clean <- subset(alldata, error < 0.02 | replicate=="Vhil_tsuji" | replicate=="Cnoc_ohmiya" | replicate=="Pgra_huvard")
 quartz("Figure 1", 13, 3)
@@ -123,7 +104,7 @@ t1.rect1 <- data.frame (xmin=-Inf, xmax=Inf, ymin=454.27, ymax=463.42)
 fig1 + geom_rect(data=t2.rect1, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax), fill="green", alpha=0.1, inherit.aes = FALSE) + geom_rect(data=t1.rect1, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax), fill="blue", alpha=0.07, inherit.aes = FALSE)  + facet_grid(cols = vars(locality), scales = "free_x", switch = "x", space = "free")
 
 ##############
-#Figure 2 - Box plot of all fwhm of species
+#Figure 2 - Variation in FWHM of emission spectra
 require(ggplot2)
 clean <- subset(alldata, error < 0.02 | replicate=="Vhil_tsuji" | replicate=="Cnoc_ohmiya" | replicate=="Pgra_huvard")
 
@@ -132,7 +113,7 @@ fig2 <- qplot(abbreviation, sgfwhm, data=clean, geom=c("boxplot", "jitter")) + y
 fig2 + facet_grid(cols = vars(locality), scales = "free_x", switch = "x", space = "free")
 
 ##############
-#Figure 3 - Expression of luciferase candidates in Pichia yeast
+#Figure 3 - In vitro expression of exemplars supports luciferase function
 library(ggplot2); library(reshape2); library(dplyr); library(tidyverse); library(gridExtra)
 setwd(maindir)
 light_data <- read.csv("Raw Data/expression-kinetics/2019_pichia_assays.csv",header=TRUE)
@@ -240,7 +221,9 @@ dat %>% arrange(sp) -> dat #sort by species name
 #Read results in csv from meme selection analysis, including positively selected sites
 meme <- read.csv("LuciferaseTree_dNds/results/hyphy/lucclade.meme.csv",header=TRUE)
 #Pull positively selected sites using vector of output table from meme
-pos_sel <- dat[,c("sp",paste("s",meme$Codon, sep=""))]
+#Add 2 FEL sites 
+c(meme_table$Codon, 43, 209) -> addfel
+pos_sel <- dat[,c("sp",paste("s",addfel, sep=""))]
 #decay file has translation of different codes between datasets
 decay <- read.csv("Raw Data/expression-kinetics/decay_averages_all_for comparison_with_color.csv",header=TRUE)
 
@@ -250,7 +233,7 @@ table1 <- read.table(file="Table1.txt", sep="\t", header=TRUE) #Read again if no
 translate <- read.csv("Raw Data/expression-kinetics/translate_lucname_decayname.csv",header=TRUE)
 tmpmerge <- merge(translate, table1, by='Species')
 lucNcolor <- merge(dat, tmpmerge, by='sp')
-pos_sel_col <- lucNcolor[,c("sp",paste("s",meme$Codon, sep=""),"Lmax_Mean", "FWHM_Mean")]
+pos_sel_col <- lucNcolor[,c("sp",paste("s",addfel, sep=""),"Lmax_Mean", "FWHM_Mean")]
 remove_constant(pos_sel_col)->pos_sel_col ##Invariant sites because luc varies in spp without color data 
 
 options(na.action = "na.fail")
@@ -260,8 +243,8 @@ paste(colnames(pos_sel_col)[4:ncol(pos_sel_col)-2], collapse=" + "   )
 colorlm_fel <- lm(Lmax_Mean ~ s43 + s209, data=pos_sel_col)
 
 
-colorlm <- lm(Lmax_Mean ~ s41 + s93 + s102 + s142 + s160 + s177 + s189 + s261 + s285 + s291 + s320 + s389 + s477, data=pos_sel_col)
-fwhmlm <- lm(FWHM_Mean ~ s41 + s93 + s102 + s142 + s160 + s177 + s189 + s261 + s285 + s291 + s320 + s389 + s477, data=pos_sel_col)
+colorlm <- lm(Lmax_Mean ~ s41 + s93 + s102 + s142 + s160 + s177 + s189 + s261 + s285 + s291 + s320 + s389 + s477 , data=pos_sel_col)
+fwhmlm <- lm(FWHM_Mean ~ s41 + s93 + s102 + s142 + s160 + s177 + s189 + s261 + s285 + s291 + s320 + s389 + s477 , data=pos_sel_col)
       
 mixnmatch_col <- dredge(	colorlm,rank = "AIC",m.lim = c(0,3)) #3 seems like the maximum terms we can fit safely
 head(mixnmatch_col, 12)
@@ -271,24 +254,24 @@ av <- model.avg(mixnmatch_col)
 #    s189 + s261 + s285 + s291 + s320 + s389 + s477, data = pos_sel_col)
 #---
 #Model selection table 
-#     (Intrc) s102 s142 s160 s177 s189 s261 s285 s291 s320 s389 s41 s477 s93 df  logLik  AIC delta weight
-#51     458.8         +              +    +                                   9  10.990 -4.0  0.00  0.167
-#113    458.8                        +    +    +                              9  10.990 -4.0  0.00  0.167
-#305    458.8                        +    +              +                    9  10.990 -4.0  0.00  0.167
-#82     458.8    +                   +         +                              9  10.990 -4.0  0.00  0.167
-#274    458.8    +                   +                   +                    9  10.990 -4.0  0.00  0.167
-#20     458.8    +    +              +                                        9  10.990 -4.0  0.00  0.167
+#     (Intrc) s102 s142 s189 s261 s285 s320 s93 df logLik  AIC delta weight
+#51     458.8         +    +    +                9 10.990 -4.0  0.00  0.167
+#113    458.8              +    +    +           9 10.990 -4.0  0.00  0.167
+#305    458.8              +    +         +      9 10.990 -4.0  0.00  0.167
+#82     458.8    +         +         +           9 10.990 -4.0  0.00  0.167
+#274    458.8    +         +              +      9 10.990 -4.0  0.00  0.167
+#20     458.8    +    +    +                     9 10.990 -4.0  0.00  0.167
+#4131   458.0         +         +             +  7 -7.838 29.7 33.66  0.000
 
-summary(eval(getCall(mixnmatch_col,"51"))) #142, 189, 261
-summary(eval(getCall(mixnmatch_col, "113"))) #189, 261, 285
-summary(eval(getCall(mixnmatch_col, "305"))) #189, 261, 320
-summary(eval(getCall(mixnmatch_col, "20")))
+summary(eval(getCall(mixnmatch_col,"35"))) 
+summary(eval(getCall(mixnmatch_col,"161"))) 
 
-lmax_anova <- lm(Lmax_Mean ~ s102 + s142 + s189 + s261 + s285 + s320,data=pos_sel_col) # rep'd 3 or more x in best models
-anova(lmax_anova)	#102, 142, 189
-lmax_anova2 <- lm(Lmax_Mean ~ s93 * s102 * s142 * s189 * s261 * s320, data=pos_sel_col) # rep'd 2 or more x in best models
-anova(lmax_anova2)	#93, 142 significant
-
+lmax_anova <- lm(Lmax_Mean ~ s102 + s142 + s189 + s261,data=pos_sel_col) # rep'd 3 or more x in best models
+anova(lmax_anova)	#93
+lmax_anova2 <- lm(Lmax_Mean ~ s102 + s142 + s189 + s261 + s285 + s320, data=pos_sel_col) # rep'd 2 or more x in best models
+anova(lmax_anova2)	#209, 142 significant
+displaysites(c(102,142,189)) -> positivelyselectedThatPredictLmax
+positivelyselectedThatPredictLmax
 
 #FWHM
 mixnmatch_fw <- dredge(fwhmlm,rank = "AIC",m.lim = c(0,3)) #3 seems like the maximum terms we can fit safely
@@ -313,7 +296,7 @@ fwhm_anova <- lm(FWHM_Mean ~ s102 + s189 + s261 ,data=pos_sel_col) # in 3 or mor
 anova(fwhm_anova)
 fwhm_anova2 <- lm(FWHM_Mean ~ s41 + s102 + s177 + s189 + s261 + s291, data=pos_sel_col) # in 2 or more of top models
 anova(fwhm_anova2)
-
+#No positively selected sites predict FWHM
 
 #***********kinetics/decay
 ### decay ANOVA  ###
@@ -370,6 +353,8 @@ anova(decay_anova)
 decay_anova2 <- lm(lambda ~ s41 + s93 + s102 + s160 + s189 + s261 + s291 + s389 + s477, data=pos_sel_lam) # > 12 appearances
 anova(decay_anova2)
 
+displaysites(c(41, 102, 189)) -> positivelyselectedThatpredictDecay
+positivelyselectedThatpredictDecay
 #############################
 ## plot of lamda max and decay
 table1 <- read.table(file="Table1.txt", sep="\t", header=TRUE) #Read again if not executed above
