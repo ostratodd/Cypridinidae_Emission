@@ -1,34 +1,62 @@
 maindir <- "~/Documents/GitHub/Cypridinidae_EmissionSpectra/"
 setwd(maindir)
 
+#First read in data sets and complete analyses for figures and tables
 source("1_Emission_Functions.R")
 source("2_Read_Datasets.R")
 source("3_Calculate_parameters.R")
 source("4_MutagenesisLuciferase.R")
 
-#*************************************************Main Tables
-#Table 1 - lmax and fwhm for all species studied
+#*************Main Figures
+#Figure 1 is luciferase phylogeny and positively selected (meme) sites
+source("Figure1.R")
 
-#First remove runs where signal:noise is too low
-clean <- subset(alldata, error < 0.02 | replicate=="Vhil_tsuji" | replicate=="Cnoc_ohmiya" | replicate=="Pgra_huvard")
-#calculate means, SDs, and counts, grouped by abbreviation
-aggregate(clean[, 9:10], list(clean$abbreviation), FUN=mean) -> means
-aggregate(clean[, 9:10], list(clean $abbreviation), FUN=sd) -> sds
-aggregate(clean[, 9:10], list(clean $abbreviation), FUN=length) -> counts
-#Now construct data frame as table for above information
-cbind(subset(means, select="Group.1"), counts$sgMax, signif(means$sgMax,4), signif(sds$sgMax,2), signif(means$sgfwhm,4), signif(sds$sgfwhm,2)) -> table1
-colnames(table1)[c(1,2,3,4,5,6)] <- c("Species", "N", "Lmax_Mean", "Lmax_SD", "FWHM_Mean", "FWHM_SD")
-table1
-	#now write to text file
-write.table(table1, file = "Table1.txt", sep="\t")
-#graphical table
-library(gridExtra); library(grid);
-tt3 <- ttheme_default(
-  core=list(bg_params = list(fill = blues9[1:2], col=NA),
-            fg_params=list(fontface=1)),
-  colhead=list(fg_params=list(col="navyblue", fontface=1)),
-  rowhead=list(fg_params=list(col="white")));
-grid.arrange(tableGrob(table1, theme=tt3))
+#executing commands below in separate block yield tree of desired proportion
+quartz("Figure 1", 10, 4)
+plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE, lwd=1, infoFile=ps_df_named, treeWidth=8,infoWidth=3, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
+
+#Figure 2 is in vitro expression experiments
+source("Figure2.R")
+
+#Figure 3 plot lambda max values (color)
+source("Figure3.R")
+Figure3
+
+
+
+#*************************************************Main Tables
+#Table 1 - Stats table for in vitro expression
+
+#Table 2 - lmax and fwhm for all species studied
+source("Table2.R")
+
+
+
+
+#***************************************************Supplemental Figures
+#Figure S1 - Luciferase phylogeny with non-luc outgroups
+source("FigureS1.R")
+
+#Figure S2 - Plot of all FWHM data
+source("FigureS2.R")
+FigureS2 
+
+#**********************************Supplemental Tables
+#Supplemental Table S1 is previously published emission spectra (constructed manually outside R)
+
+#Supplemental Table S2 -- all emission parameter data for each individual organism
+source("TableS2.R")
+
+
+
+
+
+
+
+
+
+
+#***************************** Below here are commands for tables that are not yet separated into their own files
 
 ################
 #Table 2 - ANOVA results for 5 ‘mutagenesis sites’ using all data from mutagenesis study and available species’ luciferases
@@ -89,100 +117,8 @@ write.table(table2, file = "Table2.txt", sep="\t")
 table2
 
 
-#*************************************************Main Figures
-################
-#Figure 1 - Variation in Lambda-max of emission spectra
-require(ggplot2)
-clean <- subset(alldata, error < 0.02 | replicate=="Vhil_tsuji" | replicate=="Cnoc_ohmiya" | replicate=="Pgra_huvard")
-quartz("Figure 1", 13, 3)
-fig1 <- qplot(abbreviation, sgMax, data=clean, geom=c("boxplot", "jitter")) + ylab("Lambda max (nm)") + xlab("Species")
-	#highlight data with rectangles
-	#add green blue shading w/ rectangle (geom_rect). This uses y-co-ordinates as min and max of photeros (green) and non-photeros (blue). facet_grid sorts into panels by collection locality
-t2.rect1 <- data.frame (xmin=-Inf, xmax=Inf, ymin=463.97, ymax=471.14)
-t1.rect1 <- data.frame (xmin=-Inf, xmax=Inf, ymin=454.27, ymax=463.42)
-
-fig1 + geom_rect(data=t2.rect1, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax), fill="green", alpha=0.1, inherit.aes = FALSE) + geom_rect(data=t1.rect1, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax), fill="blue", alpha=0.07, inherit.aes = FALSE)  + facet_grid(cols = vars(locality), scales = "free_x", switch = "x", space = "free")
-
-##############
-#Figure 2 - Variation in FWHM of emission spectra
-require(ggplot2)
-clean <- subset(alldata, error < 0.02 | replicate=="Vhil_tsuji" | replicate=="Cnoc_ohmiya" | replicate=="Pgra_huvard")
-
-quartz("Figure 2", 13, 3)
-fig2 <- qplot(abbreviation, sgfwhm, data=clean, geom=c("boxplot", "jitter")) + ylab("FWHM (nm)") + xlab("Species")
-fig2 + facet_grid(cols = vars(locality), scales = "free_x", switch = "x", space = "free")
-
-##############
-#Figure 3 - In vitro expression of exemplars supports luciferase function
-library(ggplot2); library(reshape2); library(dplyr); library(tidyverse); library(gridExtra)
-setwd(maindir)
-light_data <- read.csv("Raw Data/expression-kinetics/2019_pichia_assays.csv",header=TRUE)
-light_data2 <- light_data %>% group_by(Species,type,sample,count_type,Concentration,date) %>% summarise(mean_cps = mean(cps_norm))
-
-#Pichia yeast expression plot###
-sp <- c("Pichia","CNO","KHC","SVU","VTS")
-light_data2$Species <- factor(light_data2$Species,levels=sp)
-Figure3b <- ggplot(data=light_data2, aes(x = Species, y = log10(mean_cps),fill=count_type)) + geom_boxplot() +
-  geom_point(position = position_jitterdodge()) + scale_discrete_manual(aes(x=sp)) +
-  xlab("Species") + ylab(expression('log'[10]*'( CPS / Total Protein Conc. )')) +
-  scale_fill_manual(values = c("#0092ff","grey"),name="Measures",labels=c("After + luciferin","Before")) +
-  scale_x_discrete(labels=c("Pichia","C_noc","K_has","M_SVU","V_tsu")) +
-  theme(legend.position = "none")
-
-	##############
-	#Mammalian expression
-mam_data <- read.csv(file="Raw Data/expression-kinetics/2014_mammalian_assays.csv", header=TRUE)
-#Add column for dilution*substrate
-luciferin <- mam_data$dilution*mam_data$substrate
-mam_data2 <- cbind(mam_data,luciferin)
-mam_data <- mam_data2
-
-#Subset data. the Soro-luc constructs did not have proper signal peptides
-	tsuluc <- grep("VtLa", mam_data$construct); tsujii <- mam_data[tsuluc,];
-	pmorluc <- grep("PhM", mam_data$construct); morini <- mam_data[pmorluc,]
-	svuluc <- grep("SVUluc", mam_data$construct); svu <- mam_data[svuluc,]
-	blank <- grep("Blank", mam_data$construct); blankcells <- mam_data[blank,]
-	hek <- grep("HEK", mam_data$construct); hekcells <- mam_data[hek,]
-	mam_combine <- rbind(tsujii, morini, hekcells, blankcells, svu)
-	subset(mam_combine, log(luciferin) > 6.5) -> maxluc
-
-Figure3a <- ggplot(data=maxluc, aes(x=construct, y=log10(light), fill=construct)) + scale_fill_manual(values=c("grey","grey","#0092ff","#0092ff","#0092ff")) + geom_boxplot() + geom_jitter() + xlab("Species") + ylab(expression('log'[10]*'( Counts Per Second)')) +
-  scale_x_discrete(labels = c("Blank", "HEK", "P_mor", "M_SVU", "V_tsu")) +
-  theme(legend.position = "none")
-
-grid.arrange(Figure3a, Figure3b, nrow = 1) -> Figure3
-
-#***************************Figure 4 Luciferase Tree and positively selected sites
-####################
-require(phytools)
-source("plotTree.R")
-luc_tree <- read.newick(file="LuciferaseTree_dNds/results/phylogenies/combined_codon.treefile")
-#root(luc_tree, c("Vargula_hilgendorfii_AAA30332", "Cypridina_noctiluca_BAD08210"), resolve.root=TRUE) -> luc_tree_root
-ladderize(luc_tree, right=TRUE) -> luc_tree
-reroot(luc_tree, 17, resolve.root=TRUE, .5) -> luc_tree_root #root tree at midpoint of branch, which ape does not like to do
-#Here is aligned amino acid file used for codon alignment. 
-alignment <- read.csv("LuciferaseTree_dNds/results/combined_aa.csv",header=FALSE, stringsAsFactors=FALSE, colClasses = c("character"))
-#Columns are +1 compared to meme due to sp colum Next command alters numbers by 1 to account for this and name species column sp
-colnames(alignment)[2:ncol(alignment)] <- paste("s",seq(1,(ncol(alignment)-1)),sep=""); colnames(alignment)[1] <- "sp"
-#Read results in csv from meme selection analysis, including positively selected sites
-meme <- read.csv("LuciferaseTree_dNds/results/hyphy/lucclade.meme.csv",header=TRUE)
-#Pull positively selected sites using vector of output table from meme
-pos_sel <- alignment[,c("sp",paste("s",meme$Codon, sep=""))]
-data.frame(pos_sel[-1]) -> ps_df; ps_df->ps_df_named;
-rownames(ps_df_named) <- pos_sel$sp
-
-quartz("Figure 4", 10, 4) #Executing this quartz and PlotTree command alone (not as part of previous block) strangely produces figure of better proportions
-plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE, lwd=1, infoFile=ps_df_named, treeWidth=8,infoWidth=3, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
-
-
-
 #*************************************************Supplemental Tables
-#Supplemental Table S1 is previously published emission spectra
 #Supplemental Table S2 is collecting information
-#Supplemental Table S3 -- all emission parameter data for each individual organism
-alldata
-	#Now write all data to text file for supplement
-write.table(alldata, file="TableS3.txt", sep="\t")
 #Supplemental Table S4
 anova(lm(lmax ~ X38 * X178 * X191, data=nc)) -> tableS4
 write.table(tableS4, file = "TableS4.txt", sep="\t")
@@ -190,14 +126,7 @@ write.table(tableS4, file = "TableS4.txt", sep="\t")
 cnplus->tableS5
 write.table(tableS5, file = "TableS5.txt", sep="\t")
 
-#***************************************************Supplemental Figures
-#Supplemental Figure S1
-require(ape)
-require(phytools)
-read.tree(file="./LuciferaseTree_dNds/results/phylogenies/all_aa.treefile") -> lucplus_tree
-midpoint.root(lucplus_tree) -> lucplus_tree_r
-ladderize(lucplus_tree_r)-> lprl
-plot(lprl, show.tip.label=TRUE, cex=.8, x.lim=2)
+
 
 #Supplemental Figure S2
 #Created with prettyplot
