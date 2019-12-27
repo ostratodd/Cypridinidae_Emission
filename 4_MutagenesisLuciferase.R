@@ -75,4 +75,7 @@ rbind(mutated, mut_nat_col) -> all_col_mut
 allmutationslm <- lm(lmax ~ c38 + c178 + c375 + c404 + c405, data=all_col_mut)
 
 
+#*******************sites differ between Pan and Pmo
+displaysites(c(38,57,110,111,171,182,187,189,224,266,273,371,478)) -> panpmo
+
 
