@@ -1,3 +1,4 @@
+require(dplyr)
 #**************Functions to translate between alignment numbers for individual amino acids
 aligned2cyp <- function(alignednumber) {		#This translates the present alignment number to the # in Cypridina. Input #
 	#conversion table for sites corresponding between Cypridina and present alignment
@@ -66,14 +67,18 @@ table1 <- read.table(file="Table1.txt", sep="\t", header=TRUE) #Read again if no
 translate <- read.csv("Raw Data/expression-kinetics/translate_lucname_decayname.csv",header=TRUE)
 tmpmerge <- merge(translate, table1, by='Species')
 lucNcolor <- merge(nat_mutsites, tmpmerge, by='sp')
-natural_col <- merge(dat, tmpmerge, by='sp')
-cbind(natural_col$sp,natural_col[,alignment_numbers+1], natural_col$Lmax_Mean) -> mut_nat_col
+natural_col <- merge(alignment, tmpmerge, by='sp')
+alignment_numbers <- c(38, 45, 75, 79, 87, 126, 167, 170, 178, 191, 197, 223, 258, 276, 280, 372, 375, 403, 404, 405, 406, 407, 479)
+cbind(natural_col$sp,natural_col[,cyp2aligned(alignment_numbers)], natural_col$Lmax_Mean) -> mut_nat_col
 colnames(mut_nat_col) <- colnames(mutated)
 
 #********************Combine mutated sites and natural variants at those same sites called all_col_mut
 rbind(mutated, mut_nat_col) -> all_col_mut
 allmutationslm <- lm(lmax ~ c38 + c178 + c375 + c404 + c405, data=all_col_mut)
+anova(allmutationslm)
 
+mutatedlm <- lm(lmax ~ c38 + c178 + c375 + c404 + c405, data=mutated)
+anova(mutatedlm)
 
 #*******************sites differ between Pan and Pmo
 displaysites(c(38,57,110,111,171,182,187,189,224,266,273,371,478)) -> panpmo
