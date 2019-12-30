@@ -31,6 +31,8 @@ source("Table3.R")
 table3
 
 #Table 4 - positively selected sites correlated with lambda max
+source("Table4.R")
+table4
 
 #Table 5 - positively selected sites correlated with with decay
 

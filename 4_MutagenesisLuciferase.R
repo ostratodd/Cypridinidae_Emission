@@ -110,6 +110,7 @@ remove_constant(pos_sel_decay)->pos_sel_decay ##Invariant sites because luc vari
 #*****************Create data frame for luciferase, decay, and color for any available data
 tmpmerge <- merge(translate, table1, by='Species', all=TRUE)
 tmpmerge2 <- merge(tmpmerge, decay, by = 'PubName', all=TRUE)
+datamerge <- merge(alignment, tmpmerge2, by="sp")
 #remove some columns we do not need
 !names(datamerge) %in% c("N", "PubName", "Species", "country", "genus", "n_lam", "Lmax_SD", "FWHM_SD", "lamSE") -> bool
 datamerge[,bool] -> InterestingSites
@@ -145,13 +146,17 @@ rownames(fullcompositetable)[1] <- "Cypridina Site Number"
 
 rbind(fullcompositetable, c("-", "-","-","-","-","-","-","-","-","-","-","-","-", "-","-", "+", "+", "-", "-", "-")) -> fullcompositetable
 rownames(fullcompositetable)[17] <- "Significant Pervasive Diversifying Selection (FEL)"
+
 rbind(fullcompositetable, c("-", "-","+","+","+","+","+","+","+","+","+","+","+", "+","+", "-", "-", "-", "-", "-")) -> fullcompositetable
 rownames(fullcompositetable)[18] <- "Significant Episodic Diversifying Selection (MEME)"
-rbind(fullcompositetable, c("+", "+","-","-","+","+","-","-","+","-","-","-","-", "-","-", "-", "-", "-", "-", "-")) -> fullcompositetable
+
+rbind(fullcompositetable, c("M", "M","-","-","+","+","-","-","+","-","-","-","-", "-","-", "-", "-", "-", "-", "-")) -> fullcompositetable
 rownames(fullcompositetable)[19] <- "Significant Correlation with Lambda Max"
+
 rbind(fullcompositetable, c("-", "-","-","-","-","-","+","-","+","+","-","+","-", "-","-", "-", "-", "-", "-", "-")) -> fullcompositetable
 rownames(fullcompositetable)[20] <- "Significant Correlation with Enzymatic Decay"
 
+fullcompositetable
 
 
 
