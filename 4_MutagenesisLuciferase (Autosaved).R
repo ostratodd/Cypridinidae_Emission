@@ -145,13 +145,17 @@ rownames(fullcompositetable)[1] <- "Cypridina Site Number"
 
 rbind(fullcompositetable, c("-", "-","-","-","-","-","-","-","-","-","-","-","-", "-","-", "+", "+", "-", "-", "-")) -> fullcompositetable
 rownames(fullcompositetable)[17] <- "Significant Pervasive Diversifying Selection (FEL)"
+
 rbind(fullcompositetable, c("-", "-","+","+","+","+","+","+","+","+","+","+","+", "+","+", "-", "-", "-", "-", "-")) -> fullcompositetable
 rownames(fullcompositetable)[18] <- "Significant Episodic Diversifying Selection (MEME)"
-rbind(fullcompositetable, c("+", "+","-","-","+","+","-","-","+","-","-","-","-", "-","-", "-", "-", "-", "-", "-")) -> fullcompositetable
+
+rbind(fullcompositetable, c("M", "M","-","-","+","+","-","-","+","-","-","-","-", "-","-", "-", "-", "-", "-", "-")) -> fullcompositetable
 rownames(fullcompositetable)[19] <- "Significant Correlation with Lambda Max"
+
 rbind(fullcompositetable, c("-", "-","-","-","-","-","+","-","+","+","-","+","-", "-","-", "-", "-", "-", "-", "-")) -> fullcompositetable
 rownames(fullcompositetable)[20] <- "Significant Correlation with Enzymatic Decay"
 
+fullcompositetable
 
 
 
