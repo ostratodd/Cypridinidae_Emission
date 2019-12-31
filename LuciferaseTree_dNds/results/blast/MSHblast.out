@@ -14,7 +14,7 @@ Database: sequences/transcriptomes/Maristella_chicoi_nt.fa
 
 Query= MSH__25Feb2019_y_c01
 
-Length=1760
+Length=1683
                                                                       Score        E
 Sequences producing significant alignments:                          (Bits)     Value
 
@@ -38,18 +38,18 @@ MCH__DN50856_c0_g2_i1                                                 342       
 MCH__DN40905_c0_g4_i1                                                 337        3e-91 
 MCH__DN40905_c0_g3_i1                                                 337        3e-91 
 MCH__DN51553_c2_g2_i1                                                 337        3e-91 
-MCH__DN40905_c0_g1_i1                                                 331        2e-89 
-MCH__DN51042_c0_g2_i1                                                 324        3e-87 
+MCH__DN40905_c0_g1_i1                                                 331        1e-89 
+MCH__DN51042_c0_g2_i1                                                 324        2e-87 
 MCH__DN51553_c2_g1_i3                                                 320        3e-86 
-MCH__DN51553_c2_g1_i1                                                 313        6e-84 
-MCH__DN51553_c2_g1_i2                                                 279        6e-74 
+MCH__DN51553_c2_g1_i1                                                 313        5e-84 
+MCH__DN51553_c2_g1_i2                                                 279        5e-74 
 MCH__DN51553_c2_g1_i4                                                 141        3e-32 
-MCH__DN91038_c0_g1_i1                                                 137        4e-31 
+MCH__DN91038_c0_g1_i1                                                 137        3e-31 
 MCH__DN41787_c1_g2_i1                                                 130        6e-29 
 MCH__DN41787_c1_g1_i1                                                 130        6e-29 
 MCH__DN16128_c0_g1_i1                                                 108        3e-22 
 MCH__DN89068_c0_g1_i1                                                 108        3e-22 
-MCH__DN46017_c0_g1_i5                                                 104        4e-21 
+MCH__DN46017_c0_g1_i5                                                 104        3e-21 
 MCH__DN58851_c0_g1_i1                                                 86.1       1e-15 
 
 
@@ -804,7 +804,7 @@ Sbjct  47    ATTTGGGATTTGGATAAATCTAATGATGGTCCTGATACTCAGTATGT  1
 >MCH__DN40905_c0_g1_i1
 Length=304
 
- Score = 331 bits (179),  Expect = 2e-89
+ Score = 331 bits (179),  Expect = 1e-89
  Identities = 257/296 (87%), Gaps = 0/296 (0%)
  Strand=Plus/Plus
 
@@ -832,7 +832,7 @@ Sbjct  241  GACTATGGTCTCTGTACGTTAACCTGGCTAATATAGAAGGAGAAAAGGGCGCAGTT  296
 >MCH__DN51042_c0_g2_i1
 Length=296
 
- Score = 324 bits (175),  Expect = 3e-87
+ Score = 324 bits (175),  Expect = 2e-87
  Identities = 203/217 (94%), Gaps = 0/217 (0%)
  Strand=Plus/Plus
 
@@ -880,7 +880,7 @@ Sbjct  35    GTACCGTTATCGATGAATGCTTCGTGAGACACGGA  1
 >MCH__DN51553_c2_g1_i1
 Length=214
 
- Score = 313 bits (169),  Expect = 6e-84
+ Score = 313 bits (169),  Expect = 5e-84
  Identities = 205/221 (93%), Gaps = 7/221 (3%)
  Strand=Plus/Minus
 
@@ -904,7 +904,7 @@ Sbjct  41   GACTGTGTGGGAGGACTGTGGTCTCTATATGTTAACCCGGC  1
 >MCH__DN51553_c2_g1_i2
 Length=210
 
- Score = 279 bits (151),  Expect = 6e-74
+ Score = 279 bits (151),  Expect = 5e-74
  Identities = 157/160 (98%), Gaps = 0/160 (0%)
  Strand=Plus/Minus
 
@@ -949,7 +949,7 @@ Sbjct  208   ACAGTATCCACCTCAGTGTAAA  187
 >MCH__DN91038_c0_g1_i1
 Length=278
 
- Score = 137 bits (74),  Expect = 4e-31
+ Score = 137 bits (74),  Expect = 3e-31
  Identities = 84/89 (94%), Gaps = 0/89 (0%)
  Strand=Plus/Minus
 
@@ -1025,7 +1025,7 @@ Sbjct  58   GGTAAATGGAGGTACCGTTGATATCGACAGCAATCCATTCTCTATCGGTGACGTCACC  1
 >MCH__DN46017_c0_g1_i5
 Length=681
 
- Score = 104 bits (56),  Expect = 4e-21
+ Score = 104 bits (56),  Expect = 3e-21
  Identities = 56/56 (100%), Gaps = 0/56 (0%)
  Strand=Plus/Plus
 
@@ -1054,11 +1054,11 @@ Gapped
 Lambda      K        H
     1.28    0.460    0.850 
 
-Effective search space used: 106407711108
+Effective search space used: 101682570534
 
 
   Database: sequences/transcriptomes/Maristella_chicoi_nt.fa
-    Posted date:  Nov 24, 2019  10:32 AM
+    Posted date:  Dec 15, 2019  12:31 PM
   Number of letters in database: 65,694,774
   Number of sequences in database:  166,512
 

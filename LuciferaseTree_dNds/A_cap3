@@ -1,0 +1,59 @@
+#!/usr/bin/perl
+
+#Our earlier assemblies were different from later assemblies. They used an earlier version of Trinity and a secondary step to consolodate transcripts
+# after trinity using cap3. We designed primers from these to amplify luciferases, but did not keep all records of those early assemblies.
+# This script uses our Sanger sequenced luciferases to pull out the best matches from current assemblies. Usually, the full gene 
+# is spread across multiple isoforms in the newer assemblies. This is probably caused by heterozygosity resulting from combining multiple indivual animals.
+#Trinity recognizes these as isoforms. CAP3 or other assembler could put these together.
+
+
+#cap3 is installed in base conda on oakley's pod
+#use cap4lucs Species_name Species_abbr 1|0 (=completeORF|longestORF)
+
+cap4lucs("Photeros_morini", "PMO", 1);
+cap4lucs("Kornickeria_hastingsi", "KHC", 1);
+cap4lucs("Maristella_sp_SVU", "SVU", 1);
+cap4lucs("Maristella_sp_SVD", "SVD", 1);
+cap4lucs("Maristella_chicoi", "MSH", 0);
+
+
+sub cap4lucs {
+	my ($species,$abbr,$complete) = @_;
+	my $dna;
+	my $aa;
+	if($complete == 1) {
+		$dna = "3";
+		$aa = "1";
+	}else{
+		$dna = "2";
+		$aa = "0";
+	}
+	print "***********************************$species  *****************\n";
+
+	my $makeblastdb = "makeblastdb -in sequences/transcriptomes/".$species."_nt.fa -dbtype nucl";
+	system($makeblastdb);
+
+	my $blastn = "blastn -query sequences/sequenced/".$abbr."_nt.fa -db sequences/transcriptomes/".$species."_nt.fa > results/blast/".$abbr."blast.out";
+	system($blastn);
+
+	my $getnames = "grep -A 30 -Fw 'Sequences producing' results/blast/".$abbr."blast.out | grep -oP '...__.+i\\d' > results/blast/".$abbr.".txt";
+	system($getnames);
+
+	my $getsequences = "grep -A 1 -Fwf results/blast/".$abbr.".txt sequences/transcriptomes/allxtomes_nt.fasta > results/blast/".$abbr.".fa";
+	system($getsequences);
+
+	my $addsanger = "cat sequences/sequenced/".$abbr."_nt.fa >> results/blast/".$abbr.".fa";
+	system($addsanger);
+
+	my $cap3 = "cap3 results/blast/".$abbr.".fa -o 16 > results/blast/".$abbr.".cap.out";
+	system($cap3);
+
+	my $getnt = "getorf results/blast/".$abbr.".fa.cap.contigs results/blast/".$abbr."_luc_aa.fa -minsize 1400 -find $aa";
+	system($getnt);
+
+	my $getaa = "getorf results/blast/".$abbr.".fa.cap.contigs results/blast/".$abbr."_luc_nt.fa -minsize 1400 -find $dna";
+	system($getaa);
+
+	my $convertnames = "perl -pi -e 's/\>/\>".$abbr."_cap3 /g' results/blast/".$abbr."_luc_*";
+	system($convertnames);
+}

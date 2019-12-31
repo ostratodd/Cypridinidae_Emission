@@ -1,9 +1,21 @@
-cat sequences/published/published_aa.fa sequences/sequenced/sequenced_aa.fa > sequences/nonxtome_aa.fa
-cat sequences/published/published_nt.fa sequences/sequenced/sequenced_nt.fa > sequences/nonxtome_nt.fa
+
+cat sequences/sequenced/VTS_aa.fa sequences/published/published_aa.fa results/blast/*luc_aa.fa > sequences/nonxtome_aa.fa
+cat sequences/sequenced/VTS_nt.fa sequences/published/published_nt.fa results/blast/*luc_nt.fa > sequences/nonxtome_nt.fa
+
+#cat sequences/published/published_aa.fa sequences/sequenced/sequenced_aa.fa > sequences/nonxtome_aa.fa
+#cat sequences/published/published_nt.fa sequences/sequenced/sequenced_nt.fa > sequences/nonxtome_nt.fa
 
 #pull out amino acid sequences that are in the lucclade (manually created file from tree results)
+#Note 2 sequences of CMU are in luc clade but are short fragments that were removed
+#Same is true for ODH
+
 	#this keeps the i (isoform) number to pull specific isoform
-grep -A 1 -f results/lucclade.txt results/blast/besthits.fasta > sequences/lucclade_aa.fa
+
+#Removing CMU as only sequence that is incomplete and was in "phenotype" pipeline
+#cat results/blast/phenotype_besthits.fasta results/blast/besthits.fasta > results/blast/all_besthits.fasta
+cat results/blast/besthits.fasta > results/blast/all_besthits.fasta
+grep -A 1 -f results/lucclade.txt results/blast/all_besthits.fasta > sequences/lucclade_aa.fa
+
 perl -pi -e 's/\-\-//g' sequences/lucclade_aa.fa
 perl -pi -e 's/:\:\TRINITY.+g\d+//g' sequences/lucclade_aa.fa
 perl -pi -e 's/\:/ /g' sequences/lucclade_aa.fa
@@ -36,6 +48,9 @@ perl -pi -e 's/SVD\_/Maristella_sp_SVD_/g' sequences/combined*.fa
 perl -pi -e 's/MSH\_/Maristella_chicoi_/g' sequences/combined*.fa
 perl -pi -e 's/MAG\_/Maristella_sp_AG_/g' sequences/combined*.fa
 perl -pi -e 's/VAD\_/Maristella_sp_VAD_/g' sequences/combined*.fa
+perl -pi -e 's/MIR\_/Maristella_sp_IR_/g' sequences/combined*.fa
+perl -pi -e 's/ODH\_/Maristella_sp_ODH_/g' sequences/combined*.fa
+
 perl -pi -e 's/\_\_/\_/g' sequences/combined*.fa
 perl -pi -e 's/25Feb2019/sequenced/g' sequences/combined*.fa
 perl -pi -e 's/\:\:TRINITY.+/only_transcriptome/g' sequences/combined*.fa
@@ -44,9 +59,7 @@ perl -pi -e 's/\:\:TRINITY.+/only_transcriptome/g' sequences/combined*.fa
 perl -pi -e 's/\n\n/\n/g' sequences/combined_nt.fa
 mafft sequences/combined_aa.fa > sequences/combined_aa_ALN.fa
 
-#Usage:  pal2nal.pl  pep.aln  nuc.fasta - output paml
-pal2nal.pl sequences/nonxtome_aa_ALN.fa sequences/nonxtome_nt.fa -output fasta > results/nonxtome_codonaligned.fa
-
+#Usage: pal2nal.pl  pep.aln  nuc.fasta - output paml
 pal2nal.pl sequences/combined_aa_ALN.fa sequences/combined_nt.fa -output fasta > results/combined_codonaligned.fa
 
 #Need phylogeny for dn:ds
@@ -54,10 +67,15 @@ pal2nal.pl sequences/combined_aa_ALN.fa sequences/combined_nt.fa -output fasta >
 #iqtree -s results/nonxtome_codonaligned.fa -redo -pre results/phylogenies/nonxtome_codon
 
 rm results/phylogenies/combined_codon*
-iqtree -s results/combined_codonaligned.fa -redo -pre results/phylogenies/combined_codon -nt 5 -bb 1000
+iqtree -s results/combined_codonaligned.fa -o Vargula_hilgendorfii_AAA30332,Cypridina_noctiluca_BAD08210 -redo -pre results/phylogenies/combined_codon -nt 5 #bb 1000
 
 
 #Run hyphy to test for episodic positive selection
 #probably best to run these with slurm
 #hyphy absrel --alignment results/combined_codonaligned.fa --tree results/phylogenies/combined_codon.treefile --output results/hyphy/lucclade > results/hyphy/lucclade.absrel.out
-#hyphy meme --alignment results/combined_codonaligned.fa --tree results/phylogenies/combined_codon.treefile --output results/hyphy/lucclade.meme.json > results/hyphy/lucclade.meme.out
+
+
+
+#FIrst is head node, second is slurm
+hyphy meme --alignment results/combined_codonaligned.fa --tree results/phylogenies/combined_codon.treefile --output results/hyphy/lucclade.meme.json > results/hyphy/lucclade.meme.out
+#sbatch scripts/hyphy.meme.slurm.sh results/combined_codonaligned.fa results/phylogenies/combined_codon.treefile results/hyphy/combined1210.meme.json 

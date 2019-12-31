@@ -1,0 +1,174 @@
+No file of quality values (.qual) is found
+No file of constraints (.con) is found.
+No overlap is found in the given 3' clipping range for read SVD__DN24251_c1_g7_i2
+  3' clipping ranges for overlaps: 187  187  394  
+Number of overlaps saved: 193
+ComputeOverlap done
+IdentifyChimeras done
+Overlap SVD__DN25349_c0_g7_i1- and SVD__DN24990_c0_g1_i9+  C  qualscore     0  score   2680  identity 0.87
+Overlap SVD__DN25349_c0_g7_i1- and SVD__DN24990_c0_g1_i7+  C  qualscore     0  score   2680  identity 0.87
+Overlap SVD__DN25349_c0_g7_i1- and SVD__DN24990_c0_g1_i6+  C  qualscore     0  score   2750  identity 0.88
+Overlap SVD__DN25349_c0_g7_i1- and SVD__DN24990_c0_g1_i5+  C  qualscore     0  score   2400  identity 0.86
+Overlap SVD__DN25349_c0_g7_i1- and SVD__DN24990_c0_g1_i4+  C  qualscore     0  score   2400  identity 0.86
+Overlap SVD__DN25349_c0_g7_i1- and SVD__DN25061_c2_g6_i1+  P  lengths of diffs and sims: upper left 8  upper right 20  middle 124
+Overlap SVD__DN25349_c0_g7_i1- and SVD__DN25061_c2_g5_i1+  P  lengths of diffs and sims: upper left 40  upper right 0  middle 110
+Overlap SVD__DN25349_c0_g7_i1- and SVD__DN25061_c2_g4_i2+  P  lengths of diffs and sims: upper left 40  upper right 0  middle 110
+Overlap SVD__DN25349_c0_g7_i1- and SVD__DN25061_c2_g1_i1+  P  lengths of diffs and sims: upper left 40  upper right 0  middle 110
+Overlap SVD__DN25349_c0_g9_i1- and SVD__DN24990_c0_g1_i9+  P  qualscore     0  score   6020  identity 0.87
+Overlap SVD__DN25349_c0_g9_i1- and SVD__DN24990_c0_g1_i7+  P  qualscore     0  score   5880  identity 0.87
+Overlap SVD__DN25349_c0_g9_i1- and SVD__DN24990_c0_g1_i6+  P  qualscore     0  score   5100  identity 0.87
+Overlap SVD__DN25349_c0_g9_i1- and SVD__DN24990_c0_g1_i5+  P  qualscore     0  score   5460  identity 0.86
+Overlap SVD__DN25349_c0_g9_i1- and SVD__DN24990_c0_g1_i4+  P  qualscore     0  score   5740  identity 0.86
+Overlap SVD__DN25349_c0_g9_i1- and SVD__DN24990_c0_g1_i1+  P  qualscore     0  score   3310  identity 0.87
+Overlap SVD__DN25349_c0_g9_i2- and SVD__DN24990_c0_g1_i9+  C  qualscore     0  score   2580  identity 0.87
+Overlap SVD__DN25349_c0_g9_i2- and SVD__DN24990_c0_g1_i7+  C  qualscore     0  score   2510  identity 0.87
+Overlap SVD__DN25349_c0_g9_i2- and SVD__DN24990_c0_g1_i6+  C  qualscore     0  score   2580  identity 0.87
+Overlap SVD__DN25349_c0_g9_i2- and SVD__DN24990_c0_g1_i5+  C  qualscore     0  score   2720  identity 0.88
+Overlap SVD__DN25349_c0_g9_i2- and SVD__DN24990_c0_g1_i4+  C  qualscore     0  score   2720  identity 0.88
+Overlap SVD__DN25349_c0_g9_i2- and SVD__DN25061_c2_g6_i1+  P  lengths of diffs and sims: upper left 0  upper right 34  middle 75
+Overlap SVD__DN25349_c0_g9_i2- and SVD__DN25061_c2_g5_i1+  P  lengths of diffs and sims: upper left 54  upper right 0  middle 53
+Overlap SVD__DN25349_c0_g9_i2- and SVD__DN25061_c2_g4_i2+  P  qualscore     0  score    900  identity 0.83
+Overlap SVD__DN25349_c0_g9_i2- and SVD__DN25061_c2_g4_i1+  P  lengths of diffs and sims: upper left 0  upper right 34  middle 75
+Overlap SVD__DN25349_c0_g9_i2- and SVD__DN25061_c2_g1_i1+  P  lengths of diffs and sims: upper left 54  upper right 0  middle 53
+Overlap SVD__DN25349_c0_g9_i3- and SVD__DN24990_c0_g1_i9+  C  qualscore     0  score   3170  identity 0.86
+Overlap SVD__DN25349_c0_g9_i3- and SVD__DN24990_c0_g1_i7+  C  qualscore     0  score   3170  identity 0.86
+Overlap SVD__DN25349_c0_g9_i3- and SVD__DN24990_c0_g1_i6+  C  qualscore     0  score   3100  identity 0.86
+Overlap SVD__DN25349_c0_g9_i3- and SVD__DN24990_c0_g1_i5+  C  qualscore     0  score   3940  identity 0.90
+Overlap SVD__DN25349_c0_g9_i3- and SVD__DN24990_c0_g1_i4+  C  qualscore     0  score   3940  identity 0.90
+Overlap SVD__DN25349_c0_g9_i4- and SVD__DN24990_c0_g1_i9+  C  qualscore     0  score   2800  identity 0.86
+Overlap SVD__DN25349_c0_g9_i4- and SVD__DN24990_c0_g1_i7+  C  qualscore     0  score   2800  identity 0.86
+Overlap SVD__DN25349_c0_g9_i4- and SVD__DN24990_c0_g1_i6+  C  qualscore     0  score   2730  identity 0.86
+Overlap SVD__DN25349_c0_g9_i4- and SVD__DN24990_c0_g1_i5+  C  qualscore     0  score   3080  identity 0.88
+Overlap SVD__DN25349_c0_g9_i4- and SVD__DN24990_c0_g1_i4+  C  qualscore     0  score   3080  identity 0.88
+Overlap SVD__DN25349_c0_g9_i4- and SVD__DN25061_c2_g5_i1+  P  lengths of diffs and sims: upper left 40  upper right 0  middle 86
+Overlap SVD__DN25349_c0_g9_i4- and SVD__DN25061_c2_g4_i2+  P  lengths of diffs and sims: upper left 40  upper right 0  middle 86
+Overlap SVD__DN25349_c0_g9_i4- and SVD__DN25061_c2_g1_i1+  P  lengths of diffs and sims: upper left 40  upper right 0  middle 86
+Overlap SVD__DN25349_c0_g9_i5+ and SVD__DN25349_c0_g9_i7+  C  lengths of diffs and sims: upper left 0  upper right 36  middle 168
+Overlap SVD__DN25349_c0_g9_i5- and SVD__DN24990_c0_g1_i9+  C  qualscore     0  score   2140  identity 0.86
+Overlap SVD__DN25349_c0_g9_i5- and SVD__DN24990_c0_g1_i7+  C  qualscore     0  score   2140  identity 0.86
+Overlap SVD__DN25349_c0_g9_i5- and SVD__DN24990_c0_g1_i6+  C  qualscore     0  score   2210  identity 0.87
+Overlap SVD__DN25349_c0_g9_i5- and SVD__DN24990_c0_g1_i5+  C  qualscore     0  score   2630  identity 0.90
+Overlap SVD__DN25349_c0_g9_i5- and SVD__DN24990_c0_g1_i4+  C  qualscore     0  score   2630  identity 0.90
+Overlap SVD__DN25349_c0_g9_i7- and SVD__DN24990_c0_g1_i9+  C  qualscore     0  score   4640  identity 0.86
+Overlap SVD__DN25349_c0_g9_i7- and SVD__DN24990_c0_g1_i7+  C  qualscore     0  score   4640  identity 0.86
+Overlap SVD__DN25349_c0_g9_i7- and SVD__DN24990_c0_g1_i6+  C  qualscore     0  score   4570  identity 0.86
+Overlap SVD__DN25349_c0_g9_i7- and SVD__DN24990_c0_g1_i5+  C  qualscore     0  score   4920  identity 0.87
+Overlap SVD__DN25349_c0_g9_i7- and SVD__DN24990_c0_g1_i4+  C  qualscore     0  score   4920  identity 0.87
+Overlap SVD__DN25349_c0_g9_i7- and SVD__DN25061_c2_g6_i1+  P  lengths of diffs and sims: upper left 8  upper right 20  middle 124
+Overlap SVD__DN25349_c0_g9_i7- and SVD__DN25061_c2_g5_i1+  P  lengths of diffs and sims: upper left 54  upper right 0  middle 96
+Overlap SVD__DN25349_c0_g9_i7- and SVD__DN25061_c2_g4_i2+  P  lengths of diffs and sims: upper left 54  upper right 0  middle 96
+Overlap SVD__DN25349_c0_g9_i7- and SVD__DN25061_c2_g1_i1+  P  lengths of diffs and sims: upper left 54  upper right 0  middle 96
+Overlap SVD__DN25349_c0_g9_i7+ and SVD__DN25349_c0_g9_i1+  P  lengths of diffs and sims: upper left 0  upper right 41  middle 58
+Overlap SVD__DN25349_c0_g10_i1- and SVD__DN24990_c0_g1_i9+  C  qualscore     0  score   2120  identity 0.86
+Overlap SVD__DN25349_c0_g10_i1- and SVD__DN24990_c0_g1_i7+  C  qualscore     0  score   2120  identity 0.86
+Overlap SVD__DN25349_c0_g10_i1- and SVD__DN24990_c0_g1_i6+  C  qualscore     0  score   2190  identity 0.87
+Overlap SVD__DN25349_c0_g10_i1- and SVD__DN25061_c2_g6_i1+  P  lengths of diffs and sims: upper left 8  upper right 107  middle 37
+Overlap SVD__DN25349_c0_g10_i1- and SVD__DN25061_c2_g5_i1+  P  lengths of diffs and sims: upper left 40  upper right 0  middle 110
+Overlap SVD__DN25349_c0_g10_i1- and SVD__DN25061_c2_g4_i2+  P  lengths of diffs and sims: upper left 40  upper right 0  middle 110
+Overlap SVD__DN25349_c0_g10_i1- and SVD__DN25061_c2_g4_i1+  P  lengths of diffs and sims: upper left 8  upper right 107  middle 37
+Overlap SVD__DN25349_c0_g10_i1- and SVD__DN25061_c2_g1_i1+  P  lengths of diffs and sims: upper left 40  upper right 0  middle 110
+Overlap SVD__DN24251_c1_g10_i3- and SVD__DN25061_c2_g3_i4+  C  qualscore     0  score  -2180  identity 0.62
+Overlap SVD__DN24251_c1_g10_i3- and SVD__DN25061_c2_g3_i3+  C  qualscore     0  score   3700  identity 0.88
+Overlap SVD__DN24251_c1_g10_i3- and SVD__DN25061_c2_g3_i2+  C  qualscore     0  score   4050  identity 0.89
+Overlap SVD__DN24251_c1_g10_i3- and SVD__DN25061_c2_g3_i1+  C  qualscore     0  score  -3690  identity 0.58
+Overlap SVD__DN25061_c2_g1_i1+ and SVD_25Feb2019_y_c52+  C  lengths of diffs and sims: upper left 40  upper right 0  middle 171
+Overlap SVD__DN25061_c2_g1_i1+ and SVD__DN24990_c0_g1_i9+  C  qualscore     0  score   2630  identity 0.89
+Overlap SVD__DN25061_c2_g1_i1+ and SVD__DN24990_c0_g1_i7+  C  qualscore     0  score   2630  identity 0.89
+Overlap SVD__DN25061_c2_g1_i1+ and SVD__DN24990_c0_g1_i6+  C  qualscore     0  score   2630  identity 0.89
+Overlap SVD__DN25061_c2_g1_i1+ and SVD__DN25061_c2_g6_i1+  C  lengths of diffs and sims: upper left 93  upper right 0  middle 118
+Overlap SVD__DN25061_c2_g1_i1+ and SVD__DN25061_c2_g4_i1+  C  lengths of diffs and sims: upper left 93  upper right 0  middle 118
+Overlap SVD__DN25061_c2_g3_i2+ and SVD__DN25061_c2_g3_i4+  P  qualscore     0  score  -5140  identity 0.65
+Overlap SVD__DN25061_c2_g3_i2+ and SVD__DN25061_c2_g3_i1+  C  qualscore     0  score  -2290  identity 0.70
+Overlap SVD__DN25061_c2_g3_i3+ and SVD__DN25061_c2_g3_i4+  C  qualscore     0  score  -1110  identity 0.69
+Overlap SVD__DN25061_c2_g3_i3+ and SVD__DN25061_c2_g3_i1+  C  qualscore     0  score   -400  identity 0.70
+Overlap SVD__DN25061_c2_g3_i4+ and SVD__DN25061_c2_g2_i2+  P  qualscore     0  score   2270  identity 0.89
+Overlap SVD__DN25061_c2_g2_i2- and SVD__DN20994_c0_g1_i1+  P  qualscore     0  score   2320  identity 0.88
+Overlap SVD__DN25061_c2_g4_i1+ and SVD__DN24990_c0_g1_i9+  C  qualscore     0  score   2960  identity 0.90
+Overlap SVD__DN25061_c2_g4_i1+ and SVD__DN24990_c0_g1_i7+  C  qualscore     0  score   2960  identity 0.90
+Overlap SVD__DN25061_c2_g4_i1+ and SVD__DN24990_c0_g1_i6+  C  qualscore     0  score   2960  identity 0.90
+Overlap SVD__DN25061_c2_g4_i1+ and SVD__DN24990_c0_g1_i5+  C  qualscore     0  score   2470  identity 0.87
+Overlap SVD__DN25061_c2_g4_i1+ and SVD__DN24990_c0_g1_i4+  C  qualscore     0  score   2470  identity 0.87
+Overlap SVD__DN25061_c2_g4_i1+ and SVD__DN25061_c2_g5_i1+  P  lengths of diffs and sims: upper left 93  upper right 0  middle 136
+Overlap SVD__DN25061_c2_g4_i2+ and SVD_25Feb2019_y_c52+  C  lengths of diffs and sims: upper left 40  upper right 0  middle 190
+Overlap SVD__DN25061_c2_g4_i2+ and SVD__DN24990_c0_g1_i9+  C  qualscore     0  score   2420  identity 0.88
+Overlap SVD__DN25061_c2_g4_i2+ and SVD__DN24990_c0_g1_i7+  C  qualscore     0  score   2420  identity 0.88
+Overlap SVD__DN25061_c2_g4_i2+ and SVD__DN24990_c0_g1_i6+  C  qualscore     0  score   2420  identity 0.88
+Overlap SVD__DN25061_c2_g4_i2+ and SVD__DN24990_c0_g1_i5+  C  qualscore     0  score   1220  identity 0.83
+Overlap SVD__DN25061_c2_g4_i2+ and SVD__DN24990_c0_g1_i4+  C  qualscore     0  score   1220  identity 0.83
+Overlap SVD__DN25061_c2_g4_i2+ and SVD__DN25061_c2_g6_i1+  C  lengths of diffs and sims: lower left 99  upper right 0  middle 130
+Overlap SVD__DN25061_c2_g4_i2+ and SVD__DN25061_c2_g4_i1+  C  lengths of diffs and sims: lower left 99  upper right 0  middle 130
+Overlap SVD__DN25061_c2_g5_i1+ and SVD_25Feb2019_y_c52+  C  lengths of diffs and sims: upper left 40  upper right 0  middle 194
+Overlap SVD__DN25061_c2_g5_i1+ and SVD__DN24990_c0_g1_i9+  C  qualscore     0  score   2880  identity 0.89
+Overlap SVD__DN25061_c2_g5_i1+ and SVD__DN24990_c0_g1_i7+  C  qualscore     0  score   2880  identity 0.89
+Overlap SVD__DN25061_c2_g5_i1+ and SVD__DN24990_c0_g1_i6+  C  qualscore     0  score   2880  identity 0.89
+Overlap SVD__DN25061_c2_g5_i1+ and SVD__DN24990_c0_g1_i5+  C  qualscore     0  score   2040  identity 0.84
+Overlap SVD__DN25061_c2_g5_i1+ and SVD__DN24990_c0_g1_i4+  C  qualscore     0  score   2040  identity 0.84
+Overlap SVD__DN25061_c2_g6_i1+ and SVD__DN24990_c0_g1_i9+  C  qualscore     0  score   2820  identity 0.89
+Overlap SVD__DN25061_c2_g6_i1+ and SVD__DN24990_c0_g1_i7+  C  qualscore     0  score   2820  identity 0.89
+Overlap SVD__DN25061_c2_g6_i1+ and SVD__DN24990_c0_g1_i6+  C  qualscore     0  score   2820  identity 0.89
+Overlap SVD__DN25061_c2_g6_i1+ and SVD__DN24990_c0_g1_i5+  C  qualscore     0  score   2470  identity 0.87
+Overlap SVD__DN25061_c2_g6_i1+ and SVD__DN24990_c0_g1_i4+  C  qualscore     0  score   2470  identity 0.87
+Overlap SVD__DN25061_c2_g6_i1+ and SVD__DN25061_c2_g5_i1+  P  lengths of diffs and sims: upper left 93  upper right 0  middle 136
+Overlap SVD__DN20994_c0_g1_i1+ and SVD_25Feb2019_y_c52+  C  qualscore     0  score   3390  identity 0.87
+Overlap SVD__DN20994_c0_g1_i1+ and SVD__DN25061_c2_g3_i4-  P  qualscore     0  score   3410  identity 0.88
+Overlap SVD__DN20994_c0_g1_i1+ and SVD__DN25061_c2_g3_i2-  C  qualscore     0  score   3460  identity 0.88
+Overlap SVD__DN20994_c0_g1_i1+ and SVD__DN25061_c2_g3_i1-  C  qualscore     0  score   3460  identity 0.88
+Overlap SVD__DN24990_c0_g1_i1+ and SVD_25Feb2019_y_c52+  C  qualscore     0  score   3430  identity 0.87
+Overlap SVD__DN24990_c0_g1_i1+ and SVD__DN24990_c0_g1_i9+  C  lengths of diffs and sims: upper left 93  upper right 2  middle 212
+Overlap SVD__DN24990_c0_g1_i1+ and SVD__DN24990_c0_g1_i5+  C  qualscore     0  score   3640  identity 0.88
+Overlap SVD__DN24990_c0_g1_i1+ and SVD__DN24990_c0_g1_i4+  C  qualscore     0  score   3710  identity 0.89
+Overlap SVD__DN24990_c0_g1_i1+ and SVD__DN25349_c0_g9_i7-  P  qualscore     0  score   1210  identity 0.88
+Overlap SVD__DN24990_c0_g1_i1+ and SVD__DN25349_c0_g9_i5-  P  lengths of diffs and sims: upper left 48  upper right 0  middle 52
+Overlap SVD__DN24990_c0_g1_i1+ and SVD__DN25349_c0_g9_i3-  P  lengths of diffs and sims: upper left 63  upper right 0  middle 52
+Overlap SVD__DN24990_c0_g1_i4+ and SVD_25Feb2019_y_c52+  P  qualscore     0  score  11820  identity 0.88
+Overlap SVD__DN24990_c0_g1_i4+ and SVD__DN25061_c2_g2_i2-  P  lengths of diffs and sims: upper left 0  upper right 19  middle 55
+Overlap SVD__DN24990_c0_g1_i5+ and SVD_25Feb2019_y_c52+  P  qualscore     0  score  11540  identity 0.88
+Overlap SVD__DN24990_c0_g1_i5+ and SVD__DN25061_c2_g2_i2-  P  lengths of diffs and sims: upper left 0  upper right 19  middle 55
+Overlap SVD__DN24990_c0_g1_i6+ and SVD_25Feb2019_y_c52+  C  qualscore     0  score  10250  identity 0.88
+Overlap SVD__DN24990_c0_g1_i6+ and SVD__DN24990_c0_g1_i9+  C  lengths of diffs and sims: upper left 249  upper right 0  middle 651
+Overlap SVD__DN24990_c0_g1_i6+ and SVD__DN24990_c0_g1_i5+  C  qualscore     0  score  10880  identity 0.89
+Overlap SVD__DN24990_c0_g1_i6+ and SVD__DN24990_c0_g1_i4+  C  qualscore     0  score  10600  identity 0.88
+Overlap SVD__DN24990_c0_g1_i7+ and SVD_25Feb2019_y_c52+  P  qualscore     0  score  11370  identity 0.88
+Overlap SVD__DN24990_c0_g1_i7+ and SVD__DN24990_c0_g1_i5+  C  qualscore     0  score  12780  identity 0.90
+Overlap SVD__DN24990_c0_g1_i7+ and SVD__DN24990_c0_g1_i4+  C  qualscore     0  score  12500  identity 0.89
+Overlap SVD__DN24990_c0_g1_i9+ and SVD_25Feb2019_y_c52+  P  qualscore     0  score  11510  identity 0.88
+Overlap SVD__DN24990_c0_g1_i9+ and SVD__DN24990_c0_g1_i7+  C  lengths of diffs and sims: upper left 344  upper right 0  middle 651
+Overlap SVD__DN24990_c0_g1_i9+ and SVD__DN24990_c0_g1_i5+  C  erri 0.01 errj 0.01 error 0.09
+Overlap SVD__DN24990_c0_g1_i9+ and SVD__DN24990_c0_g1_i4+  C  qualscore     0  score  12850  identity 0.90
+Overlap SVD__DN24990_c0_g5_i1+ and SVD_25Feb2019_y_c52+  P  lengths of diffs and sims: upper left 39  upper right 117  middle 111
+Overlap SVD__DN24990_c0_g5_i1+ and SVD__DN24990_c0_g1_i9+  C  lengths of diffs and sims: upper left 0  upper right 159  middle 126
+Overlap SVD__DN24990_c0_g5_i1+ and SVD__DN24990_c0_g1_i4+  C  lengths of diffs and sims: upper left 0  upper right 159  middle 126
+Overlap SVD__DN24990_c0_g5_i1+ and SVD__DN25349_c0_g9_i1-  C  qualscore     0  score   3340  identity 0.88
+Overlap SVD_25Feb2019_y_c52+ and SVD__DN25061_c2_g3_i4-  P  qualscore     0  score     80  identity 0.73
+Overlap SVD_25Feb2019_y_c52+ and SVD__DN25061_c2_g3_i1-  P  qualscore     0  score   3240  identity 0.80
+Overlap SVD_25Feb2019_y_c52+ and SVD__DN24251_c1_g10_i3+  P  qualscore     0  score   4030  identity 0.89
+Number of overlaps removed: 143
+RemovePoorOverlaps done
+ASSEM done
+ComputDistForContigs done
+PresentLayout done
+Clip SVD__DN25061_c2_g1_i1 left clip: 1, right clip: 212,  length: 218,  right size 6
+Clip SVD__DN25061_c2_g4_i2 left clip: 1, right clip: 231,  length: 231,  right size 0
+Clip SVD__DN25061_c2_g5_i1 left clip: 1, right clip: 235,  length: 235,  right size 0
+Clip SVD__DN25061_c2_g3_i2 left clip: 1, right clip: 832,  length: 832,  right size 0
+Clip SVD__DN25061_c2_g3_i3 left clip: 1, right clip: 484,  length: 484,  right size 0
+Clip SVD_25Feb2019_y_c52 left clip: 13, right clip: 1595,  length: 1669,  right size 74
+Clip SVD__DN25061_c2_g6_i1 left clip: 5, right clip: 236,  length: 238,  right size 2
+Clip SVD__DN25061_c2_g4_i1 left clip: 5, right clip: 236,  length: 236,  right size 0
+Clip SVD__DN25349_c0_g7_i1 left clip: 67, right clip: 305,  length: 307,  right size 2
+Clip SVD__DN25349_c0_g10_i1 left clip: 67, right clip: 270,  length: 272,  right size 2
+Clip SVD__DN25349_c0_g9_i4 left clip: 1, right clip: 266,  length: 266,  right size 0
+Clip SVD__DN25349_c0_g9_i2 left clip: 1, right clip: 234,  length: 234,  right size 0
+Clip SVD__DN25349_c0_g9_i3 left clip: 1, right clip: 309,  length: 309,  right size 0
+Clip SVD__DN25349_c0_g9_i5 left clip: 1, right clip: 205,  length: 207,  right size 2
+Clip SVD__DN25349_c0_g9_i7 left clip: 67, right clip: 522,  length: 522,  right size 0
+Clip SVD__DN25349_c0_g9_i1 left clip: 1, right clip: 773,  length: 773,  right size 0
+Clip SVD__DN25061_c2_g3_i4 left clip: 1, right clip: 1255,  length: 1268,  right size 13
+Clip SVD__DN25061_c2_g3_i1 left clip: 1, right clip: 1202,  length: 1202,  right size 0
+Clip SVD__DN25061_c2_g2_i2 left clip: 1, right clip: 233,  length: 233,  right size 0
+Clip SVD__DN24990_c0_g1_i4 left clip: 1, right clip: 1043,  length: 1043,  right size 0
+Clip SVD__DN24990_c0_g1_i5 left clip: 1, right clip: 1043,  length: 1043,  right size 0
+Clip SVD__DN24990_c0_g1_i7 left clip: 1, right clip: 996,  length: 998,  right size 2
+Clip SVD__DN24990_c0_g5_i1 left clip: 1, right clip: 286,  length: 286,  right size 0
+Clip SVD__DN24990_c0_g1_i6 left clip: 1, right clip: 901,  length: 901,  right size 0
+Clip SVD__DN24990_c0_g1_i1 left clip: 1, right clip: 308,  length: 310,  right size 2

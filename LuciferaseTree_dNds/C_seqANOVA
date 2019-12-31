@@ -1,0 +1,32 @@
+#!/bin/bash
+
+module load singularity
+
+sing_image="/home/pcw/ubuntu_bioperl_biopy2.img" 
+
+#if [ $thehost = "pod-login1.podcluster" ]; then
+#        sing_image="/home/pcw/ubuntu_bioperl_biopy2.img"
+#fi
+#if [ $thehost = "galaxy-dev" ]; then
+#        echo Using host: $thehost
+#        sing_image="ubuntu_bioperl_biopy2.img"
+#
+#fi
+
+infile="sequences/combined_aa_ALN.fa"
+
+./scripts/meme2csv.pl results/hyphy/lucclade.meme.out > results/hyphy/lucclade.meme.csv
+
+singularity exec $sing_image perl scripts/fasta2csv.pl $infile > results/combined_aa.csv
+
+#Correspondence table of aligned site to ref site, in this case using Cypridina
+./scripts/make_seq_ref.pl sequences/combined_aa_ALN.fa Cypridina_noctiluca_BAD08210 > results/CypSites.csv
+<<<<<<< HEAD
+=======
+
+mutfile="results/Cyprindina_mutations.fasta"
+
+scripts/run_makemuts.sh sequences/published/Cypridina_noctiluca_BAD08210.fasta sequences/kawasaki_mutations.txt 454 > $mutfile
+
+singularity exec $sing_image perl scripts/fasta2csv.pl $mutfile > results/Cypridina_mutations.csv
+>>>>>>> 94603285f2da46352c5f9e871aa8e8b05c35abc0

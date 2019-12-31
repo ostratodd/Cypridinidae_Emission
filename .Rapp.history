@@ -338,251 +338,349 @@ for(n in names(mean_tauD)){#
   line = paste(c(n, tau_D, p), collapse='\t')#
   cat(line, '\n')#
 }
+execute(plotTree.R)
+dir()
 maindir <- "~/Documents/GitHub/Cypridinidae_EmissionSpectra/"#
-setwd(maindir)#
-#
+setwd(maindir)
+execute(plotTree.R)
+dir()
+source("plotTree.R")
 source("1_Emission_Functions.R")#
 source("2_Read_Datasets.R")#
 source("3_Calculate_parameters.R")#
 source("4_MutagenesisLuciferase.R")
-###############
-#Figure 3 - Expression of luciferase candidates in Pichia yeast#
-library(ggplot2); library(reshape2); library(dplyr); library(tidyverse); library(gridExtra)#
-setwd(maindir)#
-light_data <- read.csv("Raw Data/expression-kinetics/2019_pichia_assays.csv",header=TRUE)#
-light_data2 <- light_data %>% group_by(Species,type,sample,count_type,Concentration,date) %>% summarise(mean_cps = mean(cps_norm))#
+require(ggtree);#
+library(gridExtra); library(grid);#
+luc_tree <- read.newick(file="LuciferaseTree_dNds/results/phylogenies/combined_codon.treefile")#
+root(luc_tree, c("Vargula_hilgendorfii_AAA30332", "Cypridina_noctiluca_BAD08210")) -> luc_tree_root#
 #
-#Pichia yeast expression plot####
-sp <- c("Pichia","CNO","KHC","SVU","VTS")#
-light_data2$Species <- factor(light_data2$Species,levels=sp)#
-Figure3b <- ggplot(data=light_data2, aes(x = Species, y = log10(mean_cps),fill=count_type)) + geom_boxplot() +#
-  geom_point(position = position_jitterdodge()) + scale_discrete_manual(aes(x=sp)) +#
-  xlab("Species") + ylab(expression('log'[10]*'( CPS / Total Protein Conc. )')) +#
-  scale_fill_manual(values = c("#0092ff","grey"),name="Measures",labels=c("After + luciferin","Before")) +#
-  scale_x_discrete(labels=c("Pichia","C_noc","K_has","M_SVU","V_tsu")) +#
-  theme(legend.position = "none")#
+data.frame(pos_sel[-1]) -> ps_df; ps_df->ps_df_named;#
+rownames(ps_df_named) <- pos_sel$sp#
+#need to order rows the same as tree#
+ps_plot <- ggtree(luc_tree_root) + geom_tiplab(align=TRUE)#
 #
-	###############
-	#Mammalian expression#
-mam_data <- read.csv(file="Raw Data/expression-kinetics/2014_mammalian_assays.csv", header=TRUE)#
-#Add column for dilution*substrate#
-luciferin <- mam_data$dilution*mam_data$substrate#
-mam_data2 <- cbind(mam_data,luciferin)#
-mam_data <- mam_data2#
+mytheme <- gridExtra::ttheme_default(#
+    core = list(fg_params=list(cex = 1)),#
+    colhead = list(fg_params=list(cex = 1)),#
+    rowhead = list(fg_params=list(cex = 1)))#
 #
-#Subset data. the Soro-luc constructs did not have proper signal peptides#
-tsuluc <- grep("VtLa", mam_data$construct); tsujii <- mam_data[tsuluc,];#
-pmorluc <- grep("PhM", mam_data$construct); morini <- mam_data[pmorluc,]#
-svuluc <- grep("SVUluc", mam_data$construct); svu <- mam_data[svuluc,]#
-blank <- grep("Blank", mam_data$construct); blankcells <- mam_data[blank,]#
-hek <- grep("HEK", mam_data$construct); hekcells <- mam_data[hek,]#
-mam_combine <- rbind(tsujii, morini, hekcells, blankcells, svu)#
-subset(mam_combine, log(luciferin) > 6.5) -> maxluc#
+tt3 <- ttheme_default(#
+  core=list(bg_params = list(fill = blues9[1:2], col=NA),#
+            fg_params=list(fontface=1)),#
+  colhead=list(fg_params=list(col="navyblue", fontface=1)),#
+  rowhead=list(fg_params=list(col="white")));#
 #
-Figure3a <- ggplot(data=maxluc, aes(x=construct, y=log10(light), fill=construct)) + scale_fill_manual(values=c("grey","grey","#0092ff","#0092ff","#0092ff")) + geom_boxplot() + geom_jitter() + xlab("Species") + ylab(expression('log'[10]*'( Counts Per Second)')) +#
-  scale_x_discrete(labels = c("Blank", "HEK", "P_mor", "M_SVU", "V_tsu")) +#
-  theme(legend.position = "none")#
-#
-grid.arrange(Figure3a, Figure3b, nrow = 1) -> Figure3
-#Supplemental Figure S1#
+quartz("Figure 4", 15, 5) #
+tableGrob(ps_df_named, theme=mytheme)->ps_table#
+grid.arrange(ps_plot, ps_table, ncol=2)
 require(ape)#
 require(phytools)#
 read.tree(file="./LuciferaseTree_dNds/results/phylogenies/all_aa.treefile") -> lucplus_tree#
 midpoint.root(lucplus_tree) -> lucplus_tree_r#
 ladderize(lucplus_tree_r)-> lprl#
-plot(lprl, show.tip.label=TRUE, cex=.8, x.lim=2)
-#Figure 3 - Expression of luciferase candidates in Pichia yeast#
-library(ggplot2); library(reshape2); library(dplyr); library(tidyverse); library(gridExtra)#
-setwd(maindir)#
-light_data <- read.csv("Raw Data/expression-kinetics/2019_pichia_assays.csv",header=TRUE)#
-light_data2 <- light_data %>% group_by(Species,type,sample,count_type,Concentration,date) %>% summarise(mean_cps = mean(cps_norm))#
+plot(lprl, show.tip.label=TRUE, cex=.8, x.lim=2)#
 #
-#Pichia yeast expression plot####
-sp <- c("Pichia","CNO","KHC","SVU","VTS")#
-light_data2$Species <- factor(light_data2$Species,levels=sp)#
-Figure3b <- ggplot(data=light_data2, aes(x = Species, y = log10(mean_cps),fill=count_type)) + geom_boxplot() +#
-  geom_point(position = position_jitterdodge()) + scale_discrete_manual(aes(x=sp)) +#
-  xlab("Species") + ylab(expression('log'[10]*'( CPS / Total Protein Conc. )')) +#
-  scale_fill_manual(values = c("#0092ff","grey"),name="Measures",labels=c("After + luciferin","Before")) +#
-  scale_x_discrete(labels=c("Pichia","C_noc","K_has","M_SVU","V_tsu")) +#
-  theme(legend.position = "none")#
+#Supplemental Figure S2#
+#Created with prettyplot#
 #
-	###############
-	#Mammalian expression#
-mam_data <- read.csv(file="Raw Data/expression-kinetics/2014_mammalian_assays.csv", header=TRUE)#
-#Add column for dilution*substrate#
-luciferin <- mam_data$dilution*mam_data$substrate#
-mam_data2 <- cbind(mam_data,luciferin)#
-mam_data <- mam_data2#
+#############
+#Figure XX - Do + selected sites predict color or kinetics?#
+library(gridExtra); library(grid); require(janitor);#
+library(MuMIn);#
 #
-#Subset data. the Soro-luc constructs did not have proper signal peptides#
-tsuluc <- grep("VtLa", mam_data$construct); tsujii <- mam_data[tsuluc,];#
-pmorluc <- grep("PhM", mam_data$construct); morini <- mam_data[pmorluc,]#
-svuluc <- grep("SVUluc", mam_data$construct); svu <- mam_data[svuluc,]#
-blank <- grep("Blank", mam_data$construct); blankcells <- mam_data[blank,]#
-hek <- grep("HEK", mam_data$construct); hekcells <- mam_data[hek,]#
-mam_combine <- rbind(tsujii, morini, hekcells, blankcells, svu)#
-subset(mam_combine, log(luciferin) > 6.5) -> maxluc#
+#Read in luciferase alignment and sites under selection#
+dat <- read.csv("LuciferaseTree_dNds/results/combined_aa.csv",header=FALSE, stringsAsFactors=FALSE, colClasses = c("character"))#
+#Columns are +1 compared to meme due to sp colum#
+#Next command alters numbers by 1 to account for this and name species column sp#
+colnames(dat)[2:ncol(dat)] <- paste("s",seq(1,(ncol(dat)-1)),sep="")#
+colnames(dat)[1] <- "sp"#
+require(tidyverse)#
+dat %>% arrange(sp) -> dat #sort by species name #
+#Here is aligned amino acid file used for codon alignment. #
+#Read results in csv from meme selection analysis, including positively selected sites#
+meme <- read.csv("LuciferaseTree_dNds/results/hyphy/lucclade.meme.csv",header=TRUE)#
+#Pull positively selected sites using vector of output table from meme#
+pos_sel <- dat[,c("sp",paste("s",meme$Codon, sep=""))]#
+#decay file has translation of different codes between datasets#
+decay <- read.csv("Raw Data/expression-kinetics/decay_averages_all_for comparison_with_color.csv",header=TRUE)
+maindir <- "~/Documents/GitHub/Cypridinidae_EmissionSpectra/"#
+setwd(maindir)
+#Figure XX - Do + selected sites predict color or kinetics?#
+library(gridExtra); library(grid); require(janitor);#
+library(MuMIn);#
 #
-Figure3a <- ggplot(data=maxluc, aes(x=construct, y=log10(light), fill=construct)) + scale_fill_manual(values=c("grey","grey","#0092ff","#0092ff","#0092ff")) + geom_boxplot() + geom_jitter() + xlab("Species") + ylab(expression('log'[10]*'( Counts Per Second)')) +#
-  scale_x_discrete(labels = c("Blank", "HEK", "P_mor", "M_SVU", "V_tsu")) +#
-  theme(legend.position = "none")#
+#Read in luciferase alignment and sites under selection#
+dat <- read.csv("LuciferaseTree_dNds/results/combined_aa.csv",header=FALSE, stringsAsFactors=FALSE, colClasses = c("character"))#
+#Columns are +1 compared to meme due to sp colum#
+#Next command alters numbers by 1 to account for this and name species column sp#
+colnames(dat)[2:ncol(dat)] <- paste("s",seq(1,(ncol(dat)-1)),sep="")#
+colnames(dat)[1] <- "sp"#
+require(tidyverse)#
+dat %>% arrange(sp) -> dat #sort by species name #
+#Here is aligned amino acid file used for codon alignment. #
+#Read results in csv from meme selection analysis, including positively selected sites#
+meme <- read.csv("LuciferaseTree_dNds/results/hyphy/lucclade.meme.csv",header=TRUE)#
+#Pull positively selected sites using vector of output table from meme#
+pos_sel <- dat[,c("sp",paste("s",meme$Codon, sep=""))]#
+#decay file has translation of different codes between datasets#
+decay <- read.csv("Raw Data/expression-kinetics/decay_averages_all_for comparison_with_color.csv",header=TRUE)#
+#***********color#
+table1 <- read.table(file="Table1.txt", sep="\t", header=TRUE) #Read again if not executed above#
+translate <- read.csv("Raw Data/expression-kinetics/translate_lucname_decayname.csv",header=TRUE)#
+tmpmerge <- merge(translate, table1, by='Species')#
+lucNcolor <- merge(dat, tmpmerge, by='sp')#
+pos_sel_col <- lucNcolor[,c("sp",paste("s",meme$Codon, sep=""),"Lmax_Mean", "FWHM_Mean")]#
+remove_constant(pos_sel_col)->pos_sel_col ##Invariant sites because luc varies in spp without color data #
 #
-grid.arrange(Figure3a, Figure3b, nrow = 1) -> Figure3
-require(ape)#
-require(phytools)#
-read.tree(file="./LuciferaseTree_dNds/results/phylogenies/all_aa.treefile") -> lucplus_tree#
-midpoint.root(lucplus_tree) -> lucplus_tree_r#
-ladderize(lucplus_tree_r)-> lprl#
-plot(lprl, show.tip.label=TRUE, cex=.8, x.lim=2)
-source("1_Emission_Functions.R")
-source("2_Read_Datasets.R")
-source("3_Calculate_parameters.R")
-#Table 1 - lmax and fwhm for all species studied#
+options(na.action = "na.fail")#
+#doesn't work inside lm function but can cut and paste manually -- no invariant sites for color#
+paste(colnames(pos_sel_col)[4:ncol(pos_sel_col)-2], collapse=" + "   )#
 #
-#First remove runs where signal:noise is too low#
-clean <- subset(alldata, error < 0.02 | replicate=="Vhil_tsuji" | replicate=="Cnoc_ohmiya" | replicate=="Pgra_huvard")#
-#calculate means, SDs, and counts, grouped by abbreviation#
-aggregate(clean[, 9:10], list(clean$abbreviation), FUN=mean) -> means#
-aggregate(clean[, 9:10], list(clean $abbreviation), FUN=sd) -> sds#
-aggregate(clean[, 9:10], list(clean $abbreviation), FUN=length) -> counts#
-#Now construct data frame as table for above information#
-cbind(subset(means, select="Group.1"), counts$sgMax, signif(means$sgMax,4), signif(sds$sgMax,2), signif(means$sgfwhm,4), signif(sds$sgfwhm,2)) -> table1#
-colnames(table1)[c(1,2,3,4,5,6)] <- c("Species", "N", "Lmax_Mean", "Lmax_SD", "FWHM_Mean", "FWHM_SD")#
-table1#
-	#now write to text file#
-write.table(table1, file = "Table1.txt", sep="\t")#
+colorlm_fel <- lm(Lmax_Mean ~ s43 + s209, data=pos_sel_col)#
+colorlm <- lm(Lmax_Mean ~ s41 + s93 + s102 + s142 + s160 + s177 + s189 + s261 + s285 + s291 + s320 + s389 + s477, data=pos_sel_col)#
+fwhmlm <- lm(FWHM_Mean ~ s41 + s93 + s102 + s142 + s160 + s177 + s189 + s261 + s285 + s291 + s320 + s389 + s477, data=pos_sel_col)
+pos_sel
+library(gridExtra); library(grid); require(janitor);#
+library(MuMIn);#
 #
-#Table 2 - ANOVA results for 5 ‘mutagenesis sites’ using all data from mutagenesis study and available species’ luciferases#
-anova(lm(lmax ~ X38 * X178 * X375 * X404 * X405, data=cn)) -> table2#
-write.table(table2, file = "Table2.txt", sep="\t")
-#Figure 1 - Box plot of all lmax of species#
-require(ggplot2)#
-clean <- subset(alldata, error < 0.02 | replicate=="Vhil_tsuji" | replicate=="Cnoc_ohmiya" | replicate=="Pgra_huvard")#
-quartz("Figure 1", 13, 3)#
-fig1 <- qplot(abbreviation, sgMax, data=clean, geom=c("boxplot", "jitter")) + ylab("Lambda max (nm)") + xlab("Species")#
-	#highlight data with rectangles#
-	#add green blue shading w/ rectangle (geom_rect). This uses y-co-ordinates as min and max of photeros (green) and non-photeros (blue). facet_grid sorts into panels by collection locality#
-t2.rect1 <- data.frame (xmin=-Inf, xmax=Inf, ymin=463.97, ymax=471.14)#
-t1.rect1 <- data.frame (xmin=-Inf, xmax=Inf, ymin=454.27, ymax=463.42)#
+#Read in luciferase alignment and sites under selection#
+dat <- read.csv("LuciferaseTree_dNds/results/combined_aa.csv",header=FALSE, stringsAsFactors=FALSE, colClasses = c("character"))#
+#Columns are +1 compared to meme due to sp colum#
+#Next command alters numbers by 1 to account for this and name species column sp#
+colnames(dat)[2:ncol(dat)] <- paste("s",seq(1,(ncol(dat)-1)),sep="")#
+colnames(dat)[1] <- "sp"#
+require(tidyverse)#
+dat %>% arrange(sp) -> dat #sort by species name #
+#Here is aligned amino acid file used for codon alignment. #
+#Read results in csv from meme selection analysis, including positively selected sites#
+meme <- read.csv("LuciferaseTree_dNds/results/hyphy/lucclade.meme.csv",header=TRUE)#
+#Pull positively selected sites using vector of output table from meme#
+pos_sel <- dat[,c("sp",paste("s",meme$Codon, sep=""))]#
+#decay file has translation of different codes between datasets#
+decay <- read.csv("Raw Data/expression-kinetics/decay_averages_all_for comparison_with_color.csv",header=TRUE)
+require(ggtree);#
+library(gridExtra); library(grid);#
+luc_tree <- read.newick(file="LuciferaseTree_dNds/results/phylogenies/combined_codon.treefile")#
+root(luc_tree, c("Vargula_hilgendorfii_AAA30332", "Cypridina_noctiluca_BAD08210")) -> luc_tree_root#
 #
-fig1 + geom_rect(data=t2.rect1, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax), fill="green", alpha=0.1, inherit.aes = FALSE) + geom_rect(data=t1.rect1, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax), fill="blue", alpha=0.07, inherit.aes = FALSE)  + facet_grid(cols = vars(locality), scales = "free_x", switch = "x", space = "free")
-source("2_Read_Datasets.R")
-source("3_Calculate_parameters.R")
-#Table 1 - lmax and fwhm for all species studied#
+data.frame(pos_sel[-1]) -> ps_df; ps_df->ps_df_named;#
+rownames(ps_df_named) <- pos_sel$sp#
+#need to order rows the same as tree#
+ps_plot <- ggtree(luc_tree_root) + geom_tiplab(align=TRUE)#
 #
-#First remove runs where signal:noise is too low#
-clean <- subset(alldata, error < 0.02 | replicate=="Vhil_tsuji" | replicate=="Cnoc_ohmiya" | replicate=="Pgra_huvard")#
-#calculate means, SDs, and counts, grouped by abbreviation#
-aggregate(clean[, 9:10], list(clean$abbreviation), FUN=mean) -> means#
-aggregate(clean[, 9:10], list(clean $abbreviation), FUN=sd) -> sds#
-aggregate(clean[, 9:10], list(clean $abbreviation), FUN=length) -> counts#
-#Now construct data frame as table for above information#
-cbind(subset(means, select="Group.1"), counts$sgMax, signif(means$sgMax,4), signif(sds$sgMax,2), signif(means$sgfwhm,4), signif(sds$sgfwhm,2)) -> table1#
-colnames(table1)[c(1,2,3,4,5,6)] <- c("Species", "N", "Lmax_Mean", "Lmax_SD", "FWHM_Mean", "FWHM_SD")#
-table1#
-	#now write to text file#
-write.table(table1, file = "Table1.txt", sep="\t")
-alldata
-alldata
-source("3_Calculate_parameters.R")
-#Table 1 - lmax and fwhm for all species studied#
+mytheme <- gridExtra::ttheme_default(#
+    core = list(fg_params=list(cex = 1)),#
+    colhead = list(fg_params=list(cex = 1)),#
+    rowhead = list(fg_params=list(cex = 1)))#
 #
-#First remove runs where signal:noise is too low#
-clean <- subset(alldata, error < 0.02 | replicate=="Vhil_tsuji" | replicate=="Cnoc_ohmiya" | replicate=="Pgra_huvard")#
-#calculate means, SDs, and counts, grouped by abbreviation#
-aggregate(clean[, 9:10], list(clean$abbreviation), FUN=mean) -> means#
-aggregate(clean[, 9:10], list(clean $abbreviation), FUN=sd) -> sds#
-aggregate(clean[, 9:10], list(clean $abbreviation), FUN=length) -> counts#
-#Now construct data frame as table for above information#
-cbind(subset(means, select="Group.1"), counts$sgMax, signif(means$sgMax,4), signif(sds$sgMax,2), signif(means$sgfwhm,4), signif(sds$sgfwhm,2)) -> table1#
-colnames(table1)[c(1,2,3,4,5,6)] <- c("Species", "N", "Lmax_Mean", "Lmax_SD", "FWHM_Mean", "FWHM_SD")#
-table1
-alldata
-#Figure 2 - Box plot of all fwhm of species#
-require(ggplot2)#
-clean <- subset(alldata, error < 0.02 | replicate=="Vhil_tsuji" | replicate=="Cnoc_ohmiya" | replicate=="Pgra_huvard")#
+tt3 <- ttheme_default(#
+  core=list(bg_params = list(fill = blues9[1:2], col=NA),#
+            fg_params=list(fontface=1)),#
+  colhead=list(fg_params=list(col="navyblue", fontface=1)),#
+  rowhead=list(fg_params=list(col="white")));
+plotTree(tree=luc_tree_root,infoFile=pos_sel)
+plotTree(tree=luc_tree_root,infoFile=pos_sel, infoCols=c("s41", s93))
+plotTree(tree=luc_tree_root,infoFile=pos_sel, infoCols=c("s41", "s93"))
+pos_sel
+pos_sel_df
+plotTree(tree=luc_tree_root,infoFile=pos_sel, treeWidth=10,infoWidth=10, infoCols=c("s41", "s93"))
+plotTree(tree=luc_tree_root,infoFile=pos_sel, treeWidth=10,infoWidth=10, infoCols=c("s41", "s93"))
+plot(tree_luc_root)
+plot(luc_tree_root)
+luc_tree_root
+plotTree(tree=luc_tree_root,infoFile=pos_sel, treeWidth=10,infoWidth=10, infoCols=c("s41", "s93"))
+plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.colour.cex=1,cluster=T,tipColours=c("black","purple2","skyblue2","grey"),lwd=1, infoFile=pos_sel, treeWidth=10,infoWidth=10, infoCols=c("s41", "s93"))
+data.frame(pos_sel[-1]) -> ps_df; ps_df->ps_df_named;#
+rownames(ps_df_named) <- pos_sel$sp
+pos_sel_named
+ps_df_named
+plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.colour.cex=1,cluster=T,tipColours=c("black","purple2","skyblue2","grey"),lwd=1, infoFile=ps_df_named, treeWidth=10,infoWidth=10, infoCols=c("s41", "s93"))
+plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.colour.cex=1,cluster=T,tipColours=c("black","purple2","skyblue2","grey"),lwd=1, infoFile=ps_df_named, treeWidth=10,infoWidth=10, infoCols=c("s41", "s93"))
+plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE,lwd=1, infoFile=ps_df_named, treeWidth=10,infoWidth=10, infoCols=c("s41", "s93"))
+plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE,lwd=1, infoFile=ps_df_named, treeWidth=15,infoWidth=10, infoCols=c("s41", "s93"))
+plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE,lwd=1, infoFile=ps_df_named, treeWidth=25,infoWidth=10, infoCols=c("s41", "s93"))
+plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE,lwd=1, infoFile=ps_df_named, treeWidth=25,infoWidth=10, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177"))
+plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE,lwd=1, infoFile=ps_df_named, treeWidth=25,infoWidth=10, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
+help(plotTree)
+source("plotTree.R")
+luc_tree <- read.newick(file="LuciferaseTree_dNds/results/phylogenies/combined_codon.treefile")#
+root(luc_tree, c("Vargula_hilgendorfii_AAA30332", "Cypridina_noctiluca_BAD08210")) -> luc_tree_root#
+#CURRENTLY must read positively selected site with code below#
 #
-quartz("Figure 2", 13, 3)#
-fig2 <- qplot(abbreviation, sgfwhm, data=clean, geom=c("boxplot", "jitter")) + ylab("FWHM (nm)") + xlab("Species")#
-fig2 + facet_grid(cols = vars(locality), scales = "free_x", switch = "x", space = "free")
-fig1 <- qplot(abbreviation, sgMax, data=clean, geom=c("boxplot", "jitter")) + ylab("Lambda max (nm)") + xlab("Species")#
-	#highlight data with rectangles#
-	#add green blue shading w/ rectangle (geom_rect). This uses y-co-ordinates as min and max of photeros (green) and non-photeros (blue). facet_grid sorts into panels by collection locality#
-t2.rect1 <- data.frame (xmin=-Inf, xmax=Inf, ymin=463.97, ymax=471.14)#
-t1.rect1 <- data.frame (xmin=-Inf, xmax=Inf, ymin=454.27, ymax=463.42)#
+data.frame(pos_sel[-1]) -> ps_df; ps_df->ps_df_named;#
+rownames(ps_df_named) <- pos_sel$sp#
+source("plotTree.R")#
 #
-fig1 + geom_rect(data=t2.rect1, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax), fill="green", alpha=0.1, inherit.aes = FALSE) + geom_rect(data=t1.rect1, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax), fill="blue", alpha=0.07, inherit.aes = FALSE)  + facet_grid(cols = vars(locality), scales = "free_x", switch = "x", space = "free")
-require(ggplot2)#
-clean <- subset(alldata, error < 0.02 | replicate=="Vhil_tsuji" | replicate=="Cnoc_ohmiya" | replicate=="Pgra_huvard")#
-quartz("Figure 1", 13, 3)#
-fig1 <- qplot(abbreviation, sgMax, data=clean, geom=c("boxplot", "jitter")) + ylab("Lambda max (nm)") + xlab("Species")#
-	#highlight data with rectangles#
-	#add green blue shading w/ rectangle (geom_rect). This uses y-co-ordinates as min and max of photeros (green) and non-photeros (blue). facet_grid sorts into panels by collection locality#
-t2.rect1 <- data.frame (xmin=-Inf, xmax=Inf, ymin=463.97, ymax=471.14)#
-t1.rect1 <- data.frame (xmin=-Inf, xmax=Inf, ymin=454.27, ymax=463.42)#
+plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE,lwd=1, infoFile=ps_df_named, treeWidth=25,infoWidth=10, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
+quartz("Figure 4", 13, 5)#
+plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE,lwd=1, infoFile=ps_df_named, treeWidth=25,infoWidth=10, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
+quartz("Figure 4", 12, 4)#
+plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE,lwd=1, infoFile=ps_df_named, treeWidth=25,infoWidth=10, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
+quartz("Figure 4", 10, 4)#
+plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE,lwd=1, infoFile=ps_df_named, treeWidth=25,infoWidth=10, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
+source("plotTree.R")#
+quartz("Figure 4", 10, 4)#
+plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE,lwd=2, align.tip.label = TRUE, infoFile=ps_df_named, treeWidth=25,infoWidth=10, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
+plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE,lwd=2, infoFile=ps_df_named, treeWidth=25,infoWidth=10, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
+quartz("Figure 4", 10, 4)#
+plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE,lwd=2, infoFile=ps_df_named, treeWidth=25,infoWidth=10, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
+luc_tree <- read.newick(file="LuciferaseTree_dNds/results/phylogenies/combined_codon.treefile")#
+root(luc_tree, c("Vargula_hilgendorfii_AAA30332", "Cypridina_noctiluca_BAD08210")) -> luc_tree_root#
+#CURRENTLY must read positively selected site with code below#
 #
-fig1 + geom_rect(data=t2.rect1, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax), fill="green", alpha=0.1, inherit.aes = FALSE) + geom_rect(data=t1.rect1, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax), fill="blue", alpha=0.07, inherit.aes = FALSE)  + facet_grid(cols = vars(locality), scales = "free_x", switch = "x", space = "free")
-#Figure 1 - Box plot of all lmax of species#
-require(ggplot2)#
-clean <- subset(alldata, error < 0.02 | replicate=="Vhil_tsuji" | replicate=="Cnoc_ohmiya" | replicate=="Pgra_huvard")#
-quartz("Figure 1", 13, 3)#
-fig1 <- qplot(abbreviation, sgMax, data=clean, geom=c("boxplot", "jitter")) + ylab("Lambda max (nm)") + xlab("Species")#
-	#highlight data with rectangles#
-	#add green blue shading w/ rectangle (geom_rect). This uses y-co-ordinates as min and max of photeros (green) and non-photeros (blue). facet_grid sorts into panels by collection locality#
-t2.rect1 <- data.frame (xmin=-Inf, xmax=Inf, ymin=463.97, ymax=471.14)#
-t1.rect1 <- data.frame (xmin=-Inf, xmax=Inf, ymin=454.27, ymax=463.42)#
+data.frame(pos_sel[-1]) -> ps_df; ps_df->ps_df_named;#
+rownames(ps_df_named) <- pos_sel$sp#
+source("plotTree.R")#
+quartz("Figure 4", 10, 4)#
+plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE,lwd=2, infoFile=ps_df_named, treeWidth=25,infoWidth=10, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
+source("plotTree.R")#
+quartz("Figure 4", 10, 4)#
+plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE,lwd=2, infoFile=ps_df_named, treeWidth=25,infoWidth=10, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
+source("plotTree.R")#
+quartz("Figure 4", 10, 4)#
+plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE,lwd=2, infoFile=ps_df_named, treeWidth=25,infoWidth=10, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
+quartz("Figure 4", 10, 4)
+plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE, lwd=2, infoFile=ps_df_named, treeWidth=25,infoWidth=10, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
+root(luc_tree, c("Vargula_hilgendorfii_AAA30332", "Cypridina_noctiluca_BAD08210"), resolve.root=TRUE) -> luc_tree_root
+data.frame(pos_sel[-1]) -> ps_df; ps_df->ps_df_named;
+rownames(ps_df_named) <- pos_sel$sp
+source("plotTree.R")
+quartz("Figure 4", 10, 4)
+plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE, lwd=2, infoFile=ps_df_named, treeWidth=25,infoWidth=10, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
+quartz("Figure 4", 10, 4)#
+plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE, lwd=2, infoFile=ps_df_named, treeWidth=5,infoWidth=5, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
+plot(luc_tree)
+plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE, lwd=2, infoFile=ps_df_named, treeWidth=5,infoWidth=5, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
+quartz("Figure 4", 10, 4)#
+plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE, lwd=2, infoFile=ps_df_named, treeWidth=5,infoWidth=5, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
+help(reroot)
+reroot(luc_tree, c("Vargula_hilgendorfii_AAA30332", "Cypridina_noctiluca_BAD08210"), resolve.root=TRUE) -> luc_tree_root
+reroot(luc_tree, c("Vargula_hilgendorfii_AAA30332", "Cypridina_noctiluca_BAD08210"), resolve.root=TRUE)
+plot(luc_tree)
+nodelabels()
+plot(luc_tree, tip.labels=FALSE)
+plot.phylo(luc_tree, tip.labels=FALSE)
+plot.phylo(luc_tree, use.edge.length=FALSE)
+plot.phylo(luc_tree, use.edge.length=FALSE, show.tip.label=FALSE, show.node.label=TRUE)
+nodelabels()
+reroot(luc_tree, 16, resolve.root=TRUE) -> luc_tree_root
+luc_tree <- read.newick(file="LuciferaseTree_dNds/results/phylogenies/combined_codon.treefile")
+reroot(luc_tree, 16, resolve.root=TRUE) -> luc_tree_root
+help(read.newick)
+read.newick(file="LuciferaseTree_dNds/results/phylogenies/combined_codon.treefile")
+read.newick(file="LuciferaseTree_dNds/results/phylogenies/combined_codon.treefile") -> lt
+reroot(luc_tree, 16, resolve.root=TRUE) -> lt
+reroot(luc_tree, 15, resolve.root=TRUE) -> lt
+plot(lt)
+nodelabels()
+reroot(luc_tree, 17, resolve.root=TRUE) -> lt
+plot(lt)
+reroot(luc_tree, 29, resolve.root=TRUE) -> lt
+nodelabels()
+reroot(luc_tree, 16, resolve.root=TRUE) -> lt
+reroot(luc_tree, 29, resolve.root=TRUE) -> lt
+reroot(luc_tree, 17, resolve.root=TRUE) -> lt
+plot(lt)
+reroot(luc_tree, 17, resolve.root=TRUE, .5) -> lt
+plot(lt)
+reroot(luc_tree, 17, resolve.root=TRUE, .5) -> luc_tree_root #root tree at midpoint of branch, which ape does not like to do
+data.frame(pos_sel[-1]) -> ps_df; ps_df->ps_df_named;#
+rownames(ps_df_named) <- pos_sel$sp#
+source("plotTree.R")#
+quartz("Figure 4", 10, 4)#
+plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE, lwd=2, infoFile=ps_df_named, treeWidth=5,infoWidth=5, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
+luc_tree <- read.newick(file="LuciferaseTree_dNds/results/phylogenies/combined_codon.treefile")#
+#root(luc_tree, c("Vargula_hilgendorfii_AAA30332", "Cypridina_noctiluca_BAD08210"), resolve.root=TRUE) -> luc_tree_root#
+reroot(luc_tree, 17, resolve.root=TRUE, .5) -> luc_tree_root #root tree at midpoint of branch, which ape does not like to do#
 #
-fig1 + geom_rect(data=t2.rect1, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax), fill="green", alpha=0.1, inherit.aes = FALSE) + geom_rect(data=t1.rect1, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax), fill="blue", alpha=0.07, inherit.aes = FALSE)  + facet_grid(cols = vars(locality), scales = "free_x", switch = "x", space = "free")
-require(ggplot2)#
-clean <- subset(alldata, error < 0.02 | replicate=="Vhil_tsuji" | replicate=="Cnoc_ohmiya" | replicate=="Pgra_huvard")#
+#CURRENTLY must read positively selected site with code below#
 #
-quartz("Figure 2", 13, 3)#
-fig2 <- qplot(abbreviation, sgfwhm, data=clean, geom=c("boxplot", "jitter")) + ylab("FWHM (nm)") + xlab("Species")#
-fig2 + facet_grid(cols = vars(locality), scales = "free_x", switch = "x", space = "free")#
-#
-###############
-#Figure 3 - Expression of luciferase candidates in Pichia yeast#
-library(ggplot2); library(reshape2); library(dplyr); library(tidyverse); library(gridExtra)#
-setwd(maindir)#
-light_data <- read.csv("Raw Data/expression-kinetics/2019_pichia_assays.csv",header=TRUE)#
-light_data2 <- light_data %>% group_by(Species,type,sample,count_type,Concentration,date) %>% summarise(mean_cps = mean(cps_norm))
-source("3_Calculate_parameters.R")
-#Table 1 - lmax and fwhm for all species studied#
-#
-#First remove runs where signal:noise is too low#
-clean <- subset(alldata, error < 0.02 | replicate=="Vhil_tsuji" | replicate=="Cnoc_ohmiya" | replicate=="Pgra_huvard")#
-#calculate means, SDs, and counts, grouped by abbreviation#
-aggregate(clean[, 9:10], list(clean$abbreviation), FUN=mean) -> means#
-aggregate(clean[, 9:10], list(clean $abbreviation), FUN=sd) -> sds#
-aggregate(clean[, 9:10], list(clean $abbreviation), FUN=length) -> counts#
-#Now construct data frame as table for above information#
-cbind(subset(means, select="Group.1"), counts$sgMax, signif(means$sgMax,4), signif(sds$sgMax,2), signif(means$sgfwhm,4), signif(sds$sgfwhm,2)) -> table1#
-colnames(table1)[c(1,2,3,4,5,6)] <- c("Species", "N", "Lmax_Mean", "Lmax_SD", "FWHM_Mean", "FWHM_SD")#
-table1
-#now write to text file#
-write.table(table1, file = "Table1.txt", sep="\t")
-#Figure 1 - Box plot of all lmax of species#
-require(ggplot2)#
-clean <- subset(alldata, error < 0.02 | replicate=="Vhil_tsuji" | replicate=="Cnoc_ohmiya" | replicate=="Pgra_huvard")#
-quartz("Figure 1", 13, 3)#
-fig1 <- qplot(abbreviation, sgMax, data=clean, geom=c("boxplot", "jitter")) + ylab("Lambda max (nm)") + xlab("Species")#
-	#highlight data with rectangles#
-	#add green blue shading w/ rectangle (geom_rect). This uses y-co-ordinates as min and max of photeros (green) and non-photeros (blue). facet_grid sorts into panels by collection locality#
-t2.rect1 <- data.frame (xmin=-Inf, xmax=Inf, ymin=463.97, ymax=471.14)#
-t1.rect1 <- data.frame (xmin=-Inf, xmax=Inf, ymin=454.27, ymax=463.42)#
-#
-fig1 + geom_rect(data=t2.rect1, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax), fill="green", alpha=0.1, inherit.aes = FALSE) + geom_rect(data=t1.rect1, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax), fill="blue", alpha=0.07, inherit.aes = FALSE)  + facet_grid(cols = vars(locality), scales = "free_x", switch = "x", space = "free")
-require(ggplot2)#
-clean <- subset(alldata, error < 0.02 | replicate=="Vhil_tsuji" | replicate=="Cnoc_ohmiya" | replicate=="Pgra_huvard")#
-#
-quartz("Figure 2", 13, 3)#
-fig2 <- qplot(abbreviation, sgfwhm, data=clean, geom=c("boxplot", "jitter")) + ylab("FWHM (nm)") + xlab("Species")#
-fig2 + facet_grid(cols = vars(locality), scales = "free_x", switch = "x", space = "free")
-#Supplemental Figure S1#
-require(ape)#
-require(phytools)#
-read.tree(file="./LuciferaseTree_dNds/results/phylogenies/all_aa.treefile") -> lucplus_tree#
-midpoint.root(lucplus_tree) -> lucplus_tree_r#
-ladderize(lucplus_tree_r)-> lprl#
-plot(lprl, show.tip.label=TRUE, cex=.8, x.lim=2)
+data.frame(pos_sel[-1]) -> ps_df; ps_df->ps_df_named;#
+rownames(ps_df_named) <- pos_sel$sp#
+source("plotTree.R")#
+quartz("Figure 4", 10, 4)#
+plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE, lwd=1, infoFile=ps_df_named, treeWidth=5,infoWidth=5, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
+ladderize(luc_tree, right=TRUE) -> luc_tree
+reroot(luc_tree, 17, resolve.root=TRUE, .5) -> luc_tree_root #root tree at midpoint of branch, which ape does not like to do
+data.frame(pos_sel[-1]) -> ps_df; ps_df->ps_df_named;#
+rownames(ps_df_named) <- pos_sel$sp#
+source("plotTree.R")#
+quartz("Figure 4", 10, 4)#
+plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE, lwd=1, infoFile=ps_df_named, treeWidth=5,infoWidth=5, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
+quartz("Figure 4", 10, 4)#
+plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE, lwd=1, infoFile=ps_df_named, treeWidth=7,infoWidth=5, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
+luc_tree <- read.newick(file="LuciferaseTree_dNds/results/phylogenies/combined_codon.treefile")#
+#root(luc_tree, c("Vargula_hilgendorfii_AAA30332", "Cypridina_noctiluca_BAD08210"), resolve.root=TRUE) -> luc_tree_root#
+ladderize(luc_tree, right=TRUE) -> luc_tree#
+reroot(luc_tree, 17, resolve.root=TRUE, .5) -> luc_tree_root #root tree at midpoint of branch, which ape does not like to do#
+#Here is aligned amino acid file used for codon alignment. #
+alignment <- read.csv("LuciferaseTree_dNds/results/combined_aa.csv",header=FALSE, stringsAsFactors=FALSE, colClasses = c("character"))#
+#Columns are +1 compared to meme due to sp colum Next command alters numbers by 1 to account for this and name species column sp#
+colnames(alignment)[2:ncol(alignment)] <- paste("s",seq(1,(ncol(alignment)-1)),sep=""); colnames(alignment)[1] <- "sp"#
+#Read results in csv from meme selection analysis, including positively selected sites#
+meme <- read.csv("LuciferaseTree_dNds/results/hyphy/lucclade.meme.csv",header=TRUE)#
+#Pull positively selected sites using vector of output table from meme#
+pos_sel <- alignment[,c("sp",paste("s",meme$Codon, sep=""))]#
+data.frame(pos_sel[-1]) -> ps_df; ps_df->ps_df_named;#
+rownames(ps_df_named) <- pos_sel$sp#
+source("plotTree.R")#
+quartz("Figure 4", 10, 4)#
+plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE, lwd=1, infoFile=ps_df_named, treeWidth=7,infoWidth=5, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
+luc_tree <- read.newick(file="LuciferaseTree_dNds/results/phylogenies/combined_codon.treefile")#
+#root(luc_tree, c("Vargula_hilgendorfii_AAA30332", "Cypridina_noctiluca_BAD08210"), resolve.root=TRUE) -> luc_tree_root#
+ladderize(luc_tree, right=TRUE) -> luc_tree#
+reroot(luc_tree, 17, resolve.root=TRUE, .5) -> luc_tree_root #root tree at midpoint of branch, which ape does not like to do#
+#Here is aligned amino acid file used for codon alignment. #
+alignment <- read.csv("LuciferaseTree_dNds/results/combined_aa.csv",header=FALSE, stringsAsFactors=FALSE, colClasses = c("character"))#
+#Columns are +1 compared to meme due to sp colum Next command alters numbers by 1 to account for this and name species column sp#
+colnames(alignment)[2:ncol(alignment)] <- paste("s",seq(1,(ncol(alignment)-1)),sep=""); colnames(alignment)[1] <- "sp"#
+#Read results in csv from meme selection analysis, including positively selected sites#
+meme <- read.csv("LuciferaseTree_dNds/results/hyphy/lucclade.meme.csv",header=TRUE)#
+#Pull positively selected sites using vector of output table from meme#
+pos_sel <- alignment[,c("sp",paste("s",meme$Codon, sep=""))]#
+data.frame(pos_sel[-1]) -> ps_df; ps_df->ps_df_named;#
+rownames(ps_df_named) <- pos_sel$sp#
+source("plotTree.R")#
+quartz("Figure 4", 10, 4)#
+plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE, lwd=1, infoFile=ps_df_named, treeWidth=8,infoWidth=5, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
+plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE, lwd=1, infoFile=ps_df_named, treeWidth=8,infoWidth=3, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
+quartz("Figure 4", 10, 4)#
+plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE, lwd=1, infoFile=ps_df_named, treeWidth=8,infoWidth=3, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
+luc_tree <- read.newick(file="LuciferaseTree_dNds/results/phylogenies/combined_codon.treefile")#
+#root(luc_tree, c("Vargula_hilgendorfii_AAA30332", "Cypridina_noctiluca_BAD08210"), resolve.root=TRUE) -> luc_tree_root#
+ladderize(luc_tree, right=TRUE) -> luc_tree#
+reroot(luc_tree, 17, resolve.root=TRUE, .5) -> luc_tree_root #root tree at midpoint of branch, which ape does not like to do#
+#Here is aligned amino acid file used for codon alignment. #
+alignment <- read.csv("LuciferaseTree_dNds/results/combined_aa.csv",header=FALSE, stringsAsFactors=FALSE, colClasses = c("character"))#
+#Columns are +1 compared to meme due to sp colum Next command alters numbers by 1 to account for this and name species column sp#
+colnames(alignment)[2:ncol(alignment)] <- paste("s",seq(1,(ncol(alignment)-1)),sep=""); colnames(alignment)[1] <- "sp"#
+#Read results in csv from meme selection analysis, including positively selected sites#
+meme <- read.csv("LuciferaseTree_dNds/results/hyphy/lucclade.meme.csv",header=TRUE)#
+#Pull positively selected sites using vector of output table from meme#
+pos_sel <- alignment[,c("sp",paste("s",meme$Codon, sep=""))]#
+data.frame(pos_sel[-1]) -> ps_df; ps_df->ps_df_named;#
+rownames(ps_df_named) <- pos_sel$sp#
+source("plotTree.R")#
+quartz("Figure 4", 10, 4)#
+plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE, lwd=1, infoFile=ps_df_named, treeWidth=8,infoWidth=3, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
+quartz("Figure 4", 10, 4)#
+plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE, lwd=1, infoFile=ps_df_named, treeWidth=8,infoWidth=3, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
+luc_tree <- read.newick(file="LuciferaseTree_dNds/results/phylogenies/combined_codon.treefile")#
+#root(luc_tree, c("Vargula_hilgendorfii_AAA30332", "Cypridina_noctiluca_BAD08210"), resolve.root=TRUE) -> luc_tree_root#
+ladderize(luc_tree, right=TRUE) -> luc_tree#
+reroot(luc_tree, 17, resolve.root=TRUE, .5) -> luc_tree_root #root tree at midpoint of branch, which ape does not like to do#
+#Here is aligned amino acid file used for codon alignment. #
+alignment <- read.csv("LuciferaseTree_dNds/results/combined_aa.csv",header=FALSE, stringsAsFactors=FALSE, colClasses = c("character"))#
+#Columns are +1 compared to meme due to sp colum Next command alters numbers by 1 to account for this and name species column sp#
+colnames(alignment)[2:ncol(alignment)] <- paste("s",seq(1,(ncol(alignment)-1)),sep=""); colnames(alignment)[1] <- "sp"#
+#Read results in csv from meme selection analysis, including positively selected sites#
+meme <- read.csv("LuciferaseTree_dNds/results/hyphy/lucclade.meme.csv",header=TRUE)#
+#Pull positively selected sites using vector of output table from meme#
+pos_sel <- alignment[,c("sp",paste("s",meme$Codon, sep=""))]#
+data.frame(pos_sel[-1]) -> ps_df; ps_df->ps_df_named;#
+rownames(ps_df_named) <- pos_sel$sp#
+source("plotTree.R")#
+quartz("Figure 4", 10, 4)#
+plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE, lwd=1, infoFile=ps_df_named, treeWidth=8,infoWidth=3, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
+quartz("Figure 4", 10, 4)#
+plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE, lwd=1, infoFile=ps_df_named, treeWidth=8,infoWidth=3, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
