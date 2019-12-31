@@ -174,7 +174,7 @@ dat <- read.csv("LuciferaseTree_dNds/results/combined_aa.csv",header=FALSE, stri
 #Columns are +1 compared to meme due to sp colum
 #Next command alters numbers by 1 to account for this
 colnames(dat)[2:ncol(dat)] <- paste("s",seq(1,(ncol(dat)-1)),sep="")
-#Here is aligned amino acid file used for codon alignment. 
+#Here is aligned amino acid file used for codon alignment.
 #Read results in csv from meme selection analysis, including positively selected sites
 meme <- read.csv("LuciferaseTree_dNds/results/hyphy/lucclade.meme.csv",header=TRUE)
 >>>>>>> ff095bcfd681e5c38410f5a08ac4b06b6fbda16f
@@ -192,23 +192,23 @@ translate <- read.csv("Raw Data/expression-kinetics/translate_lucname_decayname.
 tmpmerge <- merge(translate, table1, by='Species')
 lucNcolor <- merge(dat, tmpmerge, by='sp')
 pos_sel_col <- lucNcolor[,c("sp",paste("s",meme$Codon, sep=""),"Lmax_Mean", "FWHM_Mean")]
-remove_constant(pos_sel_col)->pos_sel_col ##Invariant sites because luc varies in spp without color data 
+remove_constant(pos_sel_col)->pos_sel_col ##Invariant sites because luc varies in spp without color data
 
 options(na.action = "na.fail")
 #doesn't work inside lm function but can cut and paste manually -- no invariant sites for color
 paste(colnames(pos_sel_col)[4:ncol(pos_sel_col)-2], collapse=" + "   )
 colorlm <- lm(Lmax_Mean ~ s93 + s102 + s142 + s160 + s177 + s211 + s240 + s261 + s285 + s291 + s320 + s371 + s389 + s477 + s581, data=pos_sel_col)
 fwhmlm <- lm(FWHM_Mean ~ s93 + s102 + s142 + s160 + s177 + s211 + s240 + s261 + s285 + s291 + s320 + s371 + s389 + s477 + s581, data=pos_sel_col)
-      
+
 mixnmatch_col <- dredge(colorlm,rank = "AIC",m.lim = c(0,3)) #3 seems like the maximum terms we can fit safely
 head(mixnmatch_col, 12)
 av <- model.avg(mixnmatch_col)
 
-#Global model call: lm(formula = Lmax_Mean ~ s93 + s102 + s142 + s160 + s177 + s211 + 
-#    s240 + s261 + s285 + s291 + s320 + s371 + s389 + s477 + s581, 
+#Global model call: lm(formula = Lmax_Mean ~ s93 + s102 + s142 + s160 + s177 + s211 +
+#    s240 + s261 + s285 + s291 + s320 + s371 + s389 + s477 + s581,
 #    data = pos_sel_col)
 #---
-#Model selection table 
+#Model selection table
 #     (Intrc) s102 s142 s160 s211 s261 s285 s320 s371 s581 df logLik  AIC delta weight
 #1043   456.4         +         +                   +       8  2.064 11.9  0.00  0.333
 #1169   456.4                   +         +         +       8  2.064 11.9  0.00  0.333
@@ -224,11 +224,11 @@ anova(lmax_anova)
 mixnmatch_fw <- dredge(fwhmlm,rank = "AIC",m.lim = c(0,3)) #3 seems like the maximum terms we can fit safely
 head(mixnmatch_fw, 12)
 
-#Global model call: lm(formula = FWHM_Mean ~ s93 + s102 + s142 + s160 + s177 + s211 + 
-#    s240 + s261 + s285 + s291 + s320 + s371 + s389 + s477 + s581, 
+#Global model call: lm(formula = FWHM_Mean ~ s93 + s102 + s142 + s160 + s177 + s211 +
+#    s240 + s261 + s285 + s291 + s320 + s371 + s389 + s477 + s581,
 #    data = pos_sel_col)
 #---
-#Model selection table 
+#Model selection table
 #     (Intrc) s102 s160 s177 s211 s240 s261 s371 s389 s477 df  logLik  AIC delta weight
 #1049   77.98              +    +              +           10   1.955 16.1  0.00  0.999
 #1034   85.44    +         +                   +            8  -7.768 31.5 15.44  0.000
@@ -249,7 +249,7 @@ translate <- read.csv("Raw Data/expression-kinetics/translate_lucname_decayname.
 tmpmerge <- merge(decay, translate, by="PubName")
 lucNkinetics <- merge(dat, tmpmerge, by="sp")
 pos_sel_lam <- lucNkinetics[,c("sp",paste("s",meme$Codon, sep=""),"lambda")]
-remove_constant(pos_sel_lam)->pos_sel_lam ##Invariant sites because luc varies in spp without decay data 
+remove_constant(pos_sel_lam)->pos_sel_lam ##Invariant sites because luc varies in spp without decay data
 
 options(na.action = "na.fail")
 #doesn't work inside lm function but can cut and paste manually
@@ -257,15 +257,15 @@ options(na.action = "na.fail")
 paste(colnames(pos_sel_lam)[3:ncol(pos_sel_lam)-1], collapse=" + "   )
 #IF sites change copy/paste from result of above command
 glb1 <- lm(lambda ~ s93 + s102 + s160 + s177 + s211 + s240 + s261 + s291 + s371 + s389 + s477 + s581, data=pos_sel_lam)
-          
+
 mixnmatch_lam <- dredge(glb1,rank = "AIC",m.lim = c(0,6)) #6 seems like the maximum terms we can fit safely
 av <- model.avg(mixnmatch_lam)
 head(mixnmatch_lam, 132)
 
-#Global model call: lm(formula = lambda ~ s93 + s102 + s160 + s177 + s211 + s240 + 
+#Global model call: lm(formula = lambda ~ s93 + s102 + s160 + s177 + s211 + s240 +
 #    s261 + s291 + s371 + s389 + s477 + s581, data = pos_sel_lam)
 #---
-#Model selection table 
+#Model selection table
 #     (Intrc) s102 s160 s177 s211 s240 s261 s291 s371 s389 s477 s581 s93 df logLik  AIC delta weight
 #1185  13.210                             +         +              +      7 -2.704 19.4  0.00  0.012
 #1697   5.555                             +         +         +    +      7 -2.704 19.4  0.00  0.012
@@ -282,7 +282,7 @@ head(mixnmatch_lam, 132)
 # 131 models are within 2 AIC
 
 #use this function to look at each model
-summary(eval(getCall(mixnmatch_lam,1699))) 
+summary(eval(getCall(mixnmatch_lam,1699)))
 
 
 #looking at the two sites are that ALWAYS present
@@ -326,51 +326,3 @@ bm.model = corBrownian(1,pgls_tree)
 library(nlme)
 gblm2 <- gls(decay ~ V93 + V115 + V152 + V160 + V189 + V261 + V371 + V389 + V477 + V506 + V581,correlation = bm.model, data = dt2)
 #this global model does not fit because it it too parameter rich in a gls framework
-
-###******GGplot custom function to plot lme4 catepillar plot (confidence intervals of random effects)
-##credit to davebraze for this function: https://rdrr.io/github/davebraze/FDB1/man/ggCaterpillar.html
-##stack exchange resources: https://stackoverflow.com/questions/13847936/plot-random-effects-from-lmer-lme4-package-using-qqmath-or-dotplot-how-to-mak
-
-ggCaterpillar <- function(re, QQ=FALSE, likeDotplot=TRUE, detailedFacetLabs = TRUE) {
-  f <- function(x, nm = "ranef plot") {
-    pv   <- attr(x, "postVar")
-    cols <- 1:(dim(pv)[1])
-    se   <- unlist(lapply(cols, function(i) sqrt(pv[i, i, ])))
-    ord  <- unlist(lapply(x, order)) + rep((0:(ncol(x) - 1)) * nrow(x), each=nrow(x))
-    pDf  <- data.frame(y=unlist(x)[ord],
-                       ci=1.96*se[ord],
-                       nQQ=rep(stats::qnorm(stats::ppoints(nrow(x))), ncol(x)),
-                       ID=factor(rep(rownames(x), ncol(x))[ord], levels=rownames(x)[ord]),
-                       ind=gl(ncol(x), nrow(x), labels=names(x)))
-
-    if(detailedFacetLabs){
-      pDf$ind <- ifelse(grepl("(Intercept)", pDf$ind), "intercept adjustment", paste0("slope adj: ", pDf$ind))
-    }
-
-    if(QQ) {  ## normal QQ-plot
-      p <- ggplot(pDf, aes_string(x="nQQ", y="y"))
-      p <- p + facet_wrap(~ ind, scales="free")
-      p <- p + xlab("Standard normal quantiles") + ylab("Random effect quantiles")
-    } else {  ## caterpillar dotplot
-      p <- ggplot(pDf, aes_string(x="ID", y="y")) + coord_flip()
-      if(likeDotplot) {  ## imitate dotplot() -> same scales for random effects
-        p <- p + facet_wrap(~ ind)
-      } else {           ## different scales for random effects
-        p <- p + facet_grid(ind ~ ., scales="free_y")
-      }
-      p <- p + xlab(nm) + ylab("Random effects")
-      scale <- 12-log(length(levels(pDf$ID)),2)
-      p <- p + theme(axis.text.y = element_text(size=scale))
-    }
-
-    p <- p + theme(legend.position="none")
-    # p <- p + labs(title= nm)
-    p <- p + geom_hline(yintercept=0, lwd = I(7/12), colour = I(grDevices::hsv(0/12, 7/12, 7/12)), alpha = I(5/12))
-    p <- p + geom_errorbar(aes_string(ymin="y - ci", ymax="y + ci"), width=0, colour="black")
-    p <- p + geom_point(aes())
-    return(p)
-  }
-
-  #   lapply(re, f) # original
-  lapply(seq_along(re), function(y, n, i) { f(y[[i]], n[[i]]) }, y=re, n=names(re)) # adds plot names
-}
