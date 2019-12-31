@@ -53,7 +53,7 @@ FigureS3
 #Supplemental Table S1 is previously published emission spectra (constructed manually outside R)
 
 #Supplemental Table S2 -- Statistics for comparisons during in vitro expression
-source("Table")
+source("5_Statistical_tests.R")
 
 #Supplemental Table S3- all emission parameter data for each individual organism
 source("TableS2.R")

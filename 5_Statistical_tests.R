@@ -121,10 +121,14 @@ khc <- subset.data.frame(light_data2,light_data2$Species == "KHC")
 t.test(log10(khc$mean_cps)~khc$count_type)
 #p-value = 0.02686
 
+svu2 <- subset.data.frame(light_data2,light_data2$Species == "SVU")
+t.test(log10(svu2$mean_cps)~svu2$count_type)
+#t = 2.6185, df = 11.504, p-value = 0.02313
+
 vts <- subset.data.frame(light_data2,light_data2$Species == "VTS")
 t.test(log10(vts$mean_cps)~vts$count_type)
 #p-value = 0.005704
 
-p.adjust(c(0.0002923,0.02686,0.005704),method = "bonf")
-#corrected: 0.0008769, 0.0805800, 0.0171120
+p.adjust(c(0.0002923,0.02686,0.02313,0.005704),method = "bonf")
+#corrected:0.0011692, 0.1074400, 0.0925200, 0.0228160
 
