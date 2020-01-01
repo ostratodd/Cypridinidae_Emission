@@ -628,7 +628,6 @@ datamerge <- merge(tmpmerge, decay, by = 'PubName', all=TRUE)
 !names(datamerge) %in% c("N", "PubName", "Species", "country", "genus", "n_lam", "Lmax_SD", "FWHM_SD", "lamSE") -> bool
 datamerge[,bool] -> InterestingSites
 InterestingSites
-InterestingSites
 datamerge <- merge(alignment, tmpmerge2, by="sp", all=TRUE)
 datamerge
 datamerge <- merge(alignment, tmpmerge2, by="sp")
@@ -1033,7 +1032,6 @@ datamerge
 !names(datamerge) %in% c("N", "PubName", "Species", "country", "genus", "n_lam", "Lmax_SD", "FWHM_SD", "lamSE") -> bool
 datamerge[,bool] -> InterestingSites
 InterestingSites
-InterestingSites
 signifmutsites <- c(38, 178, 404)
 al_signifmutsites <- cyp2aligned(signifmutsites)
 justthesitesmaam <- displaysites(c(al_signifmutsites, al_meme, al_fel))
@@ -1178,32 +1176,6 @@ ps_df
 ps_df_named
 rbind(cyprow, ps_df_named) -> fullcompositetable
 rownames(fullcompositetable)[1] <- "Cypridina Site Number"
-rbind(fullcompositetable, c("-", "-","-","-","-","-","-","-","-","-","-","-","-", "-","-", "+", "+", "-", "-", "-")) -> fullcompositetable#
-rownames(fullcompositetable)[17] <- "Significant Pervasive Diversifying Selection (FEL)"#
-#
-rbind(fullcompositetable, c("-", "-","+","+","+","+","+","+","+","+","+","+","+", "+","+", "-", "-", "-", "-", "-")) -> fullcompositetable#
-rownames(fullcompositetable)[18] <- "Significant Episodic Diversifying Selection (MEME)"#
-#
-rbind(fullcompositetable, c("M", "M","-","-","+","+","-","-","+","-","-","-","-", "-","-", "-", "-", "-", "-", "-")) -> fullcompositetable#
-rownames(fullcompositetable)[19] <- "Significant Correlation with Lambda Max"#
-#
-rbind(fullcompositetable, c("-", "-","-","-","-","-","+","-","+","+","-","+","-", "-","-", "-", "-", "-", "-", "-")) -> fullcompositetable#
-rownames(fullcompositetable)[20] <- "Significant Correlation with Enzymatic Decay"#
-#
-fullcompositetable
-rbind(fullcompositetable, c("-", "-","-","-","-","-","-","-","-","-","-","-","-", "-","-", "+", "+", "-", "-", "-")) -> fullcompositetable#
-rownames(fullcompositetable)[17] <- "Significant Pervasive Diversifying Selection (FEL)"#
-#
-rbind(fullcompositetable, c("-", "-","+","+","+","+","+","+","+","+","+","+","+", "+","+", "-", "-", "-", "-", "-")) -> fullcompositetable#
-rownames(fullcompositetable)[18] <- "Significant Episodic Diversifying Selection (MEME)"#
-#
-rbind(fullcompositetable, c("M", "M","-","-","+","+","-","-","+","-","-","-","-", "-","-", "-", "-", "-", "-", "-")) -> fullcompositetable#
-rownames(fullcompositetable)[19] <- "Significant Correlation with Lambda Max"#
-#
-rbind(fullcompositetable, c("-", "-","-","-","-","-","+","-","+","+","-","+","-", "-","-", "-", "-", "-", "-", "-")) -> fullcompositetable#
-rownames(fullcompositetable)[20] <- "Significant Correlation with Enzymatic Decay"#
-#
-fullcompositetable
 rbind(fullcompositetable, c("-", "-","-","-","-","-","-","-","-","-","-","-","-", "-","-", "+", "+", "-", "-", "-")) -> fullcompositetable#
 rownames(fullcompositetable)[17] <- "Significant Pervasive Diversifying Selection (FEL)"#
 #

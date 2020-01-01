@@ -1,4 +1,4 @@
-maindir <- "~/Documents/GitHub/Cypridinidae_EmissionSpectra/"
+maindir <- "~/Documents/GitHub/Cypridinidae_Emission/"
 setwd(maindir)
 
 #First read in data sets and complete analyses for figures and tables
@@ -43,16 +43,17 @@ source("FigureS1.R")
 
 #Figure S2 - Plot of all FWHM data
 source("FigureS2.R")
-FigureS2 
+FigureS2
 
 #Figure S3 - No correlation between lambda max and decay
 source("FigureS3.R")
-FigureS3 
+FigureS3
 
 #**********************************Supplemental Tables
 #Supplemental Table S1 is previously published emission spectra (constructed manually outside R)
 
 #Supplemental Table S2 -- Statistics for comparisons during in vitro expression
+source("5_Statistical_tests.R")
 
 #Supplemental Table S3- all emission parameter data for each individual organism
 source("TableS2.R")
@@ -97,10 +98,10 @@ colorlm_fel <- lm(Lmax_Mean ~ s43 + s209, data=pos_sel_col)
 mixnmatch_fw <- dredge(fwhmlm,rank = "AIC",m.lim = c(0,3)) #3 seems like the maximum terms we can fit safely
 head(mixnmatch_fw, 12)
 
-#Global model call: lm(formula = FWHM_Mean ~ s41 + s93 + s102 + s142 + s160 + s177 + 
+#Global model call: lm(formula = FWHM_Mean ~ s41 + s93 + s102 + s142 + s160 + s177 +
 #    s189 + s261 + s285 + s291 + s320 + s389 + s477, data = pos_sel_col)
 #---
-#Model selection table 
+#Model selection table
 #     (Intrc) s102 s160 s177 s189 s261 s291 s41 s93 df  logLik  AIC delta weight
 #1073   82.52                   +    +        +     10   1.955 16.1  0.00  0.167
 #177    84.34                   +    +    +         10   1.955 16.1  0.00  0.167
@@ -110,7 +111,7 @@ head(mixnmatch_fw, 12)
 #1042   82.52    +              +             +     10   1.955 16.1  0.00  0.167
 
 #4114   88.58    +              +                 +  9  -6.271 30.5 14.45  0.000
-#6 
+#6
 
 fwhm_anova <- lm(FWHM_Mean ~ s102 + s189 + s261 ,data=pos_sel_col) # in 3 or more of top models
 anova(fwhm_anova)
@@ -128,15 +129,15 @@ options(na.action = "na.fail")
 paste(colnames(pos_sel_lam)[3:ncol(pos_sel_lam)-1], collapse=" + "   )
 #IF sites change copy/paste from result of above command
 glb1 <- lm(lambda ~ s41 + s93 + s102 + s160 + s177 + s189 + s261 + s291 + s389 + s477, data=pos_sel_lam)
-          
+
 mixnmatch_lam <- dredge(glb1,rank = "AIC",m.lim = c(0,6)) #6 seems like the maximum terms we can fit safely
 av <- model.avg(mixnmatch_lam)
 head(mixnmatch_lam, 76)
 
-#Global model call: lm(formula = lambda ~ s41 + s93 + s102 + s160 + s177 + s189 + 
+#Global model call: lm(formula = lambda ~ s41 + s93 + s102 + s160 + s177 + s189 +
 #    s261 + s291 + s389 + s477, data = pos_sel_lam)
 #---
-#Model selection table 
+#Model selection table
 #    (Intrc) s102 s160 s177 s189 s261 s291 s389 s41 s477 s93 df logLik  AIC delta weight
 #59    8.953         +         +    +    +                    9 -1.117 20.2  0.00  0.017
 #187   8.953         +         +    +    +        +           9 -1.117 20.2  0.00  0.017
@@ -154,9 +155,9 @@ head(mixnmatch_lam, 76)
 #409   5.720                   +    +             +    +      9 -1.117 20.2  0.00  0.017
 #650   5.883    +              +                  +        + 10 -0.730 21.5  1.22  0.009
 #652
-# 
+#
 #use this function to look at each model
-summary(eval(getCall(mixnmatch_lam,'59'))) 
+summary(eval(getCall(mixnmatch_lam,'59')))
 
 
 #looking at the two sites are that most commonly present
