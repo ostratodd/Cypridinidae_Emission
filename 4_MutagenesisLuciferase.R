@@ -155,13 +155,10 @@ rownames(fullcompositetable)[17] <- "Significant Pervasive Diversifying Selectio
 rbind(fullcompositetable, c("-", "-","+","+","+","+","+","+","+","+","+","+","+", "+","+", "-", "-", "-", "-", "-", "-")) -> fullcompositetable
 rownames(fullcompositetable)[18] <- "Significant Episodic Diversifying Selection (MEME)"
 
-rbind(fullcompositetable, c("M", "M","-","-","+","+","-","-","+","-","-","-","-", "-","-", "-", "-", "-", "-", "-", "-")) -> fullcompositetable
+rbind(fullcompositetable, c("M", "M","M","-","+","+","-","-","+","-","-","-","-", "-","-", "-", "-", "-", "-", "-", "-")) -> fullcompositetable
 rownames(fullcompositetable)[19] <- "Significant Correlation with Lambda Max"
 
 rbind(fullcompositetable, c("-", "-","-","-","-","-","+","-","+","+","-","+","-", "-","-", "-", "-", "-", "-", "-", "-")) -> fullcompositetable
-
-rbind(fullcompositetable, c("-", "-","-","-","-","-","+","-","+","+","-","+","-", "-","-", "-", "-", "-", "-", "-")) -> fullcompositetable
-
 rownames(fullcompositetable)[20] <- "Significant Correlation with Enzymatic Decay"
 
 fullcompositetable
