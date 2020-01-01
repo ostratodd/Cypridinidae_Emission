@@ -47,8 +47,11 @@ allmutsites <- c(38, 45, 75, 79, 87, 126, 167, 170, 178, 191, 197, 223, 258, 276
 varmutsites <- c(38, 178, 375, 404, 405) #Cypridina numbering sites with 3 states
   al_varmutsites <- cyp2aligned(varmutsites)
 
+signifmutsites <- c(38, 178, 404)
+  al_signifmutsites <- cyp2aligned(signifmutsites)
+
 	#Positive selection
-al_fel <- c(43, 209) #positively selected in FEL these are alignment numbers
+al_fel <- c(43, 209) #positively selected in FEL these are ALIGNMENT numbers
   fel <- aligned2cyp(al_fel)
 
 meme_table <- read.csv("LuciferaseTree_dNds/results/hyphy/lucclade.meme.csv",header=TRUE)
@@ -110,7 +113,9 @@ remove_constant(pos_sel_decay)->pos_sel_decay ##Invariant sites because luc vari
 #*****************Create data frame for luciferase, decay, and color for any available data
 tmpmerge <- merge(translate, table1, by='Species', all=TRUE)
 tmpmerge2 <- merge(tmpmerge, decay, by = 'PubName', all=TRUE)
-datamerge <- merge(alignment, tmpmerge2, by="sp")
+justthesitesmaam <- displaysites(c(al_signifmutsites, al_meme, al_fel))
+
+datamerge <- merge(justthesitesmaam, tmpmerge2, by="sp")
 #remove some columns we do not need
 !names(datamerge) %in% c("N", "PubName", "Species", "country", "genus", "n_lam", "Lmax_SD", "FWHM_SD", "lamSE") -> bool
 datamerge[,bool] -> InterestingSites
@@ -137,23 +142,21 @@ round_df <- function(x, digits) {
 #This dataframe used in Figure 1
 round_df(ps_df_named, 1)->ps_df_named
 
-displaysites(cyp2aligned(c(178, 404))) -> colorsites
-cbind(colorsites[,2:3], ps_df_named[1:18]) -> compositetable
-
-c(178, 404,aligned2cyp(meme$Codon), fel, "", "", "") -> cyprow
-rbind(cyprow, compositetable) -> fullcompositetable
+#These are all the sites discussed in manuscript -- annotated
+c(signifmutsites,aligned2cyp(meme$Codon), fel, "", "", "") -> cyprow
+rbind(cyprow, ps_df_named) -> fullcompositetable
 rownames(fullcompositetable)[1] <- "Cypridina Site Number"
 
-rbind(fullcompositetable, c("-", "-","-","-","-","-","-","-","-","-","-","-","-", "-","-", "+", "+", "-", "-", "-")) -> fullcompositetable
+rbind(fullcompositetable, c("-", "-","-","-","-","-","-","-","-","-","-","-","-", "-","-", "+", "+", "-", "-", "-", "-")) -> fullcompositetable
 rownames(fullcompositetable)[17] <- "Significant Pervasive Diversifying Selection (FEL)"
 
-rbind(fullcompositetable, c("-", "-","+","+","+","+","+","+","+","+","+","+","+", "+","+", "-", "-", "-", "-", "-")) -> fullcompositetable
+rbind(fullcompositetable, c("-", "-","+","+","+","+","+","+","+","+","+","+","+", "+","+", "-", "-", "-", "-", "-", "-")) -> fullcompositetable
 rownames(fullcompositetable)[18] <- "Significant Episodic Diversifying Selection (MEME)"
 
-rbind(fullcompositetable, c("M", "M","-","-","+","+","-","-","+","-","-","-","-", "-","-", "-", "-", "-", "-", "-")) -> fullcompositetable
+rbind(fullcompositetable, c("M", "M","-","-","+","+","-","-","+","-","-","-","-", "-","-", "-", "-", "-", "-", "-", "-")) -> fullcompositetable
 rownames(fullcompositetable)[19] <- "Significant Correlation with Lambda Max"
 
-rbind(fullcompositetable, c("-", "-","-","-","-","-","+","-","+","+","-","+","-", "-","-", "-", "-", "-", "-", "-")) -> fullcompositetable
+rbind(fullcompositetable, c("-", "-","-","-","-","-","+","-","+","+","-","+","-", "-","-", "-", "-", "-", "-", "-", "-")) -> fullcompositetable
 rownames(fullcompositetable)[20] <- "Significant Correlation with Enzymatic Decay"
 
 fullcompositetable

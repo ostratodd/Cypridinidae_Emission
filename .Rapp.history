@@ -1,686 +1,1259 @@
-# init#
-rm(list=ls())#
-#
-# opt parsing#
-suppressPackageStartupMessages(library(docopt))#
-#
-'Usage: consenTRAIT.r [options] <tree> <root> <trait>#
-#
-options:#
-  <tree>       Newick tree file (multitree).#
-  <root>       Name of root taxon.#
-  <trait>      Trait table (no headers).#
-  -b=<b>       Number trait bootstraps per bootstrap tree.#
-               [Default: 10]#
-  -s=<s>       Percent shared trait cutoff.#
-               [Default: 90]#
-  -c=<c>       Cluster size file name prefix.#
-               [Default: cluster_size]#
-  -d=<d>       Cluster distance file name prefix.#
-               [Default: cluster_dist]#
-  -t=<m>       Tau_D table name.#
-               [Default: Tau_D.txt]#
-  -u=<u>       Tau_D bootstrap table name.#
-               [Default: Tau_D_boot.txt]#
-  -x=<x>       Create a test tree & trait file with `x` taxa.#
-               Output files: "consentrait_TEST*"#
-  -r=<r>       Model rate parameters for the example traits.#
-               Lower values mean more conservatism.#
-               [Default: 0.5,1000]#
-  -n=<b>       Number of simulated trees to make.#
-               NOTE: this is only for the `x` option.#
-               [Default: 10]#
-  -p=<p>       Number of processors.#
-               [Default: 1]#
-  -h           Help#
-#
-description:#
-  The script requires two input files as arguments:#
-    1) a Newick Tree#
-    2) a tab delimited text file with names of#
-       each taxon in the first column and then 0 or 1#
-       values for each trait in the following columns#
-       (and no headers)#
-#
-  The newick tree file should consist of multiple bootstrap#
-  trees, one bootstrap tree per line in the file.#
-#
-  Tau_D is average consensus sequence distance (branch length)#
-  between trait values.#
-#
-  This version of consenTRAIT will conduct the non-parametric#
-  bootstrapping (in parallel) for calculating p-values.#
-#
-  The `x` option:#
-    You will still need to provide something for the `tree` `root` `trait`#
-    commands. Example: `consentrait.r -x 20 tmp tmp tmp`#
-#
-  Dependencies: data.table, adephylo, ape, docopt, parallel#
-  (if using >1 processor).#
-#
-  For more info: http://www.ess.uci.edu/group/amartiny/research/consentrait#
-#
-  OUTPUT:#
-    Many accessory tables are written during the run, but the main#
-    table with the tauD values for each trait are written to STDOUT.#
-    So, to save your table, redirect the output to a file.#
-#
-' -> doc#
-opts = docopt(doc)#
-opts[['-r']] = unlist(strsplit(opts[['-r']], split=','))#
-opts[['-r']] = sapply(opts[['-r']], as.numeric)#
-#
-# packages#
-pkgs <- c('data.table', 'adephylo', 'ape')#
-for(x in pkgs){#
-  suppressPackageStartupMessages(library(x, character.only=TRUE))#
-}#
-if(opts[['-p']] > 1){#
-  suppressPackageStartupMessages(library('parallel', character.only=TRUE))#
-}#
-#-- functions --##
-format.means = function(x, table){#
-  x = as.data.frame(t(x))#
-  col.n = sapply(1:(ncol(table)-1), function(x) paste(c('t', x), collapse=''))#
-  colnames(x) = col.n#
-  x$tree = 1:nrow(x)#
-  x = x[,c('tree', col.n)]#
-  return(x)#
-}#
-init_data_files = function(cluster_size_file, cluster_dist_file){#
-  cat(c("trait","tree","subtree", "distance","cluster_size"),#
-      '\n', file = cluster_size_file,#
-      sep = "\t", fill = FALSE, labels = NULL,append = FALSE)#
-  cat(c("trait","tree","subtree", "cluster","distance"),#
-      '\n', file = cluster_dist_file,#
-      sep = "\t", fill = FALSE, labels = NULL,append = FALSE)#
-}#
-#
-cons.trait = function(table, tree_all, opts, boot=FALSE){#
-  if(boot==TRUE){#
-    cat('Analyzing bootstrap replicate...\n', file = stderr())#
-  }#
-  # init#
-  n.trees = length(tree_all)#
-  Mean_all = matrix(nrow=ncol(table)-1,ncol=n.trees)#
-#
-  for (m in 1:length(tree_all)) {#
-    if(boot==FALSE){#
-      cat("Analyzing tree: ",m,"\n", file = stderr())#
-    }#
-#
-    # testing if table and tree contain the same entries - else drop tips#
-    tree = tree_all[[m]]#
-    z = subset(tree$tip.label,!(tree$tip.label %in% table[,1]))#
-    if (length(z) > 0) {#
-      cat("  WARNING: dropping tips\n", file = stderr())#
-      drop.tip(tree,z)#
-    }#
-#
-    #rooting tree with first taxon - change if different root#
-    tree = multi2di(tree)#
-    root_tree = root(tree,opts[['<root>']]) #,resolve.root=T)#
-    #replacing negative branch lengths - e.g., from PHYLIP#
-    root_tree$edge.length[root_tree$edge.length <= 0] =  0.000001#
-    subtree = subtrees(root_tree, wait=FALSE)#
-#
-    cluster_mean = numeric(length=0)#
-    # loop through all traits#
-    for (j in 2:ncol(table)) {#
-      if(boot==FALSE){#
-        cat("  Analyzing trait: ",j-1,"\n", file = stderr())#
-      }#
-      #Loading trait table#
-      table_tmp = table[,c(1,j)]#
-      colnames(table_tmp)[1] = "ID";#
-      colnames(table_tmp)[2] = "Trait";#
-#
-      # removing all entries not in tree#
-      table_tmp2 = data.table(table_tmp)#
-      setkey(table_tmp2,ID)#
-      table2 = table_tmp2[intersect(table_tmp2$ID,root_tree$tip.label)]#
-      setkey(table2,ID)#
-#
-      #initializing result vectors and file names#
-      positives = vector(mode="list",length=0)#
-      cluster_size = numeric(length=0)#
-      cluster_dist = numeric(length=0)#
-      # output files#
-      cluster_size_file = paste(opts[['-c']],'_t',j-1,".txt",sep="")#
-      cluster_dist_file = paste(opts[['-d']],'_t',j-1,".txt",sep="")#
-#
-      # Init cluster size & distance files#
-      if ((m == 1) & (boot == FALSE)){#
-        init_data_files(cluster_size_file, cluster_dist_file)#
-      }#
-#
-      #loop through all subtrees and determining if any subtrees have >P% positives#
-      for (i in 1:length(subtree)){#
-        tip_names = subtree[[i]]$tip.label#
-        # apply % shared cutoff#
-        if (mean(table2[tip_names][,Trait]) > perc.share.cutoff) {#
-          match_test = match(tip_names,positives)#
-          if (all(is.na(match_test))) {#
-            positives = c(positives,tip_names)#
-            cluster_dist = distRoot(subtree[[i]],tip_names, method=c("p"))#
-            cluster_size = append(cluster_size,mean(cluster_dist))#
-#
-            # printing to files, if not a bootstrap#
-            if(boot == FALSE){#
-              cat(j-1,m,i,mean(cluster_dist),length(cluster_dist),#
-                  '\n', file = cluster_size_file,#
-                  sep = "\t", fill = FALSE, labels = NULL,append = TRUE)#
-#
-              for(cdl in 1:length(cluster_dist)){#
-                cat(j-1,m,i,cdl,cluster_dist[cdl], '\n', file = cluster_dist_file,#
-                    sep = "\t", fill = FALSE, labels = NULL,append = TRUE)#
-              }#
-            }#
-          }#
-          else if (any(is.na(match_test))) {#
-            cat("Assertion error: NAs present\n", file = stderr())#
-          }#
-          else {#
-#
-          }#
-        }#
-      }#
-#
-      ##### find singletons #######
-      a = table2[table2$Trait == 1,][,ID]#
-      g = as.character(a)#
-#
-      singletons_names = setdiff(g,positives)#
-      if (length(singletons_names) > 0) {#
-        for (h in 1:length(singletons_names)){#
-          # weigh singletons with half#
-          we = which.edge(root_tree,singletons_names[h])#
-          singleton_edges = 0.5*root_tree$edge.length[we]#
-          cluster_size = append(cluster_size,singleton_edges)#
-#
-          if(boot == FALSE){#
-            cat(j-1,m,NA,singleton_edges,1, '\n', file=cluster_size_file,#
-                sep = "\t",fill = FALSE, labels = NULL,append = TRUE)#
-          }#
-        }#
-      }#
-    # means of cluster sizes#
-    Mean_all[j-1,m] = mean(cluster_size)#
-    }#
-  }#
-  return(Mean_all)#
-}#
-#
-sim_trait = function(phy, model, tries=1000){#
-  # simulating a binary trait.#
-  # phy = phylogeny, model = rate_model, tries=number of tries to have trait evolve at least once#
-  try_cnt = 1#
-  while(1==1){    #
-    trait = rTraitDisc(phy, model=model, states=c(0, 1), root.value=1)#
-    trait = ifelse(trait == 1, 0, 1)#
-    if(sum(trait)> 0){#
-      return(trait)#
-    }#
-    try_cnt = try_cnt + 1#
-    if(try_cnt > tries){#
-      stop('Exceeded tries to evolve the trait. Raise the rate parameter values')#
-    }#
-  }#
-}#
-#-- main --##
-# Test files#
-if(!is.null(opts[['-x']])){#
-  out.tree = 'consentrait_TEST.nwk'#
-  out.trait = 'consentrait_TEST.txt'#
-  out.tree.pic1 = 'consentrait_TEST_trait1.pdf'#
-  out.tree.pic2 = 'consentrait_TEST_trait2.pdf'#
-#
-  # tree(s)#
-  n.taxa = as.numeric(opts['-x'])#
-  tree = rcoal(n.taxa)#
-  write.tree(tree, out.tree)#
-#
-  ## traits#
-  taxa = tree$tip.label#
-  model1 = matrix(c(0,0,1,0), 2) * opts[['-r']][1]#
-  trait1 = sim_trait(tree, model1)#
-  model2 = matrix(c(1,1,1,1), 2) * opts[['-r']][2]#
-  trait2 = sim_trait(tree, model2)  #
-#
-  df = data.frame('taxa' = taxa,#
-    'trait1' = trait1,#
-    'trait2' = trait2)#
-  write.table(df, out.trait, sep='\t', quote=FALSE,#
-              row.names=FALSE, col.names=FALSE)#
-#
-  # plotting tree#
-  pdf(out.tree.pic1, bg='white')#
-  plot(tree, show.tip.label=FALSE, adj=1)#
-  trait1 = ifelse(trait1==0, 'blue', 'red')#
-  tiplabels(pch=22, col=NULL, bg=trait1)#
-  dev.off()#
-  pdf(out.tree.pic2, bg='white')#
-  plot(tree, show.tip.label=FALSE, adj=1)#
-  trait2 = ifelse(trait2==0, 'blue', 'red')#
-  tiplabels(pch=22, col=NULL, bg=trait2)#
-  dev.off()#
-#
-  # status#
-  msg = paste(c('Test files written: ', out.tree,#
-    out.trait, out.tree.pic1, out.tree.pic2), collapse='\n  ')#
-  cat(paste0(msg,'\n'), file = stderr())#
-#
-  opt <- options(show.error.messages=FALSE)#
-  on.exit(options(opt))#
-  stop()#
-}#
-#-- consenTRAIT run --##
-# Params#
-perc.share.cutoff = as.numeric(opts[['-s']])#
-stopifnot((perc.share.cutoff >= 0) &  (perc.share.cutoff <= 100))#
-perc.share.cutoff = perc.share.cutoff / 100#
-# Import#
-## Newick tree (multitree) - replace to read.nexus if using nexus tress#
-tree_all = read.tree(opts[['<tree>']],keep.multi = TRUE)#
-## Trait table w. no headers#
-table = read.table(opts[['<trait>']], sep = "\t", header=FALSE)#
-#
-# Tau_D for each bootstrap tree#
-Mean_all = cons.trait(table, tree_all, opts)#
-Mean_all = format.means(Mean_all, table)#
-## writting#
-write.table(Mean_all,opts[['-t']], sep = "\t", quote=FALSE, row.names=FALSE)#
-# non-paramtric bootstrapping#
-## making randomly arranged trait tables#
-#random.traits = function(df){#
-table.l = list()#
-for(i in 1:opts[['-b']]){#
-  df.rand = apply(as.data.frame(table[,2:ncol(table)]), 2,#
-    function(x) sample(c(0,1), length(x), replace=TRUE))#
-  df.rand = as.data.frame(df.rand)#
-  tmp = colnames(df.rand)#
-  df.rand$V1 = table[,1]#
-  df.rand = df.rand[,c('V1', tmp)]#
-  table.l[[i]] = df.rand#
-}#
-#
-## (parallel) calling of cons.trait#
-if(opts[['-p']] > 1){#
-  cat('Bootstrapping in parallel\n', file = stderr())#
-  cl1 = makeCluster(opts[['-p']], type='FORK')#
-  mean_boots = parLapply(cl1, table.l, cons.trait,#
-    tree_all=tree_all, opts=opts, boot=TRUE)#
-  stopCluster(cl1)#
-} else {#
-  mean_boots = lapply(table.l, cons.trait,#
-    tree_all=tree_all, opts=opts, boot=TRUE)#
-}#
-## formatting output#
-for(i in 1:length(mean_boots)){#
-  tmp = format.means(mean_boots[[i]], table)#
-  tmp$bootstrap = i#
-  mean_boots[[i]] = tmp#
-}#
-mean_boots = do.call(rbind, mean_boots)#
-write.table(mean_boots,opts[['-u']], sep = "\t", quote=FALSE, row.names=FALSE)#
-# calcalating p-value#
-## getting mean Tau_D of real data#
-mean_tauD = apply(as.data.frame(Mean_all[,2:ncol(Mean_all)]), 2, mean)#
-if(length(mean_tauD) == 1){#
-  names(mean_tauD) = c('t1')#
-}#
-## determine p-value#
-cat('Trait\ttau_D\tp-value', '\n')#
-for(n in names(mean_tauD)){#
-  tau_D = mean_tauD[n]#
-  boot_tauD = mean_boots[,n]#
-  p = 1 - sum(tau_D < boot_tauD) / length(boot_tauD)#
-  line = paste(c(n, tau_D, p), collapse='\t')#
-  cat(line, '\n')#
-}
-execute(plotTree.R)
-dir()
-maindir <- "~/Documents/GitHub/Cypridinidae_EmissionSpectra/"#
-setwd(maindir)
-execute(plotTree.R)
-dir()
-source("plotTree.R")
-source("1_Emission_Functions.R")#
-source("2_Read_Datasets.R")#
-source("3_Calculate_parameters.R")#
-source("4_MutagenesisLuciferase.R")
-require(ggtree);#
-library(gridExtra); library(grid);#
-luc_tree <- read.newick(file="LuciferaseTree_dNds/results/phylogenies/combined_codon.treefile")#
-root(luc_tree, c("Vargula_hilgendorfii_AAA30332", "Cypridina_noctiluca_BAD08210")) -> luc_tree_root#
-#
-data.frame(pos_sel[-1]) -> ps_df; ps_df->ps_df_named;#
-rownames(ps_df_named) <- pos_sel$sp#
-#need to order rows the same as tree#
-ps_plot <- ggtree(luc_tree_root) + geom_tiplab(align=TRUE)#
-#
-mytheme <- gridExtra::ttheme_default(#
-    core = list(fg_params=list(cex = 1)),#
-    colhead = list(fg_params=list(cex = 1)),#
-    rowhead = list(fg_params=list(cex = 1)))#
-#
-tt3 <- ttheme_default(#
-  core=list(bg_params = list(fill = blues9[1:2], col=NA),#
-            fg_params=list(fontface=1)),#
-  colhead=list(fg_params=list(col="navyblue", fontface=1)),#
-  rowhead=list(fg_params=list(col="white")));#
-#
-quartz("Figure 4", 15, 5) #
-tableGrob(ps_df_named, theme=mytheme)->ps_table#
-grid.arrange(ps_plot, ps_table, ncol=2)
-require(ape)#
+positivelyselectedThatPredictDecay
+positivelyselectedThatPredictdecay
+source("Table4.R")#
+table4
+table4 <- anova(lmax_anova)
+table4
+fullcompositetable
 require(phytools)#
-read.tree(file="./LuciferaseTree_dNds/results/phylogenies/all_aa.treefile") -> lucplus_tree#
-midpoint.root(lucplus_tree) -> lucplus_tree_r#
-ladderize(lucplus_tree_r)-> lprl#
-plot(lprl, show.tip.label=TRUE, cex=.8, x.lim=2)#
 #
-#Supplemental Figure S2#
-#Created with prettyplot#
+InterestingSites[complete.cases(InterestingSites), ] -> full#
+data.frame(cbind(full$Lmax_Mean, full$lambda))->pms#
+row.names(pms) <- full$sp#
+c("Khas", "Mchi", "MspIR", "MspSVU", "Pan", "Pmor",  "PspWLU", "Vhil")-> row.names(pms)#
+pruned.tree<-drop.tip(luc_tree,luc_tree$tip.label[-match(full$sp, luc_tree$tip.label)])#
+c("Mchi", "MspIR", "MspSVU", "Pmor", "Pan", "PspWLU", "Khas", "Vhil")->pruned.tree$tip.label#
 #
-#############
-#Figure XX - Do + selected sites predict color or kinetics?#
-library(gridExtra); library(grid); require(janitor);#
-library(MuMIn);#
+phylomorphospace(pruned.tree, pms, label="radial", xlab="Lambda max (nm)", ylab="Enzymatic Decay Constant", cx=.1)
+decay_anova <- lm(lambda ~ s160 + s189 + s261 + s291, data = pos_sel_lam) # > 13 appearances#
+anova(decay_anova)
+pos_sel
+rbind(fullcompositetable, c("-", "-","-","-","-","-","+","-","+","+","-","+","-", "-","-", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[18] <- "Significant Correlation with Enzymatic Decay"
+data.frame(InterestingSites[-1]) -> ps_df; ps_df->ps_df_named;#
+rownames(ps_df_named) <- pos_sel$sp#
+rownames(ps_df_named) <- pos_sel$sp#
 #
-#Read in luciferase alignment and sites under selection#
-dat <- read.csv("LuciferaseTree_dNds/results/combined_aa.csv",header=FALSE, stringsAsFactors=FALSE, colClasses = c("character"))#
-#Columns are +1 compared to meme due to sp colum#
-#Next command alters numbers by 1 to account for this and name species column sp#
-colnames(dat)[2:ncol(dat)] <- paste("s",seq(1,(ncol(dat)-1)),sep="")#
-colnames(dat)[1] <- "sp"#
-require(tidyverse)#
-dat %>% arrange(sp) -> dat #sort by species name #
-#Here is aligned amino acid file used for codon alignment. #
-#Read results in csv from meme selection analysis, including positively selected sites#
-meme <- read.csv("LuciferaseTree_dNds/results/hyphy/lucclade.meme.csv",header=TRUE)#
-#Pull positively selected sites using vector of output table from meme#
-pos_sel <- dat[,c("sp",paste("s",meme$Codon, sep=""))]#
-#decay file has translation of different codes between datasets#
-decay <- read.csv("Raw Data/expression-kinetics/decay_averages_all_for comparison_with_color.csv",header=TRUE)
-maindir <- "~/Documents/GitHub/Cypridinidae_EmissionSpectra/"#
-setwd(maindir)
-#Figure XX - Do + selected sites predict color or kinetics?#
-library(gridExtra); library(grid); require(janitor);#
-library(MuMIn);#
+round_df <- function(x, digits) {#
+    # round all numeric variables#
+    # x: data frame #
+    # digits: number of digits to round#
+    numeric_columns <- sapply(x, mode) == 'numeric'#
+    x[numeric_columns] <-  round(x[numeric_columns], digits)#
+    x#
+}#
 #
-#Read in luciferase alignment and sites under selection#
-dat <- read.csv("LuciferaseTree_dNds/results/combined_aa.csv",header=FALSE, stringsAsFactors=FALSE, colClasses = c("character"))#
-#Columns are +1 compared to meme due to sp colum#
-#Next command alters numbers by 1 to account for this and name species column sp#
-colnames(dat)[2:ncol(dat)] <- paste("s",seq(1,(ncol(dat)-1)),sep="")#
-colnames(dat)[1] <- "sp"#
-require(tidyverse)#
-dat %>% arrange(sp) -> dat #sort by species name #
-#Here is aligned amino acid file used for codon alignment. #
-#Read results in csv from meme selection analysis, including positively selected sites#
-meme <- read.csv("LuciferaseTree_dNds/results/hyphy/lucclade.meme.csv",header=TRUE)#
-#Pull positively selected sites using vector of output table from meme#
-pos_sel <- dat[,c("sp",paste("s",meme$Codon, sep=""))]#
-#decay file has translation of different codes between datasets#
-decay <- read.csv("Raw Data/expression-kinetics/decay_averages_all_for comparison_with_color.csv",header=TRUE)#
-#***********color#
+#This dataframe used in Figure 1#
+round_df(ps_df_named, 1)->ps_df_named#
+#
+displaysites(cyp2aligned(c(178, 404))) -> colorsites#
+cbind(colorsites[,2:3], ps_df_named[1:18]) -> compositetable#
+#
+c(178, 404,aligned2cyp(meme$Codon), fel, "", "", "") -> cyprow#
+rbind(cyprow, compositetable) -> fullcompositetable#
+rownames(fullcompositetable)[1] <- "Cypridina Site Number"#
+#
+rbind(fullcompositetable, c("-", "-","+","+","+","+","+","+","+","+","+","+","+", "+","+", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[17] <- "Significant Episodic Diversifying Selection"#
+rbind(fullcompositetable, c("+", "+","-","-","+","+","-","-","+","-","-","-","-", "-","-", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[18] <- "Significant Correlation with Lambda Max"#
+rbind(fullcompositetable, c("-", "-","-","-","-","-","+","-","+","+","-","+","-", "-","-", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[19] <- "Significant Correlation with Enzymatic Decay"
+fullcompositetable
+data.frame(InterestingSites[-1]) -> ps_df; ps_df->ps_df_named;#
+rownames(ps_df_named) <- pos_sel$sp#
+rownames(ps_df_named) <- pos_sel$sp#
+#
+round_df <- function(x, digits) {#
+    # round all numeric variables#
+    # x: data frame #
+    # digits: number of digits to round#
+    numeric_columns <- sapply(x, mode) == 'numeric'#
+    x[numeric_columns] <-  round(x[numeric_columns], digits)#
+    x#
+}#
+#
+#This dataframe used in Figure 1#
+round_df(ps_df_named, 1)->ps_df_named#
+#
+displaysites(cyp2aligned(c(178, 404))) -> colorsites#
+cbind(colorsites[,2:3], ps_df_named[1:18]) -> compositetable#
+#
+c(178, 404,aligned2cyp(meme$Codon), fel, "", "", "") -> cyprow#
+rbind(cyprow, compositetable) -> fullcompositetable#
+rownames(fullcompositetable)[1] <- "Cypridina Site Number"#
+#
+rbind(fullcompositetable, c("-", "-","-","-","-","-","-","-","-","-","-","-","-", "-","-", "+", "+", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[17] <- "Significant Episodic Diversifying Selection"#
+rbind(fullcompositetable, c("-", "-","+","+","+","+","+","+","+","+","+","+","+", "+","+", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[18] <- "Significant Episodic Diversifying Selection"#
+rbind(fullcompositetable, c("+", "+","-","-","+","+","-","-","+","-","-","-","-", "-","-", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[19] <- "Significant Correlation with Lambda Max"#
+rbind(fullcompositetable, c("-", "-","-","-","-","-","+","-","+","+","-","+","-", "-","-", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[20] <- "Significant Correlation with Enzymatic Decay"
+displaysites(cyp2aligned(c(178, 404))) -> colorsites#
+cbind(colorsites[,2:3], ps_df_named[1:18]) -> compositetable#
+#
+c(178, 404,aligned2cyp(meme$Codon), fel, "", "", "") -> cyprow#
+rbind(cyprow, compositetable) -> fullcompositetable#
+rownames(fullcompositetable)[1] <- "Cypridina Site Number"#
+#
+rbind(fullcompositetable, c("-", "-","-","-","-","-","-","-","-","-","-","-","-", "-","-", "+", "+", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[17] <- "Significant Pervasive Diversifying Selection"#
+rbind(fullcompositetable, c("-", "-","+","+","+","+","+","+","+","+","+","+","+", "+","+", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[18] <- "Significant Episodic Diversifying Selection"#
+rbind(fullcompositetable, c("+", "+","-","-","+","+","-","-","+","-","-","-","-", "-","-", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[19] <- "Significant Correlation with Lambda Max"#
+rbind(fullcompositetable, c("-", "-","-","-","-","-","+","-","+","+","-","+","-", "-","-", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[20] <- "Significant Correlation with Enzymatic Decay"
+fullcompositetable
+data.frame(InterestingSites[-1]) -> ps_df; ps_df->ps_df_named;#
+rownames(ps_df_named) <- pos_sel$sp#
+rownames(ps_df_named) <- pos_sel$sp#
+#
+round_df <- function(x, digits) {#
+    # round all numeric variables#
+    # x: data frame #
+    # digits: number of digits to round#
+    numeric_columns <- sapply(x, mode) == 'numeric'#
+    x[numeric_columns] <-  round(x[numeric_columns], digits)#
+    x#
+}#
+#
+#This dataframe used in Figure 1#
+round_df(ps_df_named, 1)->ps_df_named#
+#
+displaysites(cyp2aligned(c(178, 404))) -> colorsites#
+cbind(colorsites[,2:3], ps_df_named[1:18]) -> compositetable#
+#
+c(178, 404,aligned2cyp(meme$Codon), fel, "", "", "") -> cyprow#
+rbind(cyprow, compositetable) -> fullcompositetable#
+rownames(fullcompositetable)[1] <- "Cypridina Site Number"#
+#
+rbind(fullcompositetable, c("-", "-","-","-","-","-","-","-","-","-","-","-","-", "-","-", "+", "+", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[17] <- "Significant Pervasive Diversifying Selection (FEL)"#
+rbind(fullcompositetable, c("-", "-","+","+","+","+","+","+","+","+","+","+","+", "+","+", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[18] <- "Significant Episodic Diversifying Selection (MEME)"#
+rbind(fullcompositetable, c("+", "+","-","-","+","+","-","-","+","-","-","-","-", "-","-", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[19] <- "Significant Correlation with Lambda Max"#
+rbind(fullcompositetable, c("-", "-","-","-","-","-","+","-","+","+","-","+","-", "-","-", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[20] <- "Significant Correlation with Enzymatic Decay"
+fullcompositetable
+rbind(fullcompositetable, c("-", "-","-","-","-","-","-","-","-","-","-","-","-", "-","-", "+", "+", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[17] <- "Significant Pervasive Diversifying Selection (FEL)"#
+rbind(fullcompositetable, c("-", "-","+","+","+","+","+","+","+","+","+","+","+", "+","+", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[18] <- "Significant Episodic Diversifying Selection (MEME)"#
+rbind(fullcompositetable, c("+", "+","-","-","+","+","-","-","+","-","-","-","-", "-","-", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[19] <- "Significant Correlation with Lambda Max"#
+rbind(fullcompositetable, c("-", "-","-","-","-","-","+","-","+","+","-","+","-", "-","-", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[20] <- "Significant Correlation with Enzymatic Decay"
+fullcompositetable
+data.frame(InterestingSites[-1]) -> ps_df; ps_df->ps_df_named;#
+rownames(ps_df_named) <- pos_sel$sp#
+rownames(ps_df_named) <- pos_sel$sp#
+#
+round_df <- function(x, digits) {#
+    # round all numeric variables#
+    # x: data frame #
+    # digits: number of digits to round#
+    numeric_columns <- sapply(x, mode) == 'numeric'#
+    x[numeric_columns] <-  round(x[numeric_columns], digits)#
+    x#
+}#
+#
+#This dataframe used in Figure 1#
+round_df(ps_df_named, 1)->ps_df_named#
+#
+displaysites(cyp2aligned(c(178, 404))) -> colorsites#
+cbind(colorsites[,2:3], ps_df_named[1:18]) -> compositetable#
+#
+c(178, 404,aligned2cyp(meme$Codon), fel, "", "", "") -> cyprow#
+rbind(cyprow, compositetable) -> fullcompositetable#
+rownames(fullcompositetable)[1] <- "Cypridina Site Number"#
+#
+rbind(fullcompositetable, c("-", "-","-","-","-","-","-","-","-","-","-","-","-", "-","-", "+", "+", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[17] <- "Significant Pervasive Diversifying Selection (FEL)"#
+rbind(fullcompositetable, c("-", "-","+","+","+","+","+","+","+","+","+","+","+", "+","+", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[18] <- "Significant Episodic Diversifying Selection (MEME)"#
+rbind(fullcompositetable, c("+", "+","-","-","+","+","-","-","+","-","-","-","-", "-","-", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[19] <- "Significant Correlation with Lambda Max"#
+rbind(fullcompositetable, c("-", "-","-","-","-","-","+","-","+","+","-","+","-", "-","-", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[20] <- "Significant Correlation with Enzymatic Decay"#
+fullcompositetable
+fullcompositetable
+data.frame(InterestingSites[-1]) -> ps_df; ps_df->ps_df_named;#
+rownames(ps_df_named) <- pos_sel$sp#
+rownames(ps_df_named) <- pos_sel$sp#
+#
+round_df <- function(x, digits) {#
+    # round all numeric variables#
+    # x: data frame #
+    # digits: number of digits to round#
+    numeric_columns <- sapply(x, mode) == 'numeric'#
+    x[numeric_columns] <-  round(x[numeric_columns], digits)#
+    x#
+}#
+#
+#This dataframe used in Figure 1#
+round_df(ps_df_named, 1)->ps_df_named#
+#
+displaysites(cyp2aligned(c(178, 404))) -> colorsites#
+cbind(colorsites[,2:3], ps_df_named[1:18]) -> compositetable#
+#
+c(178, 404,aligned2cyp(meme$Codon), fel, "", "", "") -> cyprow#
+rbind(cyprow, compositetable) -> fullcompositetable#
+rownames(fullcompositetable)[1] <- "Cypridina Site Number"#
+#
+rbind(fullcompositetable, c("-", "-","-","-","-","-","-","-","-","-","-","-","-", "-","-", "+", "+", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[17] <- "Significant Pervasive Diversifying Selection (FEL)"#
+#
+rbind(fullcompositetable, c("-", "-","+","+","+","+","+","+","+","+","+","+","+", "+","+", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[18] <- "Significant Episodic Diversifying Selection (MEME)"#
+#
+rbind(fullcompositetable, c("M", "M","-","-","+","+","-","-","+","-","-","-","-", "-","-", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[19] <- "Significant Correlation with Lambda Max"#
+#
+rbind(fullcompositetable, c("-", "-","-","-","-","-","+","-","+","+","-","+","-", "-","-", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[20] <- "Significant Correlation with Enzymatic Decay"#
+#
+fullcompositetable
+InterestingSites[complete.cases(InterestingSites), ] -> full#
+data.frame(cbind(full$Lmax_Mean, full$lambda))->pms#
+row.names(pms) <- full$sp#
+c("Khas", "Mchi", "MspIR", "MspSVU", "Pan", "Pmor",  "PspWLU", "Vhil")-> row.names(pms)#
+pruned.tree<-drop.tip(luc_tree,luc_tree$tip.label[-match(full$sp, luc_tree$tip.label)])#
+c("Mchi", "MspIR", "MspSVU", "Pmor", "Pan", "PspWLU", "Khas", "Vhil")->pruned.tree$tip.label#
+#
+phylomorphospace(pruned.tree, pms, label="radial", xlab="Lambda max (nm)", ylab="Enzymatic Decay Constant", cx=.1)
+fullcompositetable
+require(phytools)#
+#
+InterestingSites[complete.cases(InterestingSites), ] -> full#
+data.frame(cbind(full$Lmax_Mean, full$lambda))->pms#
+row.names(pms) <- full$sp#
+c("Khas", "Mchi", "MspIR", "MspSVU", "Pan", "Pmor",  "PspWLU", "Vhil")-> row.names(pms)#
+pruned.tree<-drop.tip(luc_tree,luc_tree$tip.label[-match(full$sp, luc_tree$tip.label)])#
+c("Mchi", "MspIR", "MspSVU", "Pmor", "Pan", "PspWLU", "Khas", "Vhil")->pruned.tree$tip.label#
+#
+phylomorphospace(pruned.tree, pms, label="radial", xlab="Lambda max (nm)", ylab="Enzymatic Decay Constant", cx=.1)
+InterestingSites
+aligned2cyp(41)
+fullcompositetable
+alignment
+tree<-luc_tree
+fullcompositetable
+x <-alignment$s207
+x
+help(getstates)
+help(getStates)
+plotTree(tree,type="fan",fsize=0.8,ftype="i")
+require(phytools)
+plotTree(tree,type="fan",fsize=0.8,ftype="i")
+phytools.plotTree()
+plot.tree(tree,type="fan",fsize=0.8,ftype="i")
+plot.tree(tree)
+plot(tree)
+unloadNamespace("plotTree")
+help(plotTree)
+nloadNamespace("plotTree")#
+#
+require(phytools)
+unloadNamespace("plotTree")#
+#
+require(phytools)
+plotTree(tree,type="fan",fsize=0.8,ftype="i")
+x <- alignment$s207
+row.names(x) <- alignment$sp
+x
+alignment$sp
+row.names(x) <- alignment$sp
+row.names(x)
+df(x)
+data.frame(x)
+data.frame
+data.frame(x, row.names=alignment$sp)
+data.frame(x, row.names=alignment$sp) -> x
+setNames(x[,1], rownames(x))
+s207 <- setNames(x[,1], rownames(x))
+s207
+plotTree(luc_tree,type="fan",fsize=0.7,ftype="i",lwd=1)
+luc_tree <- read.newick(file="LuciferaseTree_dNds/results/phylogenies/combined_codon.treefile")#
+#
+tree<-luc_tree#
+x <- alignment$s207#
+#
+data.frame(x, row.names=alignment$sp) -> x#
+#
+s207 <- setNames(x[,1], rownames(x))
+require(dplyr)#
+#
+alignment <- read.csv("LuciferaseTree_dNds/results/combined_aa.csv",header=FALSE, stringsAsFactors=FALSE, colClasses = c("character"))#
+alignment %>% arrange(V1) -> alignment #sort by species name #
+colnames(alignment)[2:ncol(alignment)] <- paste("s",seq(1,(ncol(alignment)-1)),sep=""); colnames(alignment)[1] <- "sp"
+require(phytools)#
+#
+luc_tree <- read.newick(file="LuciferaseTree_dNds/results/phylogenies/combined_codon.treefile")#
+#
+tree<-luc_tree#
+x <- alignment$s207#
+#
+data.frame(x, row.names=alignment$sp) -> x#
+#
+s207 <- setNames(x[,1], rownames(x))
+plotTree(eel.tree,type="fan",fsize=0.7,ftype="i",lwd=1)
+plotTree(luc_tree,type="fan",fsize=0.7,ftype="i",lwd=1)
+plotTree(luc_tree,type="fan",fsize=5,ftype="i",lwd=1)
+plotTree(luc_tree,type="fan",fsize=.1,ftype="i",lwd=1)
+plotTree(luc_tree,type="fan",fsize=.3,ftype="i",lwd=1)
+plotTree(luc_tree,fsize=.3,ftype="i",lwd=1)
+plotTree(luc_tree,fsize=.6,ftype="i",lwd=1)
+cols<-setNames(c("red","blue", "green", "orange"),levels(s207))
+s207 <- setNames(x[,1], rownames(x))#
+plotTree(luc_tree,fsize=.6,ftype="i",lwd=1)#
+#
+cols<-setNames(c("red","blue", "green", "orange"),levels(s207))
+s207 <- setNames(x[,1], rownames(x))#
+plotTree(luc_tree,fsize=.6,ftype="i",lwd=1)#
+#
+cols<-setNames(c("red","blue", "green", "orange"),levels(s207))#
+#
+tiplabels(pie=to.matrix(s207[luc_tree$tip.label],#
+    levels(s207)),piecol=cols,cex=0.3)
+tree<-luc_tree#
+x <- alignment$s207#
+#
+data.frame(x, row.names=alignment$sp) -> x#
+#
+s207 <- setNames(x[,1], rownames(x))#
+plotTree(luc_tree,fsize=.6,ftype="i",lwd=1)#
+#
+cols<-setNames(c("red","blue", "green", "orange"),levels(s207))#
+#
+tiplabels(pie=to.matrix(s207[luc_tree$tip.label],#
+    levels(s207)),piecol=cols,cex=0.3)#
+#
+add.simmap.legend(colors=cols,prompt=FALSE,x=0.9*par()$usr[1],#
+    y=0.8*par()$usr[3],fsize=0.8)
+fitER<-ace(s207,luc_tree,model="ER",type="discrete")#
+fitER
+fitER<-ace(s207,luc_tree,model="ER",type="discrete")
+luc_tree <- read.newick(file="LuciferaseTree_dNds/results/phylogenies/combined_codon.treefile")#
+ladderize(luc_tree, right=TRUE) -> luc_tree#
+reroot(luc_tree, 17, resolve.root=TRUE, .5) -> luc_tree_root #root tree at midpoint of branch, which ape does not like to do#
+#
+tree<-luc_tree#
+x <- alignment$s207#
+#
+data.frame(x, row.names=alignment$sp) -> x#
+#
+s207 <- setNames(x[,1], rownames(x))#
+plotTree(luc_tree,fsize=.6,ftype="i",lwd=1)#
+#
+cols<-setNames(c("red","blue", "green", "orange"),levels(s207))#
+#
+tiplabels(pie=to.matrix(s207[luc_tree$tip.label],#
+    levels(s207)),piecol=cols,cex=0.3)
+fitER<-ace(s207,luc_tree,model="ER",type="discrete")#
+fitER
+fitER<-ace(s207,luc_tree_root,model="ER",type="discrete")
+fitER
+data.frame(x, row.names=alignment$sp) -> x#
+#
+s207 <- setNames(x[,1], rownames(x))#
+plotTree(luc_tree_root,fsize=.6,ftype="i",lwd=1)#
+#
+cols<-setNames(c("red","blue", "green", "orange"),levels(s207))#
+#
+tiplabels(pie=to.matrix(s207[luc_tree$tip.label],#
+    levels(s207)),piecol=cols,cex=0.3)#
+fitER<-ace(s207,luc_tree_root,model="ER",type="discrete")#
+fitER
+luc_tree <- read.newick(file="LuciferaseTree_dNds/results/phylogenies/combined_codon.treefile")#
+ladderize(luc_tree, right=TRUE) -> luc_tree#
+reroot(luc_tree, 17, resolve.root=TRUE, .5) -> luc_tree_root #root tree at midpoint of branch, which ape does not like to do#
+#
+tree<-luc_tree#
+x <- alignment$s207#
+#
+data.frame(x, row.names=alignment$sp) -> x#
+#
+s207 <- setNames(x[,1], rownames(x))#
+plotTree(luc_tree_root,fsize=.6,ftype="i",lwd=1)#
+#
+cols<-setNames(c("red","blue", "green", "orange"),levels(s207))#
+#
+tiplabels(pie=to.matrix(s207[luc_tree_root$tip.label],#
+    levels(s207)),piecol=cols,cex=0.3)
+fitER<-ace(s207,luc_tree_root,model="ER",type="discrete")#
+fitER
+fitER$lik.anc
+plotTree(luc_tree_root,fsize=.6,ftype="i",lwd=1)#
+#
+nodelabels(node=1:luc_tree_root$Nnode+Ntip(luc_tree_root),#
+    pie=fitER$lik.anc,piecol=cols,cex=0.4)#
+tiplabels(pie=to.matrix(s207[luc_tree_root$tip.label],#
+    levels(s207)),piecol=cols,cex=0.3)
+help(plotTree)
+alignment$s207
+alignment[,207]
+alignment[,206]
+alignment[,208]
+luc_tree <- read.newick(file="LuciferaseTree_dNds/results/phylogenies/combined_codon.treefile")#
+ladderize(luc_tree, right=TRUE) -> luc_tree#
+reroot(luc_tree, 17, resolve.root=TRUE, .5) -> luc_tree_root #root tree at midpoint of branch, which ape does not like to do#
+#
+tree<-luc_tree#
+x <- alignment$s207#
+#
+data.frame(x, row.names=alignment$sp) -> x#
+#
+s207 <- setNames(x[,1], rownames(x))#
+plotTree(luc_tree_root,fsize=.6,ftype="i",lwd=1)#
+#
+cols<-setNames(c("red","blue", "green", "orange"),levels(s207))#
+#
+tiplabels(pie=to.matrix(s207[luc_tree_root$tip.label],#
+    levels(s207)),piecol=cols,cex=0.3)#
+fitER<-ace(s207,luc_tree_root,model="ER",type="discrete")#
+fitER#
+fitER$lik.anc#
+#
+plotTree(luc_tree_root,fsize=.6,ftype="i",lwd=1)#
+#
+nodelabels(node=1:luc_tree_root$Nnode+Ntip(luc_tree_root),#
+    pie=fitER$lik.anc,piecol=cols,cex=0.4)#
+tiplabels(pie=to.matrix(s207[luc_tree_root$tip.label],#
+    levels(s207)),piecol=cols,cex=0.3)
+help(plotTree)
+luc_tree <- read.newick(file="LuciferaseTree_dNds/results/phylogenies/combined_codon.treefile")#
+ladderize(luc_tree, right=TRUE) -> luc_tree#
+reroot(luc_tree, 17, resolve.root=TRUE, .5) -> luc_tree_root #root tree at midpoint of branch, which ape does not like to do#
+#
+tree<-luc_tree#
+x <- alignment$s207#
+#
+data.frame(x, row.names=alignment$sp) -> x#
+#
+s207 <- setNames(x[,1], rownames(x))#
+fitER<-ace(s207,luc_tree_root,model="ER",type="discrete")#
+fitER#
+fitER$lik.anc#
+#
+quartz("Site 207 - Neutrally evolving color site", 10, 4)#
+plotTree(luc_tree_root,fsize=.6,ftype="i",lwd=1)#
+#
+nodelabels(node=1:luc_tree_root$Nnode+Ntip(luc_tree_root),#
+    pie=fitER$lik.anc,piecol=cols,cex=0.4)#
+tiplabels(pie=to.matrix(s207[luc_tree_root$tip.label],#
+    levels(s207)),piecol=cols,cex=0.3)
+quartz("Site 207 - Neutrally evolving color site", 10, 5)#
+plotTree(luc_tree_root,fsize=.6,ftype="i",lwd=1)#
+#
+nodelabels(node=1:luc_tree_root$Nnode+Ntip(luc_tree_root),#
+    pie=fitER$lik.anc,piecol=cols,cex=0.4)#
+tiplabels(pie=to.matrix(s207[luc_tree_root$tip.label],#
+    levels(s207)),piecol=cols,cex=0.3)
+quartz("Site 207 - Neutrally evolving color site", 7, 5)#
+plotTree(luc_tree_root,fsize=.6,ftype="i",lwd=1)#
+#
+nodelabels(node=1:luc_tree_root$Nnode+Ntip(luc_tree_root),#
+    pie=fitER$lik.anc,piecol=cols,cex=0.4)#
+tiplabels(pie=to.matrix(s207[luc_tree_root$tip.label],#
+    levels(s207)),piecol=cols,cex=0.3)
+quartz("Site 207 - Neutrally evolving color site", 8, 5)#
+plotTree(luc_tree_root,fsize=.6,ftype="i",lwd=1)#
+#
+nodelabels(node=1:luc_tree_root$Nnode+Ntip(luc_tree_root),#
+    pie=fitER$lik.anc,piecol=cols,cex=0.4)#
+tiplabels(pie=to.matrix(s207[luc_tree_root$tip.label],#
+    levels(s207)),piecol=cols,cex=0.3)
+plotASRsite <- function(site) {#
+	x <- alignment[, site+1]#
+	data.frame(x, row.names=alignment$sp) -> x#
+#
+	cursite <- setNames(x[,1], rownames(x))#
+	fitER<-ace(cursite,luc_tree_root,model="ER",type="discrete")#
+	fitER#
+	fitER$lik.anc#
+#
+	quartz("Site 207 - Neutrally evolving color site", 8, 5)#
+	plotTree(luc_tree_root,fsize=.6,ftype="i",lwd=1)#
+#
+	nodelabels(node=1:luc_tree_root$Nnode+Ntip(luc_tree_root),#
+    		pie=fitER$lik.anc,piecol=cols,cex=0.4)#
+	tiplabels(pie=to.matrix(cursite[luc_tree_root$tip.label],#
+    		levels(cursite)),piecol=cols,cex=0.3)#
+}
+plotASRsite(207)
+fullcompositetable
+require(dplyr)#
+#
+alignment <- read.csv("LuciferaseTree_dNds/results/combined_aa.csv",header=FALSE, stringsAsFactors=FALSE, colClasses = c("character"))#
+alignment %>% arrange(V1) -> alignment #sort by species name #
+colnames(alignment)[2:ncol(alignment)] <- paste("s",seq(1,(ncol(alignment)-1)),sep=""); colnames(alignment)[1] <- "sp"#
+#**************Functions to translate between alignment numbers for individual amino acids#
+aligned2cyp <- function(alignednumber) {		#This translates the present alignment number to the # in Cypridina. Input ##
+	#conversion table for sites corresponding between Cypridina and present alignment#
+	read.csv(file="LuciferaseTree_dNds/results/CypSites.csv")->cyptoalign#
+	cyptoalign$Cypridina_noctiluca_BAD08210[match(alignednumber,cyptoalign$Aligned)]#
+}#
+cyp2aligned <- function(cypnumber) {		#This translates the number in Cyprdina to the present alignment number. Input ##
+	#conversion table for sites corresponding between Cypridina and present alignment#
+	read.csv(file="LuciferaseTree_dNds/results/CypSites.csv")->cyptoalign#
+	cyptoalign$Aligned[match(cypnumber,cyptoalign$Cypridina_noctiluca_BAD08210)]#
+}#
+displaysites <- function(al_sites){#
+	alignment <- read.csv("LuciferaseTree_dNds/results/combined_aa.csv",header=FALSE, stringsAsFactors=FALSE, colClasses = c("character"))#
+	alignment %>% arrange(V1) -> alignment #sort by species name #
+	colnames(alignment)[2:ncol(alignment)] <- paste("s",seq(1,(ncol(alignment)-1)),sep=""); colnames(alignment)[1] <- "sp"#
+#
+	view <- alignment[,c("sp",paste("s",al_sites, sep=""))]#
+	data.frame(view[-1]) -> view_df; view_df->view_df_named;#
+	rownames(view_df_named) <- view$sp#
+	view	#
+}#
+#****************In old versions, I hand coded mutations into a csv file. These could be error prone, so did more automated approach below#
+#These are therefore no longer used#
+#For simplicity in R coding, I have 3 separate files. If I were better at R I could easily pull subsets out of 1 large file, but alas#
+#So, cnplus is a file that contains all the sequence data#
+read.csv(file="Luciferase/Cypridina only.csv") -> cn#
+read.csv(file="Luciferase/Cypridina mutagenesis.csv") -> cnplus#
+read.csv(file="Luciferase/NonCypridina only.csv") -> nc#
+#
+#*****************These are important sites -- either mutated or under positive selection#
+	#Mutated#
+allmutsites <- c(38, 45, 75, 79, 87, 126, 167, 170, 178, 191, 197, 223, 258, 276, 280, 372, 375, 403, 404, 405, 406, 407, 479)#
+  al_allmutsites <- cyp2aligned(allmutsites)#
+#
+varmutsites <- c(38, 178, 375, 404, 405) #Cypridina numbering sites with 3 states#
+  al_varmutsites <- cyp2aligned(varmutsites)#
+#
+	#Positive selection#
+al_fel <- c(43, 209) #positively selected in FEL these are alignment numbers#
+  fel <- aligned2cyp(al_fel)#
+#
+meme_table <- read.csv("LuciferaseTree_dNds/results/hyphy/lucclade.meme.csv",header=TRUE)#
+al_meme <- meme_table$Codon#
+  meme <- aligned2cyp(al_meme)#
+#******************Create data frame for mutations (only lmax for mutations). data frame called mutated#
+#csv file containing mutants and lmax data#
+read.csv(file="LuciferaseTree_dNds/results/Cypridina_mutations.csv", header=FALSE, stringsAsFactors=FALSE, colClasses = c("character"))->mutseqs#
+colnames(mutseqs)[2:ncol(mutseqs)] <- paste("c",seq(1,(ncol(mutseqs)-1)),sep="")#
+colnames(mutseqs)[555] <- "lmax" #last column is 555, which contains lambda max values for mutants#
+mutated <- data.frame(cbind(mutseqs$V1, mutseqs$c38, mutseqs$c45, mutseqs$c75, mutseqs$c79, mutseqs$c87, mutseqs$c126, mutseqs$c167, mutseqs$c170, mutseqs$c178, mutseqs$c191, mutseqs$c197, mutseqs$c223, mutseqs$c258, mutseqs$c276, mutseqs$c280, mutseqs$c372, mutseqs$c375, mutseqs$c403, mutseqs$c404, mutseqs$c405, mutseqs$c406, mutseqs$c407, mutseqs$c479, mutseqs$lmax) )#
+colnames(mutated) <- c("mutant", "c38", "c45", "c75", "c79","c87", "c126", "c167", "c170", "c178", "c191", "c197", "c223", "c258", "c276", "c280", "c372", "c375", "c403", "c404", "c405", "c406", "c407", "c479", "lmax")#
+as.numeric(as.character(mutated$lmax))->mutated$lmax#
+#
+#********************Create data frame for natural variants of mutated sites.  The data fram is called mut_nat_col for mutated sites; natural; color#
+#combine cypridina mutations with natural luciferases for mutated sites#
+#
+displaysites(al_allmutsites) -> nat_mutsites#
 table1 <- read.table(file="Table1.txt", sep="\t", header=TRUE) #Read again if not executed above#
 translate <- read.csv("Raw Data/expression-kinetics/translate_lucname_decayname.csv",header=TRUE)#
 tmpmerge <- merge(translate, table1, by='Species')#
-lucNcolor <- merge(dat, tmpmerge, by='sp')#
-pos_sel_col <- lucNcolor[,c("sp",paste("s",meme$Codon, sep=""),"Lmax_Mean", "FWHM_Mean")]#
+lucNcolor <- merge(nat_mutsites, tmpmerge, by='sp')#
+natural_col <- merge(alignment, tmpmerge, by='sp')#
+alignment_numbers <- c(38, 45, 75, 79, 87, 126, 167, 170, 178, 191, 197, 223, 258, 276, 280, 372, 375, 403, 404, 405, 406, 407, 479)#
+cbind(natural_col$sp,natural_col[,cyp2aligned(alignment_numbers+1)], natural_col$Lmax_Mean) -> mut_nat_col#
+colnames(mut_nat_col) <- colnames(mutated)#
+#
+#********************Combine mutated sites and natural variants at those same sites called all_col_mut#
+rbind(mutated, mut_nat_col) -> all_col_mut#
+#
+#*******************sites differ between Pan and Pmo#
+displaysites(c(38,57,110,111,171,182,187,189,224,266,273,371,478)) -> panpmo#
+#
+#***********************#
+#Read results in csv from meme selection analysis, including positively selected sites#
+meme <- read.csv("LuciferaseTree_dNds/results/hyphy/lucclade.meme.csv",header=TRUE)#
+#Pull positively selected sites using vector of output table from meme#
+#Add 2 FEL sites #
+c(meme_table$Codon, 43, 209) -> addfel#
+pos_sel <- alignment[,c("sp",paste("s",addfel, sep=""))]#
+#
+#******************Now combine positively selected site data with color  data#
+translate <- read.csv("Raw Data/expression-kinetics/translate_lucname_decayname.csv",header=TRUE)#
+tmpmerge <- merge(translate, table1, by='Species')#
+lucNcolor <- merge(alignment, tmpmerge, by='sp')#
+pos_sel_col <- lucNcolor[,c("sp",paste("s",addfel, sep=""),"Lmax_Mean", "FWHM_Mean")]#
 remove_constant(pos_sel_col)->pos_sel_col ##Invariant sites because luc varies in spp without color data #
 #
-options(na.action = "na.fail")#
-#doesn't work inside lm function but can cut and paste manually -- no invariant sites for color#
-paste(colnames(pos_sel_col)[4:ncol(pos_sel_col)-2], collapse=" + "   )#
+#******************Here combining positively selected site data with decay data#
+decay <- read.csv("Raw Data/expression-kinetics/decay_averages_all_for comparison_with_color.csv",header=TRUE)#
+translate <- read.csv("Raw Data/expression-kinetics/translate_lucname_decayname.csv",header=TRUE)#
+tmpmerge <- merge(decay, translate, by="PubName")#
+lucNkinetics <- merge(alignment, tmpmerge, by="sp")#
+pos_sel_decay <- lucNkinetics[,c("sp",paste("s",meme$Codon, sep=""),"lambda")]#
+remove_constant(pos_sel_decay)->pos_sel_decay ##Invariant sites because luc varies in spp without decay data #
 #
-colorlm_fel <- lm(Lmax_Mean ~ s43 + s209, data=pos_sel_col)#
-colorlm <- lm(Lmax_Mean ~ s41 + s93 + s102 + s142 + s160 + s177 + s189 + s261 + s285 + s291 + s320 + s389 + s477, data=pos_sel_col)#
-fwhmlm <- lm(FWHM_Mean ~ s41 + s93 + s102 + s142 + s160 + s177 + s189 + s261 + s285 + s291 + s320 + s389 + s477, data=pos_sel_col)
-pos_sel
-library(gridExtra); library(grid); require(janitor);#
-library(MuMIn);#
+#*****************Create data frame for luciferase, decay, and color for any available data#
+tmpmerge <- merge(translate, table1, by='Species', all=TRUE)#
+tmpmerge2 <- merge(tmpmerge, decay, by = 'PubName', all=TRUE)#
+#remove some columns we do not need#
+!names(datamerge) %in% c("N", "PubName", "Species", "country", "genus", "n_lam", "Lmax_SD", "FWHM_SD", "lamSE") -> bool#
+datamerge[,bool] -> InterestingSites#
+memepvals <- lapply(meme$Episodicselectiondetected, function(x) {#
+               gsub("Yes_p=", "", x)#
+               })#
+c("",memepvals, "", "", "", "", "") -> mprow#
 #
-#Read in luciferase alignment and sites under selection#
-dat <- read.csv("LuciferaseTree_dNds/results/combined_aa.csv",header=FALSE, stringsAsFactors=FALSE, colClasses = c("character"))#
-#Columns are +1 compared to meme due to sp colum#
-#Next command alters numbers by 1 to account for this and name species column sp#
-colnames(dat)[2:ncol(dat)] <- paste("s",seq(1,(ncol(dat)-1)),sep="")#
-colnames(dat)[1] <- "sp"#
-require(tidyverse)#
-dat %>% arrange(sp) -> dat #sort by species name #
-#Here is aligned amino acid file used for codon alignment. #
+data.frame(InterestingSites[-1]) -> ps_df; ps_df->ps_df_named;#
+rownames(ps_df_named) <- pos_sel$sp#
+rownames(ps_df_named) <- pos_sel$sp#
+#
+round_df <- function(x, digits) {#
+    # round all numeric variables#
+    # x: data frame #
+    # digits: number of digits to round#
+    numeric_columns <- sapply(x, mode) == 'numeric'#
+    x[numeric_columns] <-  round(x[numeric_columns], digits)#
+    x#
+}#
+#
+#This dataframe used in Figure 1#
+round_df(ps_df_named, 1)->ps_df_named#
+#
+displaysites(cyp2aligned(c(178, 404))) -> colorsites#
+cbind(colorsites[,2:3], ps_df_named[1:18]) -> compositetable#
+#
+c(178, 404,aligned2cyp(meme$Codon), fel, "", "", "") -> cyprow#
+rbind(cyprow, compositetable) -> fullcompositetable#
+rownames(fullcompositetable)[1] <- "Cypridina Site Number"#
+#
+rbind(fullcompositetable, c("-", "-","-","-","-","-","-","-","-","-","-","-","-", "-","-", "+", "+", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[17] <- "Significant Pervasive Diversifying Selection (FEL)"#
+#
+rbind(fullcompositetable, c("-", "-","+","+","+","+","+","+","+","+","+","+","+", "+","+", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[18] <- "Significant Episodic Diversifying Selection (MEME)"#
+#
+rbind(fullcompositetable, c("M", "M","-","-","+","+","-","-","+","-","-","-","-", "-","-", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[19] <- "Significant Correlation with Lambda Max"#
+#
+rbind(fullcompositetable, c("-", "-","-","-","-","-","+","-","+","+","-","+","-", "-","-", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[20] <- "Significant Correlation with Enzymatic Decay"#
+#
+fullcompositetable
+tmpmerge <- merge(translate, table1, by='Species', all=TRUE)
+datamerge <- merge(tmpmerge, decay, by = 'PubName', all=TRUE)
+!names(datamerge) %in% c("N", "PubName", "Species", "country", "genus", "n_lam", "Lmax_SD", "FWHM_SD", "lamSE") -> bool
+datamerge[,bool] -> InterestingSites
+InterestingSites
+InterestingSites
+datamerge <- merge(alignment, tmpmerge2, by="sp", all=TRUE)
+datamerge
+datamerge <- merge(alignment, tmpmerge2, by="sp")
+!names(datamerge) %in% c("N", "PubName", "Species", "country", "genus", "n_lam", "Lmax_SD", "FWHM_SD", "lamSE") -> bool#
+datamerge[,bool] -> InterestingSites
+InterestingSites
+require(dplyr)#
+#
+alignment <- read.csv("LuciferaseTree_dNds/results/combined_aa.csv",header=FALSE, stringsAsFactors=FALSE, colClasses = c("character"))#
+alignment %>% arrange(V1) -> alignment #sort by species name #
+colnames(alignment)[2:ncol(alignment)] <- paste("s",seq(1,(ncol(alignment)-1)),sep=""); colnames(alignment)[1] <- "sp"#
+#**************Functions to translate between alignment numbers for individual amino acids#
+aligned2cyp <- function(alignednumber) {		#This translates the present alignment number to the # in Cypridina. Input ##
+	#conversion table for sites corresponding between Cypridina and present alignment#
+	read.csv(file="LuciferaseTree_dNds/results/CypSites.csv")->cyptoalign#
+	cyptoalign$Cypridina_noctiluca_BAD08210[match(alignednumber,cyptoalign$Aligned)]#
+}#
+cyp2aligned <- function(cypnumber) {		#This translates the number in Cyprdina to the present alignment number. Input ##
+	#conversion table for sites corresponding between Cypridina and present alignment#
+	read.csv(file="LuciferaseTree_dNds/results/CypSites.csv")->cyptoalign#
+	cyptoalign$Aligned[match(cypnumber,cyptoalign$Cypridina_noctiluca_BAD08210)]#
+}#
+displaysites <- function(al_sites){#
+	alignment <- read.csv("LuciferaseTree_dNds/results/combined_aa.csv",header=FALSE, stringsAsFactors=FALSE, colClasses = c("character"))#
+	alignment %>% arrange(V1) -> alignment #sort by species name #
+	colnames(alignment)[2:ncol(alignment)] <- paste("s",seq(1,(ncol(alignment)-1)),sep=""); colnames(alignment)[1] <- "sp"#
+#
+	view <- alignment[,c("sp",paste("s",al_sites, sep=""))]#
+	data.frame(view[-1]) -> view_df; view_df->view_df_named;#
+	rownames(view_df_named) <- view$sp#
+	view	#
+}#
+#****************In old versions, I hand coded mutations into a csv file. These could be error prone, so did more automated approach below#
+#These are therefore no longer used#
+#For simplicity in R coding, I have 3 separate files. If I were better at R I could easily pull subsets out of 1 large file, but alas#
+#So, cnplus is a file that contains all the sequence data#
+read.csv(file="Luciferase/Cypridina only.csv") -> cn#
+read.csv(file="Luciferase/Cypridina mutagenesis.csv") -> cnplus#
+read.csv(file="Luciferase/NonCypridina only.csv") -> nc#
+#
+#*****************These are important sites -- either mutated or under positive selection#
+	#Mutated#
+allmutsites <- c(38, 45, 75, 79, 87, 126, 167, 170, 178, 191, 197, 223, 258, 276, 280, 372, 375, 403, 404, 405, 406, 407, 479)#
+  al_allmutsites <- cyp2aligned(allmutsites)#
+#
+varmutsites <- c(38, 178, 375, 404, 405) #Cypridina numbering sites with 3 states#
+  al_varmutsites <- cyp2aligned(varmutsites)#
+#
+	#Positive selection#
+al_fel <- c(43, 209) #positively selected in FEL these are alignment numbers#
+  fel <- aligned2cyp(al_fel)#
+#
+meme_table <- read.csv("LuciferaseTree_dNds/results/hyphy/lucclade.meme.csv",header=TRUE)#
+al_meme <- meme_table$Codon#
+  meme <- aligned2cyp(al_meme)#
+#******************Create data frame for mutations (only lmax for mutations). data frame called mutated#
+#csv file containing mutants and lmax data#
+read.csv(file="LuciferaseTree_dNds/results/Cypridina_mutations.csv", header=FALSE, stringsAsFactors=FALSE, colClasses = c("character"))->mutseqs#
+colnames(mutseqs)[2:ncol(mutseqs)] <- paste("c",seq(1,(ncol(mutseqs)-1)),sep="")#
+colnames(mutseqs)[555] <- "lmax" #last column is 555, which contains lambda max values for mutants#
+mutated <- data.frame(cbind(mutseqs$V1, mutseqs$c38, mutseqs$c45, mutseqs$c75, mutseqs$c79, mutseqs$c87, mutseqs$c126, mutseqs$c167, mutseqs$c170, mutseqs$c178, mutseqs$c191, mutseqs$c197, mutseqs$c223, mutseqs$c258, mutseqs$c276, mutseqs$c280, mutseqs$c372, mutseqs$c375, mutseqs$c403, mutseqs$c404, mutseqs$c405, mutseqs$c406, mutseqs$c407, mutseqs$c479, mutseqs$lmax) )#
+colnames(mutated) <- c("mutant", "c38", "c45", "c75", "c79","c87", "c126", "c167", "c170", "c178", "c191", "c197", "c223", "c258", "c276", "c280", "c372", "c375", "c403", "c404", "c405", "c406", "c407", "c479", "lmax")#
+as.numeric(as.character(mutated$lmax))->mutated$lmax#
+#
+#********************Create data frame for natural variants of mutated sites.  The data fram is called mut_nat_col for mutated sites; natural; color#
+#combine cypridina mutations with natural luciferases for mutated sites#
+#
+displaysites(al_allmutsites) -> nat_mutsites#
+table1 <- read.table(file="Table1.txt", sep="\t", header=TRUE) #Read again if not executed above#
+translate <- read.csv("Raw Data/expression-kinetics/translate_lucname_decayname.csv",header=TRUE)#
+tmpmerge <- merge(translate, table1, by='Species')#
+lucNcolor <- merge(nat_mutsites, tmpmerge, by='sp')#
+natural_col <- merge(alignment, tmpmerge, by='sp')#
+alignment_numbers <- c(38, 45, 75, 79, 87, 126, 167, 170, 178, 191, 197, 223, 258, 276, 280, 372, 375, 403, 404, 405, 406, 407, 479)#
+cbind(natural_col$sp,natural_col[,cyp2aligned(alignment_numbers+1)], natural_col$Lmax_Mean) -> mut_nat_col#
+colnames(mut_nat_col) <- colnames(mutated)#
+#
+#********************Combine mutated sites and natural variants at those same sites called all_col_mut#
+rbind(mutated, mut_nat_col) -> all_col_mut#
+#
+#*******************sites differ between Pan and Pmo#
+displaysites(c(38,57,110,111,171,182,187,189,224,266,273,371,478)) -> panpmo#
+#
+#***********************#
 #Read results in csv from meme selection analysis, including positively selected sites#
 meme <- read.csv("LuciferaseTree_dNds/results/hyphy/lucclade.meme.csv",header=TRUE)#
 #Pull positively selected sites using vector of output table from meme#
-pos_sel <- dat[,c("sp",paste("s",meme$Codon, sep=""))]#
-#decay file has translation of different codes between datasets#
-decay <- read.csv("Raw Data/expression-kinetics/decay_averages_all_for comparison_with_color.csv",header=TRUE)
-require(ggtree);#
-library(gridExtra); library(grid);#
-luc_tree <- read.newick(file="LuciferaseTree_dNds/results/phylogenies/combined_codon.treefile")#
-root(luc_tree, c("Vargula_hilgendorfii_AAA30332", "Cypridina_noctiluca_BAD08210")) -> luc_tree_root#
+#Add 2 FEL sites #
+c(meme_table$Codon, 43, 209) -> addfel#
+pos_sel <- alignment[,c("sp",paste("s",addfel, sep=""))]#
 #
-data.frame(pos_sel[-1]) -> ps_df; ps_df->ps_df_named;#
+#******************Now combine positively selected site data with color  data#
+translate <- read.csv("Raw Data/expression-kinetics/translate_lucname_decayname.csv",header=TRUE)#
+tmpmerge <- merge(translate, table1, by='Species')#
+lucNcolor <- merge(alignment, tmpmerge, by='sp')#
+pos_sel_col <- lucNcolor[,c("sp",paste("s",addfel, sep=""),"Lmax_Mean", "FWHM_Mean")]#
+remove_constant(pos_sel_col)->pos_sel_col ##Invariant sites because luc varies in spp without color data #
+#
+#******************Here combining positively selected site data with decay data#
+decay <- read.csv("Raw Data/expression-kinetics/decay_averages_all_for comparison_with_color.csv",header=TRUE)#
+translate <- read.csv("Raw Data/expression-kinetics/translate_lucname_decayname.csv",header=TRUE)#
+tmpmerge <- merge(decay, translate, by="PubName")#
+lucNkinetics <- merge(alignment, tmpmerge, by="sp")#
+pos_sel_decay <- lucNkinetics[,c("sp",paste("s",meme$Codon, sep=""),"lambda")]#
+remove_constant(pos_sel_decay)->pos_sel_decay ##Invariant sites because luc varies in spp without decay data #
+#
+#*****************Create data frame for luciferase, decay, and color for any available data#
+tmpmerge <- merge(translate, table1, by='Species', all=TRUE)#
+tmpmerge2 <- merge(tmpmerge, decay, by = 'PubName', all=TRUE)#
+datamerge <- merge(alignment, tmpmerge2, by="sp")#
+#remove some columns we do not need#
+!names(datamerge) %in% c("N", "PubName", "Species", "country", "genus", "n_lam", "Lmax_SD", "FWHM_SD", "lamSE") -> bool#
+datamerge[,bool] -> InterestingSites#
+memepvals <- lapply(meme$Episodicselectiondetected, function(x) {#
+               gsub("Yes_p=", "", x)#
+               })#
+c("",memepvals, "", "", "", "", "") -> mprow#
+#
+data.frame(InterestingSites[-1]) -> ps_df; ps_df->ps_df_named;#
 rownames(ps_df_named) <- pos_sel$sp#
-#need to order rows the same as tree#
-ps_plot <- ggtree(luc_tree_root) + geom_tiplab(align=TRUE)#
-#
-mytheme <- gridExtra::ttheme_default(#
-    core = list(fg_params=list(cex = 1)),#
-    colhead = list(fg_params=list(cex = 1)),#
-    rowhead = list(fg_params=list(cex = 1)))#
-#
-tt3 <- ttheme_default(#
-  core=list(bg_params = list(fill = blues9[1:2], col=NA),#
-            fg_params=list(fontface=1)),#
-  colhead=list(fg_params=list(col="navyblue", fontface=1)),#
-  rowhead=list(fg_params=list(col="white")));
-plotTree(tree=luc_tree_root,infoFile=pos_sel)
-plotTree(tree=luc_tree_root,infoFile=pos_sel, infoCols=c("s41", s93))
-plotTree(tree=luc_tree_root,infoFile=pos_sel, infoCols=c("s41", "s93"))
-pos_sel
-pos_sel_df
-plotTree(tree=luc_tree_root,infoFile=pos_sel, treeWidth=10,infoWidth=10, infoCols=c("s41", "s93"))
-plotTree(tree=luc_tree_root,infoFile=pos_sel, treeWidth=10,infoWidth=10, infoCols=c("s41", "s93"))
-plot(tree_luc_root)
-plot(luc_tree_root)
-luc_tree_root
-plotTree(tree=luc_tree_root,infoFile=pos_sel, treeWidth=10,infoWidth=10, infoCols=c("s41", "s93"))
-plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.colour.cex=1,cluster=T,tipColours=c("black","purple2","skyblue2","grey"),lwd=1, infoFile=pos_sel, treeWidth=10,infoWidth=10, infoCols=c("s41", "s93"))
-data.frame(pos_sel[-1]) -> ps_df; ps_df->ps_df_named;#
-rownames(ps_df_named) <- pos_sel$sp
-pos_sel_named
-ps_df_named
-plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.colour.cex=1,cluster=T,tipColours=c("black","purple2","skyblue2","grey"),lwd=1, infoFile=ps_df_named, treeWidth=10,infoWidth=10, infoCols=c("s41", "s93"))
-plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.colour.cex=1,cluster=T,tipColours=c("black","purple2","skyblue2","grey"),lwd=1, infoFile=ps_df_named, treeWidth=10,infoWidth=10, infoCols=c("s41", "s93"))
-plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE,lwd=1, infoFile=ps_df_named, treeWidth=10,infoWidth=10, infoCols=c("s41", "s93"))
-plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE,lwd=1, infoFile=ps_df_named, treeWidth=15,infoWidth=10, infoCols=c("s41", "s93"))
-plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE,lwd=1, infoFile=ps_df_named, treeWidth=25,infoWidth=10, infoCols=c("s41", "s93"))
-plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE,lwd=1, infoFile=ps_df_named, treeWidth=25,infoWidth=10, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177"))
-plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE,lwd=1, infoFile=ps_df_named, treeWidth=25,infoWidth=10, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
-help(plotTree)
-source("plotTree.R")
-luc_tree <- read.newick(file="LuciferaseTree_dNds/results/phylogenies/combined_codon.treefile")#
-root(luc_tree, c("Vargula_hilgendorfii_AAA30332", "Cypridina_noctiluca_BAD08210")) -> luc_tree_root#
-#CURRENTLY must read positively selected site with code below#
-#
-data.frame(pos_sel[-1]) -> ps_df; ps_df->ps_df_named;#
 rownames(ps_df_named) <- pos_sel$sp#
-source("plotTree.R")#
 #
-plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE,lwd=1, infoFile=ps_df_named, treeWidth=25,infoWidth=10, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
-quartz("Figure 4", 13, 5)#
-plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE,lwd=1, infoFile=ps_df_named, treeWidth=25,infoWidth=10, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
-quartz("Figure 4", 12, 4)#
-plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE,lwd=1, infoFile=ps_df_named, treeWidth=25,infoWidth=10, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
-quartz("Figure 4", 10, 4)#
-plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE,lwd=1, infoFile=ps_df_named, treeWidth=25,infoWidth=10, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
-source("plotTree.R")#
-quartz("Figure 4", 10, 4)#
-plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE,lwd=2, align.tip.label = TRUE, infoFile=ps_df_named, treeWidth=25,infoWidth=10, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
-plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE,lwd=2, infoFile=ps_df_named, treeWidth=25,infoWidth=10, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
-quartz("Figure 4", 10, 4)#
-plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE,lwd=2, infoFile=ps_df_named, treeWidth=25,infoWidth=10, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
-luc_tree <- read.newick(file="LuciferaseTree_dNds/results/phylogenies/combined_codon.treefile")#
-root(luc_tree, c("Vargula_hilgendorfii_AAA30332", "Cypridina_noctiluca_BAD08210")) -> luc_tree_root#
-#CURRENTLY must read positively selected site with code below#
+round_df <- function(x, digits) {#
+    # round all numeric variables#
+    # x: data frame #
+    # digits: number of digits to round#
+    numeric_columns <- sapply(x, mode) == 'numeric'#
+    x[numeric_columns] <-  round(x[numeric_columns], digits)#
+    x#
+}#
 #
-data.frame(pos_sel[-1]) -> ps_df; ps_df->ps_df_named;#
-rownames(ps_df_named) <- pos_sel$sp#
-source("plotTree.R")#
-quartz("Figure 4", 10, 4)#
-plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE,lwd=2, infoFile=ps_df_named, treeWidth=25,infoWidth=10, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
-source("plotTree.R")#
-quartz("Figure 4", 10, 4)#
-plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE,lwd=2, infoFile=ps_df_named, treeWidth=25,infoWidth=10, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
-source("plotTree.R")#
-quartz("Figure 4", 10, 4)#
-plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE,lwd=2, infoFile=ps_df_named, treeWidth=25,infoWidth=10, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
-quartz("Figure 4", 10, 4)
-plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE, lwd=2, infoFile=ps_df_named, treeWidth=25,infoWidth=10, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
-root(luc_tree, c("Vargula_hilgendorfii_AAA30332", "Cypridina_noctiluca_BAD08210"), resolve.root=TRUE) -> luc_tree_root
-data.frame(pos_sel[-1]) -> ps_df; ps_df->ps_df_named;
-rownames(ps_df_named) <- pos_sel$sp
-source("plotTree.R")
-quartz("Figure 4", 10, 4)
-plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE, lwd=2, infoFile=ps_df_named, treeWidth=25,infoWidth=10, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
-quartz("Figure 4", 10, 4)#
-plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE, lwd=2, infoFile=ps_df_named, treeWidth=5,infoWidth=5, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
-plot(luc_tree)
-plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE, lwd=2, infoFile=ps_df_named, treeWidth=5,infoWidth=5, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
-quartz("Figure 4", 10, 4)#
-plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE, lwd=2, infoFile=ps_df_named, treeWidth=5,infoWidth=5, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
-help(reroot)
-reroot(luc_tree, c("Vargula_hilgendorfii_AAA30332", "Cypridina_noctiluca_BAD08210"), resolve.root=TRUE) -> luc_tree_root
-reroot(luc_tree, c("Vargula_hilgendorfii_AAA30332", "Cypridina_noctiluca_BAD08210"), resolve.root=TRUE)
-plot(luc_tree)
-nodelabels()
-plot(luc_tree, tip.labels=FALSE)
-plot.phylo(luc_tree, tip.labels=FALSE)
-plot.phylo(luc_tree, use.edge.length=FALSE)
-plot.phylo(luc_tree, use.edge.length=FALSE, show.tip.label=FALSE, show.node.label=TRUE)
-nodelabels()
-reroot(luc_tree, 16, resolve.root=TRUE) -> luc_tree_root
-luc_tree <- read.newick(file="LuciferaseTree_dNds/results/phylogenies/combined_codon.treefile")
-reroot(luc_tree, 16, resolve.root=TRUE) -> luc_tree_root
-help(read.newick)
-read.newick(file="LuciferaseTree_dNds/results/phylogenies/combined_codon.treefile")
-read.newick(file="LuciferaseTree_dNds/results/phylogenies/combined_codon.treefile") -> lt
-reroot(luc_tree, 16, resolve.root=TRUE) -> lt
-reroot(luc_tree, 15, resolve.root=TRUE) -> lt
-plot(lt)
-nodelabels()
-reroot(luc_tree, 17, resolve.root=TRUE) -> lt
-plot(lt)
-reroot(luc_tree, 29, resolve.root=TRUE) -> lt
-nodelabels()
-reroot(luc_tree, 16, resolve.root=TRUE) -> lt
-reroot(luc_tree, 29, resolve.root=TRUE) -> lt
-reroot(luc_tree, 17, resolve.root=TRUE) -> lt
-plot(lt)
-reroot(luc_tree, 17, resolve.root=TRUE, .5) -> lt
-plot(lt)
-reroot(luc_tree, 17, resolve.root=TRUE, .5) -> luc_tree_root #root tree at midpoint of branch, which ape does not like to do
-data.frame(pos_sel[-1]) -> ps_df; ps_df->ps_df_named;#
-rownames(ps_df_named) <- pos_sel$sp#
-source("plotTree.R")#
-quartz("Figure 4", 10, 4)#
-plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE, lwd=2, infoFile=ps_df_named, treeWidth=5,infoWidth=5, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
+#This dataframe used in Figure 1#
+round_df(ps_df_named, 1)->ps_df_named#
+#
+displaysites(cyp2aligned(c(178, 404))) -> colorsites#
+cbind(colorsites[,2:3], ps_df_named[1:18]) -> compositetable#
+#
+c(178, 404,aligned2cyp(meme$Codon), fel, "", "", "") -> cyprow#
+rbind(cyprow, compositetable) -> fullcompositetable#
+rownames(fullcompositetable)[1] <- "Cypridina Site Number"#
+#
+rbind(fullcompositetable, c("-", "-","-","-","-","-","-","-","-","-","-","-","-", "-","-", "+", "+", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[17] <- "Significant Pervasive Diversifying Selection (FEL)"#
+#
+rbind(fullcompositetable, c("-", "-","+","+","+","+","+","+","+","+","+","+","+", "+","+", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[18] <- "Significant Episodic Diversifying Selection (MEME)"#
+#
+rbind(fullcompositetable, c("M", "M","-","-","+","+","-","-","+","-","-","-","-", "-","-", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[19] <- "Significant Correlation with Lambda Max"#
+#
+rbind(fullcompositetable, c("-", "-","-","-","-","-","+","-","+","+","-","+","-", "-","-", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[20] <- "Significant Correlation with Enzymatic Decay"#
+#
+fullcompositetable
+InterestingSites
+colorsites
+compositetable
+plotASRsite(207, "Site 207 - Neutrally evolving color site")
+plotASRsite <- function(site, title) {#
+	x <- alignment[, site+1]#
+	data.frame(x, row.names=alignment$sp) -> x#
+#
+	cursite <- setNames(x[,1], rownames(x))#
+	fitER<-ace(cursite,luc_tree_root,model="ER",type="discrete")#
+	fitER#
+	fitER$lik.anc#
+#
+	quartz(title, 8, 5)#
+	plotTree(luc_tree_root,fsize=.6,ftype="i",lwd=1)#
+#
+	nodelabels(node=1:luc_tree_root$Nnode+Ntip(luc_tree_root),#
+    		pie=fitER$lik.anc,piecol=cols,cex=0.4)#
+	tiplabels(pie=to.matrix(cursite[luc_tree_root$tip.label],#
+    		levels(cursite)),piecol=cols,cex=0.3)#
+}
+plotASRsite(207, "Site 207 - Neutrally evolving color site")
+plotASRsite(404, "Site 404 - Color site under negative selection")
+cyp2aligned(c(74,160))
+plotASRsite(102, "Site 102 - Correlated with color and decay and under positive selection")
+plotASRsite(189, "Site 189 - Correlated with color and decay and under positive selection")
+par(mfrow=c(2,2))#
+plotASRsite(207, "Site 207 - Neutrally evolving color site")#
+plotASRsite(404, "Site 404 - Color site under negative selection")#
+#
+plotASRsite(102, "Site 102 - Correlated with color and decay and under positive selection")#
+plotASRsite(189, "Site 189 - Correlated with color and decay and under positive selection")
+par(mfrow=c(2,2))
+plotASRsite(207, "Site 207 - Neutrally evolving color site")
+par(mfrow=c(2,2))#
+plotASRsite(207, "Site 207 - Neutrally evolving color site")
+plotASRsite <- function(site, title) {#
+	x <- alignment[, site+1]#
+	data.frame(x, row.names=alignment$sp) -> x#
+#
+	cursite <- setNames(x[,1], rownames(x))#
+	fitER<-ace(cursite,luc_tree_root,model="ER",type="discrete")#
+	fitER#
+	fitER$lik.anc#
+#
+	#quartz(title, 8, 5)#
+	plotTree(luc_tree_root,fsize=.6,ftype="i",lwd=1)#
+#
+	nodelabels(node=1:luc_tree_root$Nnode+Ntip(luc_tree_root),#
+    		pie=fitER$lik.anc,piecol=cols,cex=0.4)#
+	tiplabels(pie=to.matrix(cursite[luc_tree_root$tip.label],#
+    		levels(cursite)),piecol=cols,cex=0.3)#
+}
+par(mfrow=c(2,2))
+plotASRsite(207, "Site 207 - Neutrally evolving color site")
+plotASRsite(404, "Site 404 - Color site under negative selection")
+plotASRsite(102, "Site 102 - Correlated with color and decay and under positive selection")
+plotASRsite(189, "Site 189 - Correlated with color and decay and under positive selection")
+plotASRsite <- function(site, title) {#
+	x <- alignment[, site+1]#
+	data.frame(x, row.names=alignment$sp) -> x#
+#
+	cursite <- setNames(x[,1], rownames(x))#
+	fitER<-ace(cursite,luc_tree_root,model="ER",type="discrete")#
+	fitER#
+	fitER$lik.anc#
+#
+	#quartz(title, 8, 5)#
+	plotTree(luc_tree_root,fsize=.6,ftype="i",lwd=1, main =title)#
+#
+	nodelabels(node=1:luc_tree_root$Nnode+Ntip(luc_tree_root),#
+    		pie=fitER$lik.anc,piecol=cols,cex=0.4)#
+	tiplabels(pie=to.matrix(cursite[luc_tree_root$tip.label],#
+    		levels(cursite)),piecol=cols,cex=0.3)#
+}
+par(mfrow=c(2,2))#
+plotASRsite(207, "Site 207 - Neutrally evolving color site")#
+plotASRsite(404, "Site 404 - Color site under negative selection")#
+#
+plotASRsite(102, "Site 102 - Correlated with color and decay and under positive selection")#
+plotASRsite(189, "Site 189 - Correlated with color and decay and under positive selection")
+plotTree(luc_tree_root,fsize=.6,ftype="i",lwd=1, main =title)
+plotTree(luc_tree_root,fsize=.6,ftype="i",lwd=1, main = "TEST")
+plotASRsite <- function(site, title) {#
+	x <- alignment[, site+1]#
+	data.frame(x, row.names=alignment$sp) -> x#
+#
+	cursite <- setNames(x[,1], rownames(x))#
+	fitER<-ace(cursite,luc_tree_root,model="ER",type="discrete")#
+	fitER#
+	fitER$lik.anc#
+#
+	#quartz(title, 8, 5)#
+	plotTree(luc_tree_root,fsize=.6,ftype="i",lwd=1)#
+#
+	nodelabels(node=1:luc_tree_root$Nnode+Ntip(luc_tree_root),#
+    		pie=fitER$lik.anc,piecol=cols,cex=0.4)#
+	tiplabels(pie=to.matrix(cursite[luc_tree_root$tip.label],#
+    		levels(cursite)),piecol=cols,cex=0.3)#
+}
+par(mfrow=c(2,2))#
+plotASRsite(207, "Site 207 - Neutrally evolving color site")#
+plotASRsite(404, "Site 404 - Color site under negative selection")#
+#
+plotASRsite(102, "Site 102 - Correlated with color and decay and under positive selection")#
+plotASRsite(189, "Site 189 - Correlated with color and decay and under positive selection")
+plotASRsite(207, "Site 207 - Neutrally evolving color site")
+plotASRsite(404, "Site 404 - Color site under negative selection")
+plotASRsite(102, "Site 102 - Correlated with color and decay and under positive selection")
+plotASRsite(404, "Site 404 - Color site under negative selection")
+plotASRsite(102, "Site 102 - Correlated with color and decay and under positive selection")
+plotASRsite(189, "Site 189 - Correlated with color and decay and under positive selection")
+displaysites(189)
+plotASRsite(189, "Site 189 - Correlated with color and decay and under positive selection")
+plotASRsite <- function(site, title) {#
+	x <- alignment[, site+1]#
+	data.frame(x, row.names=alignment$sp) -> x#
+#
+	cursite <- setNames(x[,1], rownames(x))#
+	fitER<-ace(cursite,luc_tree_root,model="ER",type="discrete")#
+	fitER#
+	fitER$lik.anc#
+#
+	quartz(title, 8, 5)#
+	plotTree(luc_tree_root,fsize=.6,ftype="i",lwd=1)#
+#
+	nodelabels(node=1:luc_tree_root$Nnode+Ntip(luc_tree_root),#
+    		pie=fitER$lik.anc,piecol=cols,cex=0.4)#
+	tiplabels(pie=to.matrix(cursite[luc_tree_root$tip.label],#
+    		levels(cursite)),piecol=cols,cex=0.3)#
+}
+plotASRsite(207, "Site 207 - Neutrally evolving color site")
+plotASRsite(404, "Site 404 - Color site under negative selection")
+plotASRsite(102, "Site 102 - Correlated with color and decay and under positive selection")
+displaysites(207)
+require(phytools)#
+#
+InterestingSites[complete.cases(InterestingSites), ] -> full#
+data.frame(cbind(full$Lmax_Mean, full$lambda))->pms#
+row.names(pms) <- full$sp#
+c("Khas", "Mchi", "MspIR", "MspSVU", "Pan", "Pmor",  "PspWLU", "Vhil")-> row.names(pms)#
+pruned.tree<-drop.tip(luc_tree,luc_tree$tip.label[-match(full$sp, luc_tree$tip.label)])#
+c("Mchi", "MspIR", "MspSVU", "Pmor", "Pan", "PspWLU", "Khas", "Vhil")->pruned.tree$tip.label#
+#
+phylomorphospace(pruned.tree, pms, label="radial", xlab="Lambda max (nm)", ylab="Enzymatic Decay Constant", cx=.1)#
+#Correlated with PIC?#
+#pic(pms$X1, pruned.tree)->pic.lm#
+#pic(pms$X2, pruned.tree)->pic.dec#
+#fit.pic<-lm(pic.lm~pic.dec+0)#
+#fit.pic#
+#summary(fit.pic)
+require(phytools)#
+#
 luc_tree <- read.newick(file="LuciferaseTree_dNds/results/phylogenies/combined_codon.treefile")#
-#root(luc_tree, c("Vargula_hilgendorfii_AAA30332", "Cypridina_noctiluca_BAD08210"), resolve.root=TRUE) -> luc_tree_root#
+ladderize(luc_tree, right=TRUE) -> luc_tree#
 reroot(luc_tree, 17, resolve.root=TRUE, .5) -> luc_tree_root #root tree at midpoint of branch, which ape does not like to do#
 #
-#CURRENTLY must read positively selected site with code below#
+par(mfrow=c(2,2))#
+plotASRsite(207, "Site 207 - Neutrally evolving color site")#
+p
+displaysites(207)
+plotASRsite(207, "Site 207 - Neutrally evolving color site")
+plotASRsite(404, "Site 404 - Color site under negative selection")
+displaysites(404)
+plotASRsite(102, "Site 102 - Correlated with color and decay and under positive selection")
+displaysites(102)
+plotASRsite(189, "Site 189 - Correlated with color and decay and under positive selection")
+displaysites(189)
+cursite
+plotASRsite <- function(site, title) {#
+	x <- alignment[, site+1]#
+	data.frame(x, row.names=alignment$sp) -> x#
 #
-data.frame(pos_sel[-1]) -> ps_df; ps_df->ps_df_named;#
+	cursite <- setNames(x[,1], rownames(x))#
+	fitER<-ace(cursite,luc_tree_root,model="ER",type="discrete")#
+	fitER#
+	fitER$lik.anc#
+	cols<-setNames(c("red","blue", "green", "orange", "yellow", "black"),levels(cursite))#
+	quartz(title, 8, 5)#
+	plotTree(luc_tree_root,fsize=.6,ftype="i",lwd=1)#
+#
+	nodelabels(node=1:luc_tree_root$Nnode+Ntip(luc_tree_root),#
+    		pie=fitER$lik.anc,piecol=cols,cex=0.4)#
+	tiplabels(pie=to.matrix(cursite[luc_tree_root$tip.label],#
+    		levels(cursite)),piecol=cols,cex=0.3)#
+}
+plotASRsite(189, "Site 189 - Correlated with color and decay and under positive selection")
+aligned2cyp(189)
+displaysites(189)
+displaysites(132)
+InterestingSites
+require(phytools)#
+#
+InterestingSites[complete.cases(InterestingSites), ] -> full#
+data.frame(cbind(full$Lmax_Mean, full$lambda))->pms#
+row.names(pms) <- full$sp#
+c("Khas", "Mchi", "MspIR", "MspSVU", "Pan", "Pmor",  "PspWLU", "Vhil")-> row.names(pms)#
+pruned.tree<-drop.tip(luc_tree,luc_tree$tip.label[-match(full$sp, luc_tree$tip.label)])#
+c("Mchi", "MspIR", "MspSVU", "Pmor", "Pan", "PspWLU", "Khas", "Vhil")->pruned.tree$tip.label#
+#
+phylomorphospace(pruned.tree, pms, label="radial", xlab="Lambda max (nm)", ylab="Enzymatic Decay Constant", cx=.1)
+plot(luc_tree)
+aligned2cyp(102)
+aligned2cyp(404)
+displaysites(404)
+displaysites(102)
+displaysites(207)
+aligned2cyp(207)
+displaysites(404)
+plotASRsite <- function(site, title) {#
+	x <- alignment[, site+1]#
+	data.frame(x, row.names=alignment$sp) -> x#
+#
+	cursite <- setNames(x[,1], rownames(x))#
+	fitER<-ace(cursite,luc_tree_root,model="ER",type="discrete")#
+	fitER#
+	fitER$lik.anc#
+	cols<-setNames(c("red","blue", "green", "orange", "yellow", "black"),levels(cursite))#
+	quartz(title, 8, 5)#
+	plotTree(luc_tree_root,fsize=.6,ftype="i",lwd=1)#
+#
+	nodelabels(node=1:luc_tree_root$Nnode+Ntip(luc_tree_root),#
+    		pie=fitER$lik.anc,piecol=cols,cex=0.4)#
+	tiplabels(pie=to.matrix(cursite[luc_tree_root$tip.label],#
+    		levels(cursite)),piecol=cols,cex=0.3)#
+}
+cyp2aligned(404)
+plotASRsite(207, "Site 178 - Neutrally evolving color site")
+plotASRsite(435, "Site 404 - Color site under negative selection")
+displaysites(404)
+plotASRsite(435, "Site 404 - Color site under negative selection")
+cyp2aligned(102)
+aligned2cyp(102)
+aligned2cyp(189)
+cyp2aligned(19)
+plotASRsite(41, "Site 19 - Correlated with decay and under positive selection")
+cyp2aligned(114)
+plotASRsite(142, "Site 114 - Correlated with decay and under positive selection")
+plotASRsite(41, "Site 19 - Correlated with decay and under positive selection")
+displaysites(114)
+displaysites(cyp2aligned(114))
+displaysites(cyp2aligned(19))
+InterestingSites
+justthesitesmaam <- displaysites(c(al_meme, al_fel))
+justthesitesmaam
+datamerge <- merge(justthesitesmaam, tmpmerge2, by="sp")
+datamerge
+!names(datamerge) %in% c("N", "PubName", "Species", "country", "genus", "n_lam", "Lmax_SD", "FWHM_SD", "lamSE") -> bool
+datamerge[,bool] -> InterestingSites
+InterestingSites
+InterestingSites
+signifmutsites <- c(38, 178, 404)
+al_signifmutsites <- cyp2aligned(signifmutsites)
+justthesitesmaam <- displaysites(c(al_signifmutsites, al_meme, al_fel))
+datamerge <- merge(justthesitesmaam, tmpmerge2, by="sp")
+!names(datamerge) %in% c("N", "PubName", "Species", "country", "genus", "n_lam", "Lmax_SD", "FWHM_SD", "lamSE") -> bool
+datamerge[,bool] -> InterestingSites
+InterestingSites
+memepvals <- lapply(meme$Episodicselectiondetected, function(x) {#
+               gsub("Yes_p=", "", x)#
+               })#
+c("",memepvals, "", "", "", "", "") -> mprow#
+#
+data.frame(InterestingSites[-1]) -> ps_df; ps_df->ps_df_named;#
 rownames(ps_df_named) <- pos_sel$sp#
-source("plotTree.R")#
-quartz("Figure 4", 10, 4)#
-plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE, lwd=1, infoFile=ps_df_named, treeWidth=5,infoWidth=5, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
+rownames(ps_df_named) <- pos_sel$sp#
+#
+round_df <- function(x, digits) {#
+    # round all numeric variables#
+    # x: data frame #
+    # digits: number of digits to round#
+    numeric_columns <- sapply(x, mode) == 'numeric'#
+    x[numeric_columns] <-  round(x[numeric_columns], digits)#
+    x#
+}#
+#
+#This dataframe used in Figure 1#
+round_df(ps_df_named, 1)->ps_df_named#
+#
+displaysites(cyp2aligned(c(178, 404))) -> colorsites#
+cbind(colorsites[,2:3], ps_df_named[1:18]) -> compositetable#
+#
+c(178, 404,aligned2cyp(meme$Codon), fel, "", "", "") -> cyprow#
+rbind(cyprow, compositetable) -> fullcompositetable#
+rownames(fullcompositetable)[1] <- "Cypridina Site Number"#
+#
+rbind(fullcompositetable, c("-", "-","-","-","-","-","-","-","-","-","-","-","-", "-","-", "+", "+", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[17] <- "Significant Pervasive Diversifying Selection (FEL)"#
+#
+rbind(fullcompositetable, c("-", "-","+","+","+","+","+","+","+","+","+","+","+", "+","+", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[18] <- "Significant Episodic Diversifying Selection (MEME)"#
+#
+rbind(fullcompositetable, c("M", "M","-","-","+","+","-","-","+","-","-","-","-", "-","-", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[19] <- "Significant Correlation with Lambda Max"#
+#
+rbind(fullcompositetable, c("-", "-","-","-","-","-","+","-","+","+","-","+","-", "-","-", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[20] <- "Significant Correlation with Enzymatic Decay"#
+#
+fullcompositetable
+c(al_signifmutsites,aligned2cyp(meme$Codon), fel, "", "", "") -> cyprow
+cyprow
+displaysites(cyp2aligned(c(178, 404))) -> colorsites#
+cbind(colorsites[,2:3], ps_df_named[1:18]) -> compositetable#
+#
+c(al_signifmutsites,aligned2cyp(meme$Codon), fel, "", "", "") -> cyprow#
+rbind(cyprow, compositetable) -> fullcompositetable#
+rownames(fullcompositetable)[1] <- "Cypridina Site Number"#
+#
+rbind(fullcompositetable, c("-", "-","-","-","-","-","-","-","-","-","-","-","-", "-","-", "+", "+", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[17] <- "Significant Pervasive Diversifying Selection (FEL)"#
+#
+rbind(fullcompositetable, c("-", "-","+","+","+","+","+","+","+","+","+","+","+", "+","+", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[18] <- "Significant Episodic Diversifying Selection (MEME)"#
+#
+rbind(fullcompositetable, c("M", "M","-","-","+","+","-","-","+","-","-","-","-", "-","-", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[19] <- "Significant Correlation with Lambda Max"#
+#
+rbind(fullcompositetable, c("-", "-","-","-","-","-","+","-","+","+","-","+","-", "-","-", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[20] <- "Significant Correlation with Enzymatic Decay"#
+#
+fullcompositetable
+al_signifmutsites -> colorsites
+cbind(colorsites[,2:3], ps_df_named[1:18]) -> compositetable
+colorsites
+displaysites(al_signifmutsites) -> colorsites
+cbind(colorsites[,2:3], ps_df_named[1:18]) -> compositetable
+compositetable
+cbind(colorsites[,2:4], ps_df_named[1:18]) -> compositetable
+compositetable
+displaysites(al_signifmutsites) -> colorsites#
+cbind(colorsites[,2:4], ps_df_named[1:18]) -> compositetable#
+#
+c(al_signifmutsites,aligned2cyp(meme$Codon), fel, "", "", "") -> cyprow#
+rbind(cyprow, compositetable) -> fullcompositetable#
+rownames(fullcompositetable)[1] <- "Cypridina Site Number"#
+#
+rbind(fullcompositetable, c("-", "-","-","-","-","-","-","-","-","-","-","-","-", "-","-", "+", "+", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[17] <- "Significant Pervasive Diversifying Selection (FEL)"#
+#
+rbind(fullcompositetable, c("-", "-","+","+","+","+","+","+","+","+","+","+","+", "+","+", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[18] <- "Significant Episodic Diversifying Selection (MEME)"#
+#
+rbind(fullcompositetable, c("M", "M","-","-","+","+","-","-","+","-","-","-","-", "-","-", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[19] <- "Significant Correlation with Lambda Max"#
+#
+rbind(fullcompositetable, c("-", "-","-","-","-","-","+","-","+","+","-","+","-", "-","-", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[20] <- "Significant Correlation with Enzymatic Decay"#
+#
+fullcompositetable
+c(signifmutsites,aligned2cyp(meme$Codon), fel, "", "", "") -> cyprow
+rbind(cyprow, compositetable) -> fullcompositetable
+rownames(fullcompositetable)[1] <- "Cypridina Site Number"
+rbind(fullcompositetable, c("-", "-","-","-","-","-","-","-","-","-","-","-","-", "-","-", "+", "+", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[17] <- "Significant Pervasive Diversifying Selection (FEL)"#
+#
+rbind(fullcompositetable, c("-", "-","+","+","+","+","+","+","+","+","+","+","+", "+","+", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[18] <- "Significant Episodic Diversifying Selection (MEME)"#
+#
+rbind(fullcompositetable, c("M", "M","-","-","+","+","-","-","+","-","-","-","-", "-","-", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[19] <- "Significant Correlation with Lambda Max"#
+#
+rbind(fullcompositetable, c("-", "-","-","-","-","-","+","-","+","+","-","+","-", "-","-", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[20] <- "Significant Correlation with Enzymatic Decay"#
+#
+fullcompositetable
+InterestingSites
+require(phytools)
+source("plotTree.R")
+luc_tree <- read.newick(file="LuciferaseTree_dNds/results/phylogenies/combined_codon.treefile")
 ladderize(luc_tree, right=TRUE) -> luc_tree
 reroot(luc_tree, 17, resolve.root=TRUE, .5) -> luc_tree_root #root tree at midpoint of branch, which ape does not like to do
-data.frame(pos_sel[-1]) -> ps_df; ps_df->ps_df_named;#
-rownames(ps_df_named) <- pos_sel$sp#
-source("plotTree.R")#
-quartz("Figure 4", 10, 4)#
-plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE, lwd=1, infoFile=ps_df_named, treeWidth=5,infoWidth=5, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
-quartz("Figure 4", 10, 4)#
-plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE, lwd=1, infoFile=ps_df_named, treeWidth=7,infoWidth=5, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
-luc_tree <- read.newick(file="LuciferaseTree_dNds/results/phylogenies/combined_codon.treefile")#
-#root(luc_tree, c("Vargula_hilgendorfii_AAA30332", "Cypridina_noctiluca_BAD08210"), resolve.root=TRUE) -> luc_tree_root#
-ladderize(luc_tree, right=TRUE) -> luc_tree#
-reroot(luc_tree, 17, resolve.root=TRUE, .5) -> luc_tree_root #root tree at midpoint of branch, which ape does not like to do#
-#Here is aligned amino acid file used for codon alignment. #
-alignment <- read.csv("LuciferaseTree_dNds/results/combined_aa.csv",header=FALSE, stringsAsFactors=FALSE, colClasses = c("character"))#
-#Columns are +1 compared to meme due to sp colum Next command alters numbers by 1 to account for this and name species column sp#
-colnames(alignment)[2:ncol(alignment)] <- paste("s",seq(1,(ncol(alignment)-1)),sep=""); colnames(alignment)[1] <- "sp"#
-#Read results in csv from meme selection analysis, including positively selected sites#
-meme <- read.csv("LuciferaseTree_dNds/results/hyphy/lucclade.meme.csv",header=TRUE)#
-#Pull positively selected sites using vector of output table from meme#
-pos_sel <- alignment[,c("sp",paste("s",meme$Codon, sep=""))]#
-data.frame(pos_sel[-1]) -> ps_df; ps_df->ps_df_named;#
-rownames(ps_df_named) <- pos_sel$sp#
-source("plotTree.R")#
-quartz("Figure 4", 10, 4)#
-plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE, lwd=1, infoFile=ps_df_named, treeWidth=7,infoWidth=5, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
-luc_tree <- read.newick(file="LuciferaseTree_dNds/results/phylogenies/combined_codon.treefile")#
-#root(luc_tree, c("Vargula_hilgendorfii_AAA30332", "Cypridina_noctiluca_BAD08210"), resolve.root=TRUE) -> luc_tree_root#
-ladderize(luc_tree, right=TRUE) -> luc_tree#
-reroot(luc_tree, 17, resolve.root=TRUE, .5) -> luc_tree_root #root tree at midpoint of branch, which ape does not like to do#
-#Here is aligned amino acid file used for codon alignment. #
-alignment <- read.csv("LuciferaseTree_dNds/results/combined_aa.csv",header=FALSE, stringsAsFactors=FALSE, colClasses = c("character"))#
-#Columns are +1 compared to meme due to sp colum Next command alters numbers by 1 to account for this and name species column sp#
-colnames(alignment)[2:ncol(alignment)] <- paste("s",seq(1,(ncol(alignment)-1)),sep=""); colnames(alignment)[1] <- "sp"#
-#Read results in csv from meme selection analysis, including positively selected sites#
-meme <- read.csv("LuciferaseTree_dNds/results/hyphy/lucclade.meme.csv",header=TRUE)#
-#Pull positively selected sites using vector of output table from meme#
-pos_sel <- alignment[,c("sp",paste("s",meme$Codon, sep=""))]#
-data.frame(pos_sel[-1]) -> ps_df; ps_df->ps_df_named;#
-rownames(ps_df_named) <- pos_sel$sp#
-source("plotTree.R")#
-quartz("Figure 4", 10, 4)#
-plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE, lwd=1, infoFile=ps_df_named, treeWidth=8,infoWidth=5, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
-plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE, lwd=1, infoFile=ps_df_named, treeWidth=8,infoWidth=3, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
-quartz("Figure 4", 10, 4)#
-plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE, lwd=1, infoFile=ps_df_named, treeWidth=8,infoWidth=3, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
-luc_tree <- read.newick(file="LuciferaseTree_dNds/results/phylogenies/combined_codon.treefile")#
-#root(luc_tree, c("Vargula_hilgendorfii_AAA30332", "Cypridina_noctiluca_BAD08210"), resolve.root=TRUE) -> luc_tree_root#
-ladderize(luc_tree, right=TRUE) -> luc_tree#
-reroot(luc_tree, 17, resolve.root=TRUE, .5) -> luc_tree_root #root tree at midpoint of branch, which ape does not like to do#
-#Here is aligned amino acid file used for codon alignment. #
-alignment <- read.csv("LuciferaseTree_dNds/results/combined_aa.csv",header=FALSE, stringsAsFactors=FALSE, colClasses = c("character"))#
-#Columns are +1 compared to meme due to sp colum Next command alters numbers by 1 to account for this and name species column sp#
-colnames(alignment)[2:ncol(alignment)] <- paste("s",seq(1,(ncol(alignment)-1)),sep=""); colnames(alignment)[1] <- "sp"#
-#Read results in csv from meme selection analysis, including positively selected sites#
-meme <- read.csv("LuciferaseTree_dNds/results/hyphy/lucclade.meme.csv",header=TRUE)#
-#Pull positively selected sites using vector of output table from meme#
-pos_sel <- alignment[,c("sp",paste("s",meme$Codon, sep=""))]#
-data.frame(pos_sel[-1]) -> ps_df; ps_df->ps_df_named;#
-rownames(ps_df_named) <- pos_sel$sp#
-source("plotTree.R")#
-quartz("Figure 4", 10, 4)#
-plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE, lwd=1, infoFile=ps_df_named, treeWidth=8,infoWidth=3, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
-quartz("Figure 4", 10, 4)#
-plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE, lwd=1, infoFile=ps_df_named, treeWidth=8,infoWidth=3, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
-luc_tree <- read.newick(file="LuciferaseTree_dNds/results/phylogenies/combined_codon.treefile")#
-#root(luc_tree, c("Vargula_hilgendorfii_AAA30332", "Cypridina_noctiluca_BAD08210"), resolve.root=TRUE) -> luc_tree_root#
-ladderize(luc_tree, right=TRUE) -> luc_tree#
-reroot(luc_tree, 17, resolve.root=TRUE, .5) -> luc_tree_root #root tree at midpoint of branch, which ape does not like to do#
-#Here is aligned amino acid file used for codon alignment. #
-alignment <- read.csv("LuciferaseTree_dNds/results/combined_aa.csv",header=FALSE, stringsAsFactors=FALSE, colClasses = c("character"))#
-#Columns are +1 compared to meme due to sp colum Next command alters numbers by 1 to account for this and name species column sp#
-colnames(alignment)[2:ncol(alignment)] <- paste("s",seq(1,(ncol(alignment)-1)),sep=""); colnames(alignment)[1] <- "sp"#
-#Read results in csv from meme selection analysis, including positively selected sites#
-meme <- read.csv("LuciferaseTree_dNds/results/hyphy/lucclade.meme.csv",header=TRUE)#
-#Pull positively selected sites using vector of output table from meme#
-pos_sel <- alignment[,c("sp",paste("s",meme$Codon, sep=""))]#
-data.frame(pos_sel[-1]) -> ps_df; ps_df->ps_df_named;#
-rownames(ps_df_named) <- pos_sel$sp#
-source("plotTree.R")#
-quartz("Figure 4", 10, 4)#
-plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE, lwd=1, infoFile=ps_df_named, treeWidth=8,infoWidth=3, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
-quartz("Figure 4", 10, 4)#
-plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE, lwd=1, infoFile=ps_df_named, treeWidth=8,infoWidth=3, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
+quartz("Figure 1", 10, 4)#
+plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE, lwd=1, infoFile=ps_df_named, treeWidth=7,infoWidth=4, infoCols=c("Lmax_Mean", "s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477", "lambda"))
+plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE, lwd=1, infoFile=ps_df_named, treeWidth=7,infoWidth=4, infoCols=c("Lmax_Mean", "s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477", "lambda"))
+quartz("Figure 1", 10, 4)#
+plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE, lwd=1, infoFile=ps_df_named, treeWidth=7,infoWidth=4, infoCols=c("Lmax_Mean", "s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477", "lambda"))
+rbind(cyprow, InterestingSites) -> fullcompositetable
+rownames(fullcompositetable)[1] <- "Cypridina Site Number"
+rbind(fullcompositetable, c("-", "-","-","-","-","-","-","-","-","-","-","-","-", "-","-", "+", "+", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[17] <- "Significant Pervasive Diversifying Selection (FEL)"#
+#
+rbind(fullcompositetable, c("-", "-","+","+","+","+","+","+","+","+","+","+","+", "+","+", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[18] <- "Significant Episodic Diversifying Selection (MEME)"#
+#
+rbind(fullcompositetable, c("M", "M","-","-","+","+","-","-","+","-","-","-","-", "-","-", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[19] <- "Significant Correlation with Lambda Max"#
+#
+rbind(fullcompositetable, c("-", "-","-","-","-","-","+","-","+","+","-","+","-", "-","-", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[20] <- "Significant Correlation with Enzymatic Decay"#
+#
+fullcompositetable
+ps_df
+ps_df_named
+rbind(cyprow, ps_df_named) -> fullcompositetable
+rownames(fullcompositetable)[1] <- "Cypridina Site Number"
+rbind(fullcompositetable, c("-", "-","-","-","-","-","-","-","-","-","-","-","-", "-","-", "+", "+", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[17] <- "Significant Pervasive Diversifying Selection (FEL)"#
+#
+rbind(fullcompositetable, c("-", "-","+","+","+","+","+","+","+","+","+","+","+", "+","+", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[18] <- "Significant Episodic Diversifying Selection (MEME)"#
+#
+rbind(fullcompositetable, c("M", "M","-","-","+","+","-","-","+","-","-","-","-", "-","-", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[19] <- "Significant Correlation with Lambda Max"#
+#
+rbind(fullcompositetable, c("-", "-","-","-","-","-","+","-","+","+","-","+","-", "-","-", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[20] <- "Significant Correlation with Enzymatic Decay"#
+#
+fullcompositetable
+rbind(fullcompositetable, c("-", "-","-","-","-","-","-","-","-","-","-","-","-", "-","-", "+", "+", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[17] <- "Significant Pervasive Diversifying Selection (FEL)"#
+#
+rbind(fullcompositetable, c("-", "-","+","+","+","+","+","+","+","+","+","+","+", "+","+", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[18] <- "Significant Episodic Diversifying Selection (MEME)"#
+#
+rbind(fullcompositetable, c("M", "M","-","-","+","+","-","-","+","-","-","-","-", "-","-", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[19] <- "Significant Correlation with Lambda Max"#
+#
+rbind(fullcompositetable, c("-", "-","-","-","-","-","+","-","+","+","-","+","-", "-","-", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[20] <- "Significant Correlation with Enzymatic Decay"#
+#
+fullcompositetable
+rbind(fullcompositetable, c("-", "-","-","-","-","-","-","-","-","-","-","-","-", "-","-", "+", "+", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[17] <- "Significant Pervasive Diversifying Selection (FEL)"#
+#
+rbind(fullcompositetable, c("-", "-","+","+","+","+","+","+","+","+","+","+","+", "+","+", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[18] <- "Significant Episodic Diversifying Selection (MEME)"#
+#
+rbind(fullcompositetable, c("M", "M","-","-","+","+","-","-","+","-","-","-","-", "-","-", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[19] <- "Significant Correlation with Lambda Max"#
+#
+rbind(fullcompositetable, c("-", "-","-","-","-","-","+","-","+","+","-","+","-", "-","-", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[20] <- "Significant Correlation with Enzymatic Decay"#
+#
+fullcompositetable
+round_df(ps_df_named, 1)->ps_df_named#
+#
+#These are all the sites discussed in manuscript -- annotated#
+c(signifmutsites,aligned2cyp(meme$Codon), fel, "", "", "") -> cyprow#
+rbind(cyprow, ps_df_named) -> fullcompositetable#
+rownames(fullcompositetable)[1] <- "Cypridina Site Number"#
+#
+rbind(fullcompositetable, c("-", "-","-","-","-","-","-","-","-","-","-","-","-", "-","-", "+", "+", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[17] <- "Significant Pervasive Diversifying Selection (FEL)"#
+#
+rbind(fullcompositetable, c("-", "-","+","+","+","+","+","+","+","+","+","+","+", "+","+", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[18] <- "Significant Episodic Diversifying Selection (MEME)"#
+#
+rbind(fullcompositetable, c("M", "M","-","-","+","+","-","-","+","-","-","-","-", "-","-", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[19] <- "Significant Correlation with Lambda Max"#
+#
+rbind(fullcompositetable, c("-", "-","-","-","-","-","+","-","+","+","-","+","-", "-","-", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[20] <- "Significant Correlation with Enzymatic Decay"#
+#
+fullcompositetable
+round_df(ps_df_named, 1)->ps_df_named#
+#
+#These are all the sites discussed in manuscript -- annotated#
+c(signifmutsites,aligned2cyp(meme$Codon), fel, "", "", "") -> cyprow#
+rbind(cyprow, ps_df_named) -> fullcompositetable#
+rownames(fullcompositetable)[1] <- "Cypridina Site Number"#
+#
+rbind(fullcompositetable, c("-", "-","-","-","-","-","-","-","-","-","-","-","-", "-","-", "+", "+", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[17] <- "Significant Pervasive Diversifying Selection (FEL)"#
+#
+rbind(fullcompositetable, c("-", "-","+","+","+","+","+","+","+","+","+","+","+", "+","+", "-", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[18] <- "Significant Episodic Diversifying Selection (MEME)"#
+#
+rbind(fullcompositetable, c("M", "M","-","-","+","+","-","-","+","-","-","-","-", "-","-", "-", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[19] <- "Significant Correlation with Lambda Max"#
+#
+rbind(fullcompositetable, c("-", "-","-","-","-","-","+","-","+","+","-","+","-", "-","-", "-", "-", "-", "-", "-", "-")) -> fullcompositetable#
+rownames(fullcompositetable)[20] <- "Significant Correlation with Enzymatic Decay"#
+#
+fullcompositetable
