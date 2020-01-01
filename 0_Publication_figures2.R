@@ -34,68 +34,14 @@ grid.arrange(tableGrob(table1, theme=tt3))
 #Table 2 - ANOVA results for 5 ‘mutagenesis sites’ using all data from mutagenesis study and available species’ luciferases
 allmutsites <- c(38, 45, 75, 79, 87, 126, 167, 170, 178, 191, 197, 223, 258, 276, 280, 372, 375, 403, 404, 405, 406, 407, 479)
 mutsites <- c(38, 178, 375, 404, 405) #Cypridina numbering sites with 3 states
-cyptoalign$Aligned[match(allmutsites,cyptoalign$Cypridina_noctiluca_BAD08210)] -> alignment_numbers
-
-amutationslm <- lm(lmax ~ c38+ c45+ c75+ c79+ c87+ c126+ c167+ c170+ c178+ c191+ c197+ c223+ c258+ c276+ c280+ c372+ c375+ c403+ c404+ c405+ c406+ c407+ c479, data=mutated)
-mixnmatch_amut <- dredge(amutationslm,rank = "AIC",m.lim = c(0,2)) 
-head(mixnmatch_amut, 50)
-#Global model call: lm(formula = lmax ~ c38 + c45 + c75 + c79 + c87 + c126 + c167 + 
-#    c170 + c178 + c191 + c197 + c223 + c258 + c276 + c280 + c372 + 
-#    c375 + c403 + c404 + c405 + c406 + c407 + c479, data = mutated)
-#---
-#Model selection table 
-#       (Intrc) c126 c170 c178 c191 c197 c223 c258 c276 c280 c372 c375 c403 c404 c405 c406 c407 df  logLik   AIC delta weight
-#51977    453.9              +                        +    +         +         +    +           12 -61.048 146.1  0.00  0.037
-#52489    453.9              +                        +         +    +         +    +           12 -61.048 146.1  0.00  0.037
-#51721    453.5              +                             +         +         +    +           11 -62.174 146.3  0.25  0.033
-#51753    453.5              +         +                   +         +         +    +           11 -62.174 146.3  0.25  0.033
-#52233    453.5              +                                  +    +         +    +           11 -62.174 146.3  0.25  0.033
-#52265    453.5              +         +                        +    +         +    +           11 -62.174 146.3  0.25  0.033
-#52745    453.5              +                             +    +    +         +    +           11 -62.174 146.3  0.25  0.033
-#51785    455.2              +              +              +         +         +    +           12 -61.340 146.7  0.58  0.028
-#52297    455.2              +              +                   +    +         +    +           12 -61.340 146.7  0.58  0.028
-#51722    455.2    +         +                             +         +         +    +           12 -61.340 146.7  0.58  0.028
-#52234    455.2    +         +                                  +    +         +    +           12 -61.340 146.7  0.58  0.028
-#18953    451.5              +                             +         +         +                 9 -64.523 147.0  0.95  0.023
-#18985    451.5              +         +                   +         +         +                 9 -64.523 147.0  0.95  0.023
-#19465    451.5              +                                  +    +         +                 9 -64.523 147.0  0.95  0.023
-#19497    451.5              +         +                        +    +         +                 9 -64.523 147.0  0.95  0.023
-#19977    451.5              +                             +    +    +         +                 9 -64.523 147.0  0.95  0.023
-#20009    451.5              +         +                   +    +    +         +                 9 -64.523 147.0  0.95  0.023
-#19017    453.1              +              +              +         +         +                10 -63.793 147.6  1.49  0.018
-#19049    453.1              +         +    +              +         +         +                10 -63.793 147.6  1.49  0.018
-#19529    453.1              +              +                   +    +         +                10 -63.793 147.6  1.49  0.018
-#19561    453.1              +         +    +                   +    +         +                10 -63.793 147.6  1.49  0.018
-#20041    453.1              +              +              +    +    +         +                10 -63.793 147.6  1.49  0.018
-#18954    453.1    +         +                             +         +         +                10 -63.793 147.6  1.49  0.018
-#18986    453.1    +         +         +                   +         +         +                10 -63.793 147.6  1.49  0.018
-#19018    453.1    +         +              +              +         +         +                10 -63.793 147.6  1.49  0.018
-#19466    453.1    +         +                                  +    +         +                10 -63.793 147.6  1.49  0.018
-#19498    453.1    +         +         +                        +    +         +                10 -63.793 147.6  1.49  0.018
-#19530    453.1    +         +              +                   +    +         +                10 -63.793 147.6  1.49  0.018
-#19978    453.1    +         +                             +    +    +         +                10 -63.793 147.6  1.49  0.018
-#59913    453.8              +                             +         +    +    +    +           12 -61.838 147.7  1.58  0.017
-#60425    453.8              +                                  +    +    +    +    +           12 -61.838 147.7  1.58  0.017
-#19209    451.5              +                        +    +         +         +                10 -63.867 147.7  1.64  0.016
-#19241    451.5              +         +              +    +         +         +                10 -63.867 147.7  1.64  0.016
-#19721    451.5              +                        +         +    +         +                10 -63.867 147.7  1.64  0.016
-#19753    451.5              +         +              +         +    +         +                10 -63.867 147.7  1.64  0.016
-#20233    451.5              +                        +    +    +    +         +                10 -63.867 147.7  1.64  0.016
-#51737    453.4              +    +                        +         +         +    +           12 -62.053 148.1  2.01  0.014
-
-vmutationslm <- lm(lmax ~ c38 + c178 + c375 + c404 + c405, data=mutated)
-mixnmatch_vmut <- dredge(	vmutationslm,rank = "AIC",m.lim = c(0,5)) #3 seems like the maximum terms we can fit safely
-head(mixnmatch_vmut, 5)
-
-anova(lm(lmax ~ c38 * c178 * c375 * c404 * c405, data=mutated)) -> table2
+psmutsites <-c(45, 87)	#These are positively selected and were mutagenized
+cyptoalign$Aligned[match(allmutsites,cyptoalign$Cypridina_noctiluca_BAD08210)] -> cypridina_numbers
+anova(lm(lmax ~ X38 * X178 * X375 * X404 * X405, data=cn)) -> table2
 write.table(table2, file = "Table2.txt", sep="\t")
 table2
-
-
 print("Tranlastion of Alingment sites to Cypridina site numbers")
 allmutsites
-alignment_numbers
-#rbind(allmutsites, alignment_numbers)
+cypridina_numbers
 
 #*************************************************Main Figures
 ################
@@ -160,29 +106,6 @@ Figure3a <- ggplot(data=maxluc, aes(x=construct, y=log10(light), fill=construct)
 
 grid.arrange(Figure3a, Figure3b, nrow = 1) -> Figure3
 
-#***************************Figure 4 Luciferase Tree and positively selected sites
-####################
-require(phytools)
-source("plotTree.R")
-luc_tree <- read.newick(file="LuciferaseTree_dNds/results/phylogenies/combined_codon.treefile")
-#root(luc_tree, c("Vargula_hilgendorfii_AAA30332", "Cypridina_noctiluca_BAD08210"), resolve.root=TRUE) -> luc_tree_root
-ladderize(luc_tree, right=TRUE) -> luc_tree
-reroot(luc_tree, 17, resolve.root=TRUE, .5) -> luc_tree_root #root tree at midpoint of branch, which ape does not like to do
-#Here is aligned amino acid file used for codon alignment. 
-alignment <- read.csv("LuciferaseTree_dNds/results/combined_aa.csv",header=FALSE, stringsAsFactors=FALSE, colClasses = c("character"))
-#Columns are +1 compared to meme due to sp colum Next command alters numbers by 1 to account for this and name species column sp
-colnames(alignment)[2:ncol(alignment)] <- paste("s",seq(1,(ncol(alignment)-1)),sep=""); colnames(alignment)[1] <- "sp"
-#Read results in csv from meme selection analysis, including positively selected sites
-meme <- read.csv("LuciferaseTree_dNds/results/hyphy/lucclade.meme.csv",header=TRUE)
-#Pull positively selected sites using vector of output table from meme
-pos_sel <- alignment[,c("sp",paste("s",meme$Codon, sep=""))]
-data.frame(pos_sel[-1]) -> ps_df; ps_df->ps_df_named;
-rownames(ps_df_named) <- pos_sel$sp
-
-quartz("Figure 4", 10, 4) #Executing this quartz and PlotTree command alone (not as part of previous block) strangely produces figure of better proportions
-plotTree(tree=luc_tree_root,ancestral.reconstruction=F,tip.labels=TRUE, lwd=1, infoFile=ps_df_named, treeWidth=8,infoWidth=3, infoCols=c("s41", "s93", "s102", "s142", "s160", "s177", "s189", "s261", "s285", "s291", "s320", "s389", "s477"))
-
-
 
 #*************************************************Supplemental Tables
 #Supplemental Table S1 is previously published emission spectra
@@ -211,6 +134,37 @@ plot(lprl, show.tip.label=TRUE, cex=.8, x.lim=2)
 #Created with prettyplot
 
 ############
+<<<<<<< HEAD
+#Supplemental Figure S3
+### decay ANOVA for luciferase function paper ###
+# using codon-aligned translations from AliView given THO's dNds output
+
+dat <- read.csv("/Users/nicholaihensley/Documents/GitHub/Cypridinidae_Emission/Raw Data/expression-kinetics/clipboard-alignment_4671897282832913936.translated.csv",header=FALSE, stringsAsFactors=FALSE, colClasses = c("character"))
+#sites from positive selection scan are:
+# 93
+# 115
+# 142
+# 152
+# 160
+# 189
+# 261
+# 285
+# 320
+# 371
+# 389
+# 477
+# 506
+# 581
+
+#sites from color data converted to this alignment are, converted to CNO alignment:
+# 38 --> 64
+# 87 --> 115
+# 178 --> 207
+# 375 --> 406
+# 404 --> 435
+# 405 --> 436 ##invariant in decay dataset
+
+=======
 #Figure XX - Do + selected sites predict color or kinetics?
 library(gridExtra); library(grid); require(janitor);
 library(MuMIn);
@@ -218,16 +172,14 @@ library(MuMIn);
 #Read in luciferase alignment and sites under selection
 dat <- read.csv("LuciferaseTree_dNds/results/combined_aa.csv",header=FALSE, stringsAsFactors=FALSE, colClasses = c("character"))
 #Columns are +1 compared to meme due to sp colum
-#Next command alters numbers by 1 to account for this and name species column sp
+#Next command alters numbers by 1 to account for this
 colnames(dat)[2:ncol(dat)] <- paste("s",seq(1,(ncol(dat)-1)),sep="")
-colnames(dat)[1] <- "sp"
-require(tidyverse)
-dat %>% arrange(sp) -> dat #sort by species name 
-
-
-#Here is aligned amino acid file used for codon alignment. 
+#Here is aligned amino acid file used for codon alignment.
 #Read results in csv from meme selection analysis, including positively selected sites
 meme <- read.csv("LuciferaseTree_dNds/results/hyphy/lucclade.meme.csv",header=TRUE)
+>>>>>>> ff095bcfd681e5c38410f5a08ac4b06b6fbda16f
+#naming all columns properly
+colnames(dat)[1] <- "sp"
 #Pull positively selected sites using vector of output table from meme
 pos_sel <- dat[,c("sp",paste("s",meme$Codon, sep=""))]
 #decay file has translation of different codes between datasets
@@ -240,68 +192,53 @@ translate <- read.csv("Raw Data/expression-kinetics/translate_lucname_decayname.
 tmpmerge <- merge(translate, table1, by='Species')
 lucNcolor <- merge(dat, tmpmerge, by='sp')
 pos_sel_col <- lucNcolor[,c("sp",paste("s",meme$Codon, sep=""),"Lmax_Mean", "FWHM_Mean")]
-remove_constant(pos_sel_col)->pos_sel_col ##Invariant sites because luc varies in spp without color data 
+remove_constant(pos_sel_col)->pos_sel_col ##Invariant sites because luc varies in spp without color data
 
 options(na.action = "na.fail")
 #doesn't work inside lm function but can cut and paste manually -- no invariant sites for color
 paste(colnames(pos_sel_col)[4:ncol(pos_sel_col)-2], collapse=" + "   )
+colorlm <- lm(Lmax_Mean ~ s93 + s102 + s142 + s160 + s177 + s211 + s240 + s261 + s285 + s291 + s320 + s371 + s389 + s477 + s581, data=pos_sel_col)
+fwhmlm <- lm(FWHM_Mean ~ s93 + s102 + s142 + s160 + s177 + s211 + s240 + s261 + s285 + s291 + s320 + s371 + s389 + s477 + s581, data=pos_sel_col)
 
-colorlm_fel <- lm(Lmax_Mean ~ s43 + s209, data=pos_sel_col)
-
-
-colorlm <- lm(Lmax_Mean ~ s41 + s93 + s102 + s142 + s160 + s177 + s189 + s261 + s285 + s291 + s320 + s389 + s477, data=pos_sel_col)
-fwhmlm <- lm(FWHM_Mean ~ s41 + s93 + s102 + s142 + s160 + s177 + s189 + s261 + s285 + s291 + s320 + s389 + s477, data=pos_sel_col)
-      
-mixnmatch_col <- dredge(	colorlm,rank = "AIC",m.lim = c(0,3)) #3 seems like the maximum terms we can fit safely
+mixnmatch_col <- dredge(colorlm,rank = "AIC",m.lim = c(0,3)) #3 seems like the maximum terms we can fit safely
 head(mixnmatch_col, 12)
 av <- model.avg(mixnmatch_col)
 
-#Global model call: lm(formula = Lmax_Mean ~ s41 + s93 + s102 + s142 + s160 + s177 + 
-#    s189 + s261 + s285 + s291 + s320 + s389 + s477, data = pos_sel_col)
+#Global model call: lm(formula = Lmax_Mean ~ s93 + s102 + s142 + s160 + s177 + s211 +
+#    s240 + s261 + s285 + s291 + s320 + s371 + s389 + s477 + s581,
+#    data = pos_sel_col)
 #---
-#Model selection table 
-#     (Intrc) s102 s142 s160 s177 s189 s261 s285 s291 s320 s389 s41 s477 s93 df  logLik  AIC delta weight
-#51     458.8         +              +    +                                   9  10.990 -4.0  0.00  0.167
-#113    458.8                        +    +    +                              9  10.990 -4.0  0.00  0.167
-#305    458.8                        +    +              +                    9  10.990 -4.0  0.00  0.167
-#82     458.8    +                   +         +                              9  10.990 -4.0  0.00  0.167
-#274    458.8    +                   +                   +                    9  10.990 -4.0  0.00  0.167
-#20     458.8    +    +              +                                        9  10.990 -4.0  0.00  0.167
+#Model selection table
+#     (Intrc) s102 s142 s160 s211 s261 s285 s320 s371 s581 df logLik  AIC delta weight
+#1043   456.4         +         +                   +       8  2.064 11.9  0.00  0.333
+#1169   456.4                   +         +         +       8  2.064 11.9  0.00  0.333
+#1553   456.4                   +              +    +       8  2.064 11.9  0.00  0.333
+#8385   457.6                        +    +              +  7 -7.657 29.3 17.44  0.000
 
-summary(eval(getCall(mixnmatch_col,"51"))) #142, 189, 261
-summary(eval(getCall(mixnmatch_col, "113"))) #189, 261, 285
-summary(eval(getCall(mixnmatch_col, "305"))) #189, 261, 320
-summary(eval(getCall(mixnmatch_col, "20")))
-
-lmax_anova <- lm(Lmax_Mean ~ s102 + s142 + s189 + s261 + s285 + s320,data=pos_sel_col) # rep'd 3 or more x in best models
-anova(lmax_anova)	#102, 142, 189
-lmax_anova2 <- lm(Lmax_Mean ~ s93 * s102 * s142 * s189 * s261 * s320, data=pos_sel_col) # rep'd 2 or more x in best models
-anova(lmax_anova2)	#93, 142 significant
-
+summary(eval(getCall(mixnmatch_col,42))) #189, 93
+summary(eval(getCall(mixnmatch_col, 2058))) #ERROR model 2058 doesn't seem to exist
+lmax_anova <- lm(FWHM_Mean ~ s142 + s211 + s261 + s285 + s371 + s581,data=pos_sel_col)
+anova(lmax_anova)
 
 #FWHM
 mixnmatch_fw <- dredge(fwhmlm,rank = "AIC",m.lim = c(0,3)) #3 seems like the maximum terms we can fit safely
 head(mixnmatch_fw, 12)
 
-#Global model call: lm(formula = FWHM_Mean ~ s41 + s93 + s102 + s142 + s160 + s177 + 
-#    s189 + s261 + s285 + s291 + s320 + s389 + s477, data = pos_sel_col)
+#Global model call: lm(formula = FWHM_Mean ~ s93 + s102 + s142 + s160 + s177 + s211 +
+#    s240 + s261 + s285 + s291 + s320 + s371 + s389 + s477 + s581,
+#    data = pos_sel_col)
 #---
-#Model selection table 
-#     (Intrc) s102 s160 s177 s189 s261 s291 s41 s93 df  logLik  AIC delta weight
-#1073   82.52                   +    +        +     10   1.955 16.1  0.00  0.167
-#177    84.34                   +    +    +         10   1.955 16.1  0.00  0.167
-#57     84.34              +    +    +              10   1.955 16.1  0.00  0.167
-#26     84.34    +         +    +                   10   1.955 16.1  0.00  0.167
-#146    84.34    +              +         +         10   1.955 16.1  0.00  0.167
-#1042   82.52    +              +             +     10   1.955 16.1  0.00  0.167
+#Model selection table
+#     (Intrc) s102 s160 s177 s211 s240 s261 s371 s389 s477 df  logLik  AIC delta weight
+#1049   77.98              +    +              +           10   1.955 16.1  0.00  0.999
+#1034   85.44    +         +                   +            8  -7.768 31.5 15.44  0.000
+#1097   85.44              +              +    +            8  -7.768 31.5 15.44  0.000
+#77     78.72         +    +              +                 7 -14.335 42.7 26.58  0.000
+#10     83.50    +         +                                7 -14.335 42.7 26.58  0.000
 
-#4114   88.58    +              +                 +  9  -6.271 30.5 14.45  0.000
-#6 
-
-fwhm_anova <- lm(FWHM_Mean ~ s102 + s189 + s261 ,data=pos_sel_col) # in 3 or more of top models
+fwhm_anova <- lm(FWHM_Mean ~ s177 + s211 + s371 ,data=pos_sel_col)
 anova(fwhm_anova)
-fwhm_anova2 <- lm(FWHM_Mean ~ s41 + s102 + s177 + s189 + s261 + s291, data=pos_sel_col) # in 2 or more of top models
-anova(fwhm_anova2)
+
 
 
 #***********kinetics/decay
@@ -312,52 +249,45 @@ translate <- read.csv("Raw Data/expression-kinetics/translate_lucname_decayname.
 tmpmerge <- merge(decay, translate, by="PubName")
 lucNkinetics <- merge(dat, tmpmerge, by="sp")
 pos_sel_lam <- lucNkinetics[,c("sp",paste("s",meme$Codon, sep=""),"lambda")]
-remove_constant(pos_sel_lam)->pos_sel_lam ##Invariant sites because luc varies in spp without decay data 
+remove_constant(pos_sel_lam)->pos_sel_lam ##Invariant sites because luc varies in spp without decay data
 
 options(na.action = "na.fail")
 #doesn't work inside lm function but can cut and paste manually
 #after removing invariant sites, which are 160, 303, 338
 paste(colnames(pos_sel_lam)[3:ncol(pos_sel_lam)-1], collapse=" + "   )
 #IF sites change copy/paste from result of above command
-glb1 <- lm(lambda ~ s41 + s93 + s102 + s160 + s177 + s189 + s261 + s291 + s389 + s477, data=pos_sel_lam)
-          
+glb1 <- lm(lambda ~ s93 + s102 + s160 + s177 + s211 + s240 + s261 + s291 + s371 + s389 + s477 + s581, data=pos_sel_lam)
+
 mixnmatch_lam <- dredge(glb1,rank = "AIC",m.lim = c(0,6)) #6 seems like the maximum terms we can fit safely
 av <- model.avg(mixnmatch_lam)
-head(mixnmatch_lam, 76)
+head(mixnmatch_lam, 132)
 
-#Global model call: lm(formula = lambda ~ s41 + s93 + s102 + s160 + s177 + s189 + 
-#    s261 + s291 + s389 + s477, data = pos_sel_lam)
+#Global model call: lm(formula = lambda ~ s93 + s102 + s160 + s177 + s211 + s240 +
+#    s261 + s291 + s371 + s389 + s477 + s581, data = pos_sel_lam)
 #---
-#Model selection table 
-#    (Intrc) s102 s160 s177 s189 s261 s291 s389 s41 s477 s93 df logLik  AIC delta weight
-#59    8.953         +         +    +    +                    9 -1.117 20.2  0.00  0.017
-#187   8.953         +         +    +    +        +           9 -1.117 20.2  0.00  0.017
-#315   8.953         +         +    +    +             +      9 -1.117 20.2  0.00  0.017
-#443   8.953         +         +    +    +        +    +      9 -1.117 20.2  0.00  0.017
-#155   1.458         +         +    +             +           9 -1.117 20.2  0.00  0.017
-#281   5.720                   +    +                  +      9 -1.117 20.2  0.00  0.017
-#411   1.458         +         +    +             +    +      9 -1.117 20.2  0.00  0.017
-#57   13.210                   +    +    +                    9 -1.117 20.2  0.00  0.017
-#185  13.210                   +    +    +        +           9 -1.117 20.2  0.00  0.017
-#313  13.210                   +    +    +             +      9 -1.117 20.2  0.00  0.017
-#441  13.210                   +    +    +        +    +      9 -1.117 20.2  0.00  0.017
-#283   8.953         +         +    +                  +      9 -1.117 20.2  0.00  0.017
-#153   5.720                   +    +             +           9 -1.117 20.2  0.00  0.017
-#409   5.720                   +    +             +    +      9 -1.117 20.2  0.00  0.017
-#650   5.883    +              +                  +        + 10 -0.730 21.5  1.22  0.009
-#652
-# 75 models are within 2 AIC
+#Model selection table
+#     (Intrc) s102 s160 s177 s211 s240 s261 s291 s371 s389 s477 s581 s93 df logLik  AIC delta weight
+#1185  13.210                             +         +              +      7 -2.704 19.4  0.00  0.012
+#1697   5.555                             +         +         +    +      7 -2.704 19.4  0.00  0.012
+#1201   5.555                        +    +         +              +      7 -2.704 19.4  0.00  0.012
+#1713   5.555                        +    +         +         +    +      7 -2.704 19.4  0.00  0.012
+#1699   8.953         +                   +         +         +    +      7 -2.704 19.4  0.00  0.012
+#1187   8.953         +                   +         +              +      7 -2.704 19.4  0.00  0.012
+#1203   8.953         +              +    +         +              +      7 -2.704 19.4  0.00  0.012
+#1715   8.953         +              +    +         +         +    +      7 -2.704 19.4  0.00  0.012
+#3233  12.840                             +         +              +   +  9 -0.875 19.7  0.34  0.010
+#3745   5.273                             +         +         +    +   +  9 -0.875 19.7  0.34  0.010
+#3249   5.273                        +    +         +              +   +  9 -0.875 19.7  0.34  0.010
+#3761   5.273                        +    +         +         +    +   +  9 -0.875 19.7  0.34  0.010
+# 131 models are within 2 AIC
 
 #use this function to look at each model
-summary(eval(getCall(mixnmatch_lam,'59'))) 
+summary(eval(getCall(mixnmatch_lam,1699)))
 
 
-#looking at the two sites are that most commonly present
-decay_anova <- lm(lambda ~ s160 + s189 + s261 + s291, data = pos_sel_lam) # > 13 appearances
+#looking at the two sites are that ALWAYS present
+decay_anova <- lm(lambda ~ s93 + s102 + s160 + s240 + s261 + s371 + s477 + s581,data=pos_sel_lam)
 anova(decay_anova)
-
-decay_anova2 <- lm(lambda ~ s41 + s93 + s102 + s160 + s189 + s261 + s291 + s389 + s477, data=pos_sel_lam) # > 12 appearances
-anova(decay_anova2)
 
 #############################
 ## plot of lamda max and decay
@@ -373,51 +303,26 @@ library(ggplot2)
 figS <- ggplot(data=col_dec,aes(x=lambda,y=Lmax_Mean)) + geom_point(aes(color=genus,shape=country),size=3) +
   xlab("Ave. decay constant per species") + ylab("Ave. peak emission per species")
 
-
-###******GGplot custom function to plot lme4 catepillar plot (confidence intervals of random effects)
-##credit to davebraze for this function: https://rdrr.io/github/davebraze/FDB1/man/ggCaterpillar.html
-##stack exchange resources: https://stackoverflow.com/questions/13847936/plot-random-effects-from-lmer-lme4-package-using-qqmath-or-dotplot-how-to-mak
-
-ggCaterpillar <- function(re, QQ=FALSE, likeDotplot=TRUE, detailedFacetLabs = TRUE) {
-  f <- function(x, nm = "ranef plot") {
-    pv   <- attr(x, "postVar")
-    cols <- 1:(dim(pv)[1])
-    se   <- unlist(lapply(cols, function(i) sqrt(pv[i, i, ])))
-    ord  <- unlist(lapply(x, order)) + rep((0:(ncol(x) - 1)) * nrow(x), each=nrow(x))
-    pDf  <- data.frame(y=unlist(x)[ord],
-                       ci=1.96*se[ord],
-                       nQQ=rep(stats::qnorm(stats::ppoints(nrow(x))), ncol(x)),
-                       ID=factor(rep(rownames(x), ncol(x))[ord], levels=rownames(x)[ord]),
-                       ind=gl(ncol(x), nrow(x), labels=names(x)))
-
-    if(detailedFacetLabs){
-      pDf$ind <- ifelse(grepl("(Intercept)", pDf$ind), "intercept adjustment", paste0("slope adj: ", pDf$ind))
-    }
-
-    if(QQ) {  ## normal QQ-plot
-      p <- ggplot(pDf, aes_string(x="nQQ", y="y"))
-      p <- p + facet_wrap(~ ind, scales="free")
-      p <- p + xlab("Standard normal quantiles") + ylab("Random effect quantiles")
-    } else {  ## caterpillar dotplot
-      p <- ggplot(pDf, aes_string(x="ID", y="y")) + coord_flip()
-      if(likeDotplot) {  ## imitate dotplot() -> same scales for random effects
-        p <- p + facet_wrap(~ ind)
-      } else {           ## different scales for random effects
-        p <- p + facet_grid(ind ~ ., scales="free_y")
-      }
-      p <- p + xlab(nm) + ylab("Random effects")
-      scale <- 12-log(length(levels(pDf$ID)),2)
-      p <- p + theme(axis.text.y = element_text(size=scale))
-    }
-
-    p <- p + theme(legend.position="none")
-    # p <- p + labs(title= nm)
-    p <- p + geom_hline(yintercept=0, lwd = I(7/12), colour = I(grDevices::hsv(0/12, 7/12, 7/12)), alpha = I(5/12))
-    p <- p + geom_errorbar(aes_string(ymin="y - ci", ymax="y + ci"), width=0, colour="black")
-    p <- p + geom_point(aes())
-    return(p)
-  }
-
-  #   lapply(re, f) # original
-  lapply(seq_along(re), function(y, n, i) { f(y[[i]], n[[i]]) }, y=re, n=names(re)) # adds plot names
-}
+####incorporating var-covar analyses into the model
+sp_seq <- dat2$sp
+sp_seq[1] <- "Vargula_hilgendorfii_AAA30332_luciferase"
+sp_seq[2] <- "KHC_sequenced"
+sp_seq[3] <- "MSH_sequenced"
+sp_seq[4] <- "PMO_sequenced"
+sp_seq[5] <- "SVD_sequenced"
+sp_seq[6] <- "SVU_sequenced"
+sp_seq[7] <- "Maristella_sp_AG_DN382219_c2_g1"
+sp_seq[8] <- "Maristella_sp_VAD_DN92476_c5_g4"
+sp_seq[9] <- "Photeros_annecohenae_DN96747_c10_g3"
+sp_seq[10] <- "Photeros_macelroyi_DN131343_c2_g2"
+sp_seq[11] <- "Photeros_sp_WLU_DN218316_c2_g1"
+tree_seq <- lprl$tip.label
+nomat <- tree_seq[!(tree_seq %in% sp_seq)]
+pgls_tree <- drop.tip(lprl,nomat) #create var-covar matrix with BM model
+dt2 <- dat2
+row.names(dt2) <- sp_seq
+dt2 = dat2[match(pgls_tree$tip.label, row.names(dt2)),] #data and tree must be in same order
+bm.model = corBrownian(1,pgls_tree)
+library(nlme)
+gblm2 <- gls(decay ~ V93 + V115 + V152 + V160 + V189 + V261 + V371 + V389 + V477 + V506 + V581,correlation = bm.model, data = dt2)
+#this global model does not fit because it it too parameter rich in a gls framework
