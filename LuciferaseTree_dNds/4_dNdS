@@ -66,8 +66,8 @@ pal2nal.pl sequences/combined_aa_ALN.fa sequences/combined_nt.fa -output fasta >
 #rm results/phylogenies/nonxtome_codon.*
 #iqtree -s results/nonxtome_codonaligned.fa -redo -pre results/phylogenies/nonxtome_codon
 
-#rm results/phylogenies/combined_codon*
-#iqtree -s results/combined_codonaligned.fa -o Vargula_hilgendorfii_AAA30332,Cypridina_noctiluca_BAD08210 -redo -pre results/phylogenies/combined_codon -nt 5 #bb 1000
+rm results/phylogenies/combined_codon*
+iqtree -s results/combined_codonaligned.fa -o Vargula_hilgendorfii_AAA30332,Cypridina_noctiluca_BAD08210 -redo -pre results/phylogenies/combined_codon -nt 5 -bb 1000
 
 
 #Run hyphy to test for episodic positive selection
@@ -79,4 +79,5 @@ pal2nal.pl sequences/combined_aa_ALN.fa sequences/combined_nt.fa -output fasta >
 #sbatch scripts/hyphy.meme.slurm.sh results/combined_codonaligned.fa results/phylogenies/combined_codon.treefile results/hyphy/combined1210.meme.json 
 
 
-hyphy relax --alignment results/combined_codonaligned.fa --tree results/phylogenies/combined_codon.treefile --output results/hyphy/lucclade.relax.json > results/hyphy/lucclade.relax.out
+#Ran RELAX but did not end up using results in publication
+#hyphy relax --alignment results/combined_codonaligned.fa --tree results/phylogenies/combined_codon.treefile --output results/hyphy/lucclade.relax.json > results/hyphy/lucclade.relax.out
