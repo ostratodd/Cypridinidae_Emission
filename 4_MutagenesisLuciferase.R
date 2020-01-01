@@ -1,10 +1,10 @@
-require(dplyr)
+require(dplyr); require(janitor)
 
 alignment <- read.csv("LuciferaseTree_dNds/results/combined_aa.csv",header=FALSE, stringsAsFactors=FALSE, colClasses = c("character"))
 alignment %>% arrange(V1) -> alignment #sort by species name 
 colnames(alignment)[2:ncol(alignment)] <- paste("s",seq(1,(ncol(alignment)-1)),sep=""); colnames(alignment)[1] <- "sp"
 #conversion table for sites corresponding between Cypridina and present alignment
-read.csv(file="../LuciferaseTree_dNds/results/CypSites.csv")->cyptoalign
+read.csv(file="LuciferaseTree_dNds/results/CypSites.csv")->cyptoalign
 
 
 #**************Functions to translate between alignment numbers for individual amino acids
