@@ -1,4 +1,4 @@
-maindir <- "~/Documents/GitHub/Cypridinidae_Emission/"
+maindir <- "~/Documents/GitHub/Cypridinidae_EmissionSpectra/"
 setwd(maindir)
 
 #First read in data sets and complete analyses for figures and tables
@@ -18,7 +18,8 @@ source("Figure2.R")
 source("Figure3.R")
 Figure3
 
-
+#Figure 4 Phylophenospace with reconstructed ancestors
+source("Figure4.R")
 
 #*************************************************Main Tables
 #Table 1 - Stats table for in vitro expression
