@@ -1,0 +1,16 @@
+"sp"	"s64"	"s207"	"s435"	"s41"	"s93"	"s102"	"s142"	"s160"	"s177"	"s189"	"s261"	"s285"	"s291"	"s320"	"s389"	"s477"	"s43"	"s209"	"Lmax_Mean"	"FWHM_Mean"	"lambda"
+"1"	"Cypridina_noctiluca_BAD08210"	"K"	"M"	"N"	"Q"	"T"	"Y"	"K"	"K"	"T"	"P"	"D"	"D"	"K"	"R"	"S"	"K"	"-"	"G"	454.3	79.17	NA
+"2"	"Kornickeria_hastingsi_cap3"	"Q"	"T"	"D"	"F"	"S"	"E"	"S"	"S"	"G"	"A"	"N"	"S"	"K"	"Y"	"T"	"R"	"S"	"N"	460.5	77.98	9.607659099
+"3"	"Maristella_chicoi_cap3"	"I"	"T"	"D"	"Y"	"S"	"E"	"S"	"S"	"L"	"D"	"N"	"S"	"V"	"Y"	"T"	"D"	"F"	"Y"	461.3	79.24	2.090658064
+"4"	"Maristella_sp_AG_DN382219_c2_g1_i4"	"I"	"T"	"D"	"Y"	"S"	"E"	"S"	"S"	"V"	"A"	"N"	"S"	"L"	"Y"	"T"	"D"	"F"	"Y"	NA	NA	2.73229241
+"5"	"Maristella_sp_IR_DN50846_c6_g1_i1"	"I"	"T"	"D"	"Y"	"S"	"E"	"S"	"S"	"V"	"A"	"N"	"S"	"L"	"Y"	"T"	"D"	"F"	"Y"	460.7	76.16	1.492921622
+"6"	"Maristella_sp_ODH_DN60908_c36_g8_i1"	"I"	"T"	"D"	"Y"	"S"	"E"	"S"	"S"	"L"	"D"	"N"	"S"	"V"	"Y"	"V"	"D"	"F"	"Y"	NA	NA	1.866348011
+"7"	"Maristella_sp_SVD_cap3"	"I"	"T"	"D"	"Y"	"S"	"E"	"S"	"S"	"V"	"D"	"N"	"S"	"V"	"Y"	"V"	"D"	"F"	"F"	NA	NA	1.999160368
+"8"	"Maristella_sp_SVU_cap3"	"L"	"T"	"D"	"V"	"A"	"E"	"S"	"S"	"I"	"E"	"N"	"S"	"L"	"Y"	"T"	"D"	"T"	"N"	460.9	79.43	1.503137057
+"9"	"Maristella_sp_VAD_DN92476_c5_g4_i1"	"I"	"T"	"D"	"Y"	"S"	"E"	"S"	"S"	"L"	"A"	"N"	"S"	"V"	"Y"	"V"	"D"	"F"	"Y"	NA	NA	NA
+"10"	"Photeros_annecohenae_DN96747_c10_g3_i3"	"Q"	"P"	"D"	"A"	"N"	"A"	"S"	"S"	"G"	"P"	"C"	"S"	"T"	"Y"	"T"	"R"	"T"	"F"	468.5	85.44	5.404152203
+"11"	"Photeros_macelroyi_DN131343_c2_g2_i4"	"Q"	"P"	"D"	"A"	"S"	"E"	"S"	"S"	"G"	"P"	"C"	"S"	"T"	"Y"	"T"	"R"	"T"	"F"	NA	NA	5.078722525
+"12"	"Photeros_morini_cap3"	"Q"	"P"	"D"	"A"	"N"	"A"	"S"	"S"	"G"	"Q"	"C"	"S"	"T"	"Y"	"T"	"R"	"T"	"F"	466.3	81.56	15.22538465
+"13"	"Photeros_sp_WLU_DN218316_c2_g1_i3"	"Q"	"P"	"D"	"A"	"N"	"E"	"S"	"S"	"G"	"P"	"N"	"S"	"T"	"Y"	"T"	"R"	"T"	"F"	465.9	79.08	1.634115779
+"14"	"Vargula_hilgendorfii_AAA30332"	"K"	"I"	"N"	"Q"	"T"	"Y"	"S"	"K"	"T"	"P"	"D"	"S"	"K"	"Y"	"S"	"K"	"A"	"G"	458.7	78.28	0.9790189
+"15"	"Vargula_tsujii_sequenced"	"L"	"T"	"D"	"Y"	"S"	"E"	"S"	"S"	"V"	"E"	"N"	"S"	"V"	"Y"	"T"	"D"	"S"	"N"	460.6	74.28	NA

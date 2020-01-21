@@ -9,7 +9,7 @@ source("4_MutagenesisLuciferase.R")
 
 #*************Main Figures
 #Figure 1 is luciferase phylogeny and positively selected (meme) sites
-source("Figure1.R")
+source("Figure1.R")	#aesthetics modified in Illustrator
 
 #Figure 2 is in vitro expression experiments
 source("Figure2.R")
@@ -54,15 +54,17 @@ FigureS3
 #Supplemental Table S1 is previously published emission spectra (constructed manually outside R)
 
 #Supplemental Table S2 -- Statistics for comparisons during in vitro expression
-source("5_Statistical_tests.R")
+source("TableS2.R") #These are the statistical analyses, which were compiled manually into the table
 
 #Supplemental Table S3- all emission parameter data for each individual organism
-source("TableS2.R")
+source("TableS3.R")
+TableS3
 
 #Supplemental Table S4 - collection and sequencing data
+#Created outside R
 
 #Supplemental Table S5 - multiple sequence alignment
-
+#Created outside R
 
 
 
@@ -120,53 +122,3 @@ fwhm_anova2 <- lm(FWHM_Mean ~ s41 + s102 + s177 + s189 + s261 + s291, data=pos_s
 anova(fwhm_anova2)
 #No positively selected sites predict FWHM
 
-#***********kinetics/decay
-### decay ANOVA  ###
-#Now read decay data and merge -- decay column called lambda
-
-options(na.action = "na.fail")
-#doesn't work inside lm function but can cut and paste manually
-#after removing invariant sites, which are 160, 303, 338
-paste(colnames(pos_sel_lam)[3:ncol(pos_sel_lam)-1], collapse=" + "   )
-#IF sites change copy/paste from result of above command
-glb1 <- lm(lambda ~ s41 + s93 + s102 + s160 + s177 + s189 + s261 + s291 + s389 + s477, data=pos_sel_lam)
-
-mixnmatch_lam <- dredge(glb1,rank = "AIC",m.lim = c(0,6)) #6 seems like the maximum terms we can fit safely
-av <- model.avg(mixnmatch_lam)
-head(mixnmatch_lam, 76)
-
-#Global model call: lm(formula = lambda ~ s41 + s93 + s102 + s160 + s177 + s189 +
-#    s261 + s291 + s389 + s477, data = pos_sel_lam)
-#---
-#Model selection table
-#    (Intrc) s102 s160 s177 s189 s261 s291 s389 s41 s477 s93 df logLik  AIC delta weight
-#59    8.953         +         +    +    +                    9 -1.117 20.2  0.00  0.017
-#187   8.953         +         +    +    +        +           9 -1.117 20.2  0.00  0.017
-#315   8.953         +         +    +    +             +      9 -1.117 20.2  0.00  0.017
-#443   8.953         +         +    +    +        +    +      9 -1.117 20.2  0.00  0.017
-#155   1.458         +         +    +             +           9 -1.117 20.2  0.00  0.017
-#281   5.720                   +    +                  +      9 -1.117 20.2  0.00  0.017
-#411   1.458         +         +    +             +    +      9 -1.117 20.2  0.00  0.017
-#57   13.210                   +    +    +                    9 -1.117 20.2  0.00  0.017
-#185  13.210                   +    +    +        +           9 -1.117 20.2  0.00  0.017
-#313  13.210                   +    +    +             +      9 -1.117 20.2  0.00  0.017
-#441  13.210                   +    +    +        +    +      9 -1.117 20.2  0.00  0.017
-#283   8.953         +         +    +                  +      9 -1.117 20.2  0.00  0.017
-#153   5.720                   +    +             +           9 -1.117 20.2  0.00  0.017
-#409   5.720                   +    +             +    +      9 -1.117 20.2  0.00  0.017
-#650   5.883    +              +                  +        + 10 -0.730 21.5  1.22  0.009
-#652
-#
-#use this function to look at each model
-summary(eval(getCall(mixnmatch_lam,'59')))
-
-
-#looking at the two sites are that most commonly present
-decay_anova <- lm(lambda ~ s160 + s189 + s261 + s291, data = pos_sel_lam) # > 13 appearances
-anova(decay_anova)
-
-decay_anova2 <- lm(lambda ~ s41 + s93 + s102 + s160 + s189 + s261 + s291 + s389 + s477, data=pos_sel_lam) # > 12 appearances
-anova(decay_anova2)
-
-displaysites(c(41, 102, 189)) -> positivelyselectedThatpredictDecay
-positivelyselectedThatpredictDecay

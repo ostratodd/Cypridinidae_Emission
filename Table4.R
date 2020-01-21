@@ -1,7 +1,11 @@
-colorlm <- lm(Lmax_Mean ~ s41 + s93 + s102 + s142 + s160 + s177 + s189 + s261 + s285 + s291 + s320 + s389 + s477 , data=pos_sel_col)
+library(gridExtra); library(grid); require(janitor);
+library(MuMIn);
+
+
+#colorlm <- lm(Lmax_Mean ~ s41 + s93 + s102 + s142 + s160 + s177 + s189 + s261 + s285 + s291 + s320 + s389 + s477 , data=pos_sel_col)
       
-mixnmatch_col <- dredge(	colorlm,rank = "AIC",m.lim = c(0,3)) #3 seems like the maximum terms we can fit safely
-head(mixnmatch_col, 7)
+#mixnmatch_col <- dredge(	colorlm,rank = "AIC",m.lim = c(0,3)) #3 seems like the maximum terms we can fit safely
+#head(mixnmatch_col, 7)
 
 #Global model call: lm(formula = Lmax_Mean ~ s41 + s93 + s102 + s142 + s160 + s177 + 
 #    s189 + s261 + s285 + s291 + s320 + s389 + s477, data = pos_sel_col)
