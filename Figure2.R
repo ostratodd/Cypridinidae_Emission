@@ -6,11 +6,13 @@ light_data2 <- light_data %>% group_by(Species,type,sample,count_type,Concentrat
 
 #Pichia yeast expression plot###
 sp <- c("Pichia","CNO","KHC","SVU","VTS")
+count_type <- c("before","after")
 light_data2$Species <- factor(light_data2$Species,levels=sp)
+light_data2$count_type <- factor(light_data2$count_type,levels=count_type)
 Figure2b <- ggplot(data=light_data2, aes(x = Species, y = log10(mean_cps),fill=count_type)) + geom_boxplot() +
   geom_point(position = position_jitterdodge()) + scale_discrete_manual(aes(x=sp)) +
   xlab("Species") + ylab(expression('log'[10]*'(CPS / Total Protein Conc. )')) +
-  scale_fill_manual(values = c("#0092ff","white"),name="Measures",labels=c("After + luciferin","Before")) +
+  scale_fill_manual(values = c("white","#0092ff"),name="Measures",labels=c("After + luciferin","Before")) +
   scale_x_discrete(labels=c("Pichia","C_noc","K_has","M_SVU","V_tsu")) +
   theme(legend.position = "none")
 
