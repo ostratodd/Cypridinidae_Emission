@@ -346,65 +346,45 @@ source("1_Emission_Functions.R")#
 source("2_Read_Datasets.R")#
 source("3_Calculate_parameters.R")#
 source("4_MutagenesisLuciferase.R")
-source("Table2.R")
-source("Table3.R")
-table3
-source("Table4.R")
-table4
-aligned2cyp(102, 142, 189)
-aligned2cyp(c(102, 142, 189))
-library(gridExtra); library(grid); require(janitor);#
-library(MuMIn);#
-#***********kinetics/decay#
-### decay ANOVA  ####
-#Now read decay data and merge -- decay column called lambda#
+source("Figure2.R")
+#Figure 2 - In vitro expression of exemplars supports luciferase function#
+library(ggplot2); library(reshape2); library(dplyr); library(tidyverse); library(gridExtra)#
 #
-options(na.action = "na.fail")#
-#doesn't work inside lm function but can cut and paste manually#
-#after removing invariant sites, which are 160, 303, 338#
-paste(colnames(pos_sel_lam)[3:ncol(pos_sel_lam)-1], collapse=" + "   )#
-#IF sites change copy/paste from result of above command#
+light_data <- read.csv("Raw Data/expression-kinetics/2019_pichia_assays.csv",header=TRUE)#
+light_data2 <- light_data %>% group_by(Species,type,sample,count_type,Concentration,date) %>% summarise(mean_cps = mean(cps_norm))#
 #
-glb1 <- lm(lambda ~ s41 + s93 + s102 + s160 + s177 + s189 + s261 + s291 + s389 + s477, data=pos_sel_decay)#
+#Pichia yeast expression plot####
+sp <- c("Pichia","CNO","KHC","SVU","VTS")#
+light_data2$Species <- factor(light_data2$Species,levels=sp)#
+Figure2b <- ggplot(data=light_data2, aes(x = Species, y = log10(mean_cps),fill=count_type)) + geom_boxplot() +#
+  geom_point(position = position_jitterdodge()) + scale_discrete_manual(aes(x=sp)) +#
+  xlab("Species") + ylab(expression('log'[10]*'(CPS / Total Protein Conc. )')) +#
+  scale_fill_manual(values = c("#0092ff","grey"),name="Measures",labels=c("After + luciferin","Before")) +#
+  scale_x_discrete(labels=c("Pichia","C_noc","K_has","M_SVU","V_tsu")) +#
+  theme(legend.position = "none")#
 #
-mixnmatch_lam <- dredge(glb1,rank = "AIC",m.lim = c(0,6)) #6 seems like the maximum terms we can fit safely#
-av <- model.avg(mixnmatch_lam)#
-head(mixnmatch_lam, 76)#
+	###############
+	#Mammalian expression#
+mam_data <- read.csv(file="Raw Data/expression-kinetics/2014_mammalian_assays.csv", header=TRUE)#
+#Add column for dilution*substrate#
+luciferin <- mam_data$dilution*mam_data$substrate#
+mam_data2 <- cbind(mam_data,luciferin)#
+mam_data <- mam_data2#
 #
-#Global model call: lm(formula = lambda ~ s41 + s93 + s102 + s160 + s177 + s189 +#
-#    s261 + s291 + s389 + s477, data = pos_sel_lam)#
-#---#
-#Model selection table#
-#    (Intrc) s102 s160 s177 s189 s261 s291 s389 s41 s477 s93 df logLik  AIC delta weight#
-#59    8.953         +         +    +    +                    9 -1.117 20.2  0.00  0.017#
-#187   8.953         +         +    +    +        +           9 -1.117 20.2  0.00  0.017#
-#315   8.953         +         +    +    +             +      9 -1.117 20.2  0.00  0.017#
-#443   8.953         +         +    +    +        +    +      9 -1.117 20.2  0.00  0.017#
-#155   1.458         +         +    +             +           9 -1.117 20.2  0.00  0.017#
-#281   5.720                   +    +                  +      9 -1.117 20.2  0.00  0.017#
-#411   1.458         +         +    +             +    +      9 -1.117 20.2  0.00  0.017#
-#57   13.210                   +    +    +                    9 -1.117 20.2  0.00  0.017#
-#185  13.210                   +    +    +        +           9 -1.117 20.2  0.00  0.017#
-#313  13.210                   +    +    +             +      9 -1.117 20.2  0.00  0.017#
-#441  13.210                   +    +    +        +    +      9 -1.117 20.2  0.00  0.017#
-#283   8.953         +         +    +                  +      9 -1.117 20.2  0.00  0.017#
-#153   5.720                   +    +             +           9 -1.117 20.2  0.00  0.017#
-#409   5.720                   +    +             +    +      9 -1.117 20.2  0.00  0.017#
-#650   5.883    +              +                  +        + 10 -0.730 21.5  1.22  0.009#
-#652#
-##
-#use this function to look at each model#
-summary(eval(getCall(mixnmatch_lam,'59')))#
-#looking at the two sites are that most commonly present#
-decay_anova <- lm(lambda ~ s160 + s189 + s261 + s291, data = pos_sel_decay) # > 13 appearances#
-anova(decay_anova)#
-displaysites(c(41, 102, 189)) -> positivelyselectedThatpredictDecay#
-positivelyselectedThatpredictDecay
-aligned2cyp(c(160, 189, 261, 291))
-aligned2cyp(c(41,102,189))
-table4
-aligned2cyp(c(102,142,189))
-table4
-table3
-aligned2cyp(c(375,404))
-table4
+#Subset data. the Soro-luc constructs did not have proper signal peptides#
+	tsuluc <- grep("VtLa", mam_data$construct); tsujii <- mam_data[tsuluc,];#
+	pmorluc <- grep("PhM", mam_data$construct); morini <- mam_data[pmorluc,]#
+	svuluc <- grep("SVUluc", mam_data$construct); svu <- mam_data[svuluc,]#
+	blank <- grep("Blank", mam_data$construct); blankcells <- mam_data[blank,]#
+	hek <- grep("HEK", mam_data$construct); hekcells <- mam_data[hek,]#
+	mam_combine <- rbind(tsujii, morini, hekcells, blankcells, svu)#
+	subset(mam_combine, log(luciferin) > 6.5) -> maxluc#
+#
+quartz("Figure 2", 9, 3)#
+#
+Figure2a <- ggplot(data=maxluc, aes(x=construct, y=log10(light), fill=construct)) + scale_fill_manual(values=c("white","white","#0092ff","#0092ff","#0092ff")) + geom_boxplot() + geom_jitter() + xlab("Species") + ylab(expression('log'[10]*' (Counts Per Second)')) +#
+  scale_x_discrete(labels = c("Blank", "HEK", "P_mor", "M_SVU", "V_tsu")) +#
+  theme(legend.position = "none")#
+#
+grid.arrange(Figure2a, Figure2b, nrow = 1)
+source("Figure2.R")
