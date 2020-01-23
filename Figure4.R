@@ -22,13 +22,20 @@ ladderize(luc_tree, right=TRUE) -> luc_tree
 reroot(luc_tree, 17, resolve.root=TRUE, .5) -> luc_tree_root #root tree at midpoint of branch, which ape does not like to do
 
 plotASRsite(207, "Site 178 - Neutrally evolving color site")
-plotASRsite(435, "Site 404 - Color site under negative selection")
+plotASRsite(cyp2aligned(280), "Site 280 - Neutrally evolving color site")
+plotASRsite(cyp2aligned(375), "Site 375 - Neutrally evolving color site")
 
-plotASRsite(102, "Site 74 - Correlated with color and decay and under positive selection")
+
+plotASRsite(435, "Site 404 - Color site under negative selection")
+plotASRsite(102, "Site 74 - Correlated with color and under positive selection")
+
+
+
 plotASRsite(189, "Site 160 - Correlated with color and decay and under positive selection")
 
 plotASRsite(41, "Site 19 - Correlated with decay and under positive selection")
 plotASRsite(142, "Site 114 - Correlated with decay and under positive selection")
+plotASRsite(cyp2aligned(232), "Site 232 - Correlated with decay and under positive selection")
 
 
 #******************Phylophenospace starts here
