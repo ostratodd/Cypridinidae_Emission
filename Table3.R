@@ -7,10 +7,10 @@
 
 anova(lm(lmax ~ c38 * c178 * c375 * c404 * c405, data=all_col_mut)) -> table3
 write.table(table3, file = "Table3.txt", sep="\t")
-table3
+table3_mutagenesis
 
 #Model selection does not choose c38
-anova(lm(lmax ~ c178 * c375 * c404 * c405, data=all_col_mut))
+anova(lm(lmax ~ c178 * c280 * c372 * c375 * c404 * c405, data=all_col_mut)) -> table3
 
 
 
@@ -22,13 +22,10 @@ anova(lm(lmax ~ c178 * c375 * c404 * c405, data=all_col_mut))
 #library(MuMIn);
 #
 #options(na.action = "na.fail")
-#amutationslm <- lm(lmax ~ c38+ c45+ c75+ c79+ c87+ c126+ c167+ c170+ c178+ c191+ c197+ c223+ c258+ c276+ c280+ c372+ c375+ c403+ c404+ c405+ c406+ #c407+ c479, data=all_col_mut)
+#amutationslm <- lm(lmax ~ c38+ c45+ c75+ c79+ c87+ c126+ c167+ c170+ c178+ c191+ c197+ c223+ c258+ c276+ c280+ c372+ c375+ c403+ c404+ c405+ c406+ c407+ c479, data=all_col_mut)
 #mixnmatch_amut <- dredge(amutationslm,rank = "AIC",m.lim = c(0,6)) 
 #head(mixnmatch_amut, 20)
 
-cyp2aligned(c(178, 191, 223, 403 ))
-#207 220 252 434
-anova(lm(lmax ~ c178 + c191 + c223 + c403, data=all_col_mut))
 
 #Results of model selection
 #

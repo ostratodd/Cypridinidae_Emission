@@ -46,9 +46,9 @@ summary(eval(getCall(mixnmatch_lam,'59')))
 
 
 #looking at the two sites are that most commonly present
-decay_anova <- lm(lambda ~ s160 + s189 + s261 + s291, data = pos_sel_decay) # > 13 appearances
-anova(decay_anova)
+decay_anova <- lm(lambda ~ s41 + s160 + s189 + s261 + s291 + s477, data = pos_sel_decay) # > 13 appearances
+anova(decay_anova)->table5
 
 
-displaysites(c(41, 102, 189)) -> positivelyselectedThatpredictDecay
+displaysites(c(41, 189, 261)) -> positivelyselectedThatpredictDecay
 positivelyselectedThatpredictDecay
