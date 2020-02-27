@@ -4,10 +4,7 @@ require(ggplot2)
 
 clean <- subset(alldata, error < 0.02 | replicate=="Vhil_tsuji" | replicate=="Cnoc_ohmiya" | replicate=="Pgra_huvard")
 quartz("Figure 3", 13, 3)
-fig3 <- qplot(abbreviation, sgMax, data=clean, geom=c("boxplot", "jitter")) + ylab("Lambda max (nm)") + xlab("Species")
-	#highlight data with rectangles
-	#add green blue shading w/ rectangle (geom_rect). This uses y-co-ordinates as min and max of photeros (green) and non-photeros (blue). facet_grid sorts into panels by collection locality
-t2.rect1 <- data.frame (xmin=-Inf, xmax=Inf, ymin=463.97, ymax=471.14)
-t1.rect1 <- data.frame (xmin=-Inf, xmax=Inf, ymin=454.27, ymax=463.42)
+fig3 <- ggplot(data=clean, aes(x=abbreviation, y=sgMax, fill=abbreviation)) + geom_boxplot() + geom_jitter() 
 
-fig3 + geom_rect(data=t2.rect1, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax), fill="green", alpha=0.1, inherit.aes = FALSE) + geom_rect(data=t1.rect1, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax), fill="blue", alpha=0.07, inherit.aes = FALSE)  + facet_grid(cols = vars(locality), scales = "free_x", switch = "x", space = "free") -> Figure3
+
+fig3 + facet_grid(cols = vars(locality), scales = "free_x", switch = "x", space = "free")  + ylab("Lambda max (nm)") + xlab("Species") + scale_fill_manual(values=c("green", "green","#0092ff", "#0092ff", "#0092ff", "green","green", "#0092ff","#0092ff", "#0092ff","#0092ff", "green","green", "#0092ff","#0092ff", "#0092ff","#0092ff", "#0092ff", "#0092ff","#0092ff", "green","#0092ff", "#0092ff")) + theme(legend.position = "none")
