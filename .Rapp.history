@@ -346,7 +346,26 @@ source("1_Emission_Functions.R")#
 source("2_Read_Datasets.R")#
 source("3_Calculate_parameters.R")#
 source("4_MutagenesisLuciferase.R")
-source("Figure2.R")
+#Figure 3 plot lambda max values (color)#
+source("Figure3.R")#
+Figure3
+require(ggplot2)#
+#read in Supplemental table with all data into alldata#
+#
+clean <- subset(alldata, error < 0.02 | replicate=="Vhil_tsuji" | replicate=="Cnoc_ohmiya" | replicate=="Pgra_huvard")#
+quartz("Figure 3", 13, 3)#
+fig3 <- qplot(abbreviation, sgMax, data=clean, geom=c("boxplot", "jitter")) + ylab("Lambda max (nm)") + xlab("Species")#
+	#highlight data with rectangles#
+	#add green blue shading w/ rectangle (geom_rect). This uses y-co-ordinates as min and max of photeros (green) and non-photeros (blue). facet_grid sorts into panels by collection locality#
+t2.rect1 <- data.frame (xmin=-Inf, xmax=Inf, ymin=463.97, ymax=471.14)#
+t1.rect1 <- data.frame (xmin=-Inf, xmax=Inf, ymin=454.27, ymax=463.42)#
+#
+fig3 + geom_rect(data=t2.rect1, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax), fill="green", alpha=0.1, inherit.aes = FALSE) + geom_rect(data=t1.rect1, aes(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax), fill="blue", alpha=0.07, inherit.aes = FALSE)  + facet_grid(cols = vars(locality), scales = "free_x", switch = "x", space = "free") -> Figure3
+figure3
+Figure3
+fig3 <- qplot(abbreviation, sgMax, data=clean, geom=c("boxplot", "jitter")) + ylab("Lambda max (nm)") + xlab("Species")
+fig3  + facet_grid(cols = vars(locality), scales = "free_x", switch = "x", space = "free") -> Figure3
+Figure3
 #Figure 2 - In vitro expression of exemplars supports luciferase function#
 library(ggplot2); library(reshape2); library(dplyr); library(tidyverse); library(gridExtra)#
 #
@@ -355,11 +374,13 @@ light_data2 <- light_data %>% group_by(Species,type,sample,count_type,Concentrat
 #
 #Pichia yeast expression plot####
 sp <- c("Pichia","CNO","KHC","SVU","VTS")#
+count_type <- c("before","after")#
 light_data2$Species <- factor(light_data2$Species,levels=sp)#
+light_data2$count_type <- factor(light_data2$count_type,levels=count_type)#
 Figure2b <- ggplot(data=light_data2, aes(x = Species, y = log10(mean_cps),fill=count_type)) + geom_boxplot() +#
   geom_point(position = position_jitterdodge()) + scale_discrete_manual(aes(x=sp)) +#
   xlab("Species") + ylab(expression('log'[10]*'(CPS / Total Protein Conc. )')) +#
-  scale_fill_manual(values = c("#0092ff","grey"),name="Measures",labels=c("After + luciferin","Before")) +#
+  scale_fill_manual(values = c("white","#0092ff"),name="Measures",labels=c("After + luciferin","Before")) +#
   scale_x_discrete(labels=c("Pichia","C_noc","K_has","M_SVU","V_tsu")) +#
   theme(legend.position = "none")#
 #
@@ -387,4 +408,80 @@ Figure2a <- ggplot(data=maxluc, aes(x=construct, y=log10(light), fill=construct)
   theme(legend.position = "none")#
 #
 grid.arrange(Figure2a, Figure2b, nrow = 1)
-source("Figure2.R")
+fig3 <- qplot(abbreviation, sgMax, data=clean, geom=c("boxplot", "jitter")) + ylab("Lambda max (nm)") + xlab("Species")
+fig3  + scale_fill_manual(values=c("white","white","#0092ff","#0092ff","#0092ff")) + facet_grid(cols = vars(locality), scales = "free_x", switch = "x", space = "free")
+fig3 <- qplot(abbreviation, sgMax, (data=clean, aes(fill=Species)), geom=c("boxplot", "jitter")) + ylab("Lambda max (nm)") + xlab("Species")
+clean
+fig3 <- qplot(abbreviation, sgMax, (data=clean, aes(x=abbreviation, y=sgMax,fill=abbreviation)), geom=c("boxplot", "jitter")) + ylab("Lambda max (nm)") + xlab("Species")
+fig3 <- qplot(abbreviation, sgMax, ggplot(data=clean, aes(x=abbreviation, y=sgMax,fill=abbreviation)), geom=c("boxplot", "jitter")) + ylab("Lambda max (nm)") + xlab("Species")
+fig3 <- qplot(abbreviation, sgMax, data=clean, geom=c("boxplot", "jitter")) + ylab("Lambda max (nm)") + xlab("Species")
+fig3  + scale_fill_manual(values=c("white","white","#0092ff","#0092ff","#0092ff")) + facet_grid(cols = vars(locality), scales = "free_x", switch = "x", space = "free")
+fig3 <- ggplot(data=clean, aes(x=abbreviation, y=sgMax, fill=abbreviaion))
+fig3
+head(clean)
+fig3 <- qplot(abbreviation, sgMax, data=clean, geom=c("boxplot", "jitter"))
+fig3  + scale_fill_manual(values=c("white","white","#0092ff","#0092ff","#0092ff")) + facet_grid(cols = vars(locality), scales = "free_x", switch = "x", space = "free")
+fig3 <- ggplot(abbreviation, sgMax, data=clean, geom=c("boxplot", "jitter"))
+fig3  + scale_fill_manual(values=c("white","white","#0092ff","#0092ff","#0092ff")) + facet_grid(cols = vars(locality), scales = "free_x", switch = "x", space = "free")
+ggplot(abbreviation, sgMax, data=clean, geom=c("boxplot", "jitter")) + ylab("Lambda max (nm)") + xlab("Species")
+fig3 <- ggplot(abbreviation, sgMax, data=clean, geom=c("boxplot", "jitter"), fill=abbreviation) + ylab("Lambda max (nm)") + xlab("Species")#
+#
+fig3  + scale_fill_manual(values=c("white","white","#0092ff","#0092ff","#0092ff")) + facet_grid(cols = vars(locality), scales = "free_x", switch = "x", space = "free")
+fig3 <- ggplot(abbreviation, sgMax, data=clean, geom=c("boxplot", "jitter"), fill=abbreviation) + scale_fill_manual(values=c("white","white","#0092ff","#0092ff","#0092ff")) + ylab("Lambda max (nm)") + xlab("Species")#
+#
+fig3  + scale_fill_manual(values=c("white","white","#0092ff","#0092ff","#0092ff")) + facet_grid(cols = vars(locality), scales = "free_x", switch = "x", space = "free")
+Figure2a <- ggplot(data=maxluc, aes(x=construct, y=log10(light), fill=construct)) + scale_fill_manual(values=c("white","white","#0092ff","#0092ff","#0092ff")) + geom_boxplot() + geom_jitter() + xlab("Species") + ylab(expression('log'[10]*' (Counts Per Second)')) +#
+  scale_x_discrete(labels = c("Blank", "HEK", "P_mor", "M_SVU", "V_tsu")) +#
+  theme(legend.position = "none")#
+#
+grid.arrange(Figure2a, Figure2b, nrow = 1)
+fig3 <- ggplot(abbreviation, sgMax, data=clean, geom=c("boxplot", "jitter"), fill=abbreviation)#
+#
+fig3 + facet_grid(cols = vars(locality), scales = "free_x", switch = "x", space = "free") + scale_fill_manual(values=c("white","white","#0092ff","#0092ff","#0092ff")) + ylab("Lambda max (nm)") + xlab("Species")
+quartz("Figure 3", 13, 3)#
+fig3 <- ggplot(abbreviation, sgMax, data=clean, geom=c("boxplot", "jitter"), fill=abbreviation)#
+#
+fig3 + facet_grid(cols = vars(locality), scales = "free_x", switch = "x", space = "free") + scale_fill_manual(values=c("blue")) + ylab("Lambda max (nm)") + xlab("Species")
+fig3 <- ggplot(x=abbreviation, y=sgMax, data=clean, geom=c("boxplot", "jitter"), fill=abbreviation)
+quartz("Figure 3", 13, 3)#
+fig3 <- ggplot(x=abbreviation, y=sgMax, data=clean, geom=c("boxplot", "jitter"), fill=abbreviation)#
+#
+fig3 + facet_grid(cols = vars(locality), scales = "free_x", switch = "x", space = "free") + scale_fill_manual(values=c("blue")) + ylab("Lambda max (nm)") + xlab("Species")
+fig3 <- ggplot(data=clean, aes(x=abbreviation, y=sgMax), fill=abbreviation)) + geom_boxplot() + geom_jitter()
+fig3 <- ggplot(data=clean, aes(x=abbreviation, y=sgMax, fill=abbreviation)) + geom_boxplot() + geom_jitter()
+fig3 + facet_grid(cols = vars(locality), scales = "free_x", switch = "x", space = "free") + scale_fill_manual(values=c("blue")) + ylab("Lambda max (nm)") + xlab("Species")
+quartz("Figure 3", 13, 3)#
+fig3 <- ggplot(data=clean, aes(x=abbreviation, y=sgMax, fill=abbreviation)) + geom_boxplot() + geom_jitter() #
+fig3 + facet_grid(cols = vars(locality), scales = "free_x", switch = "x", space = "free")  + ylab("Lambda max (nm)") + xlab("Species")
+quartz("Figure 3", 13, 3)#
+fig3 <- ggplot(data=clean, aes(x=abbreviation, y=sgMax, fill=abbreviation)) + geom_boxplot() + geom_jitter() #
+fig3 + facet_grid(cols = vars(locality), scales = "free_x", switch = "x", space = "free")  + ylab("Lambda max (nm)") + xlab("Species") + scale_fill_manual(values=c("green", "green","blue", "blue", "blue", "blue","green", "green","blue", "blue","green", "green","blue", "blue","blue", "blue","blue", "blue", "blue","blue", "blue","blue", "blue"))
+quartz("Figure 3", 13, 3)#
+fig3 <- ggplot(data=clean, aes(x=abbreviation, y=sgMax, fill=abbreviation)) + geom_boxplot() + geom_jitter() #
+fig3 + facet_grid(cols = vars(locality), scales = "free_x", switch = "x", space = "free")  + ylab("Lambda max (nm)") + xlab("Species") + scale_fill_manual(values=c("green", "green","blue", "blue", "blue", "blue","green", "green","blue", "blue","green", "green","blue", "blue","blue", "blue","blue", "blue", "blue","blue", "green","blue", "blue"))
+clean <- subset(alldata, error < 0.02 | replicate=="Vhil_tsuji" | replicate=="Cnoc_ohmiya" | replicate=="Pgra_huvard")#
+quartz("Figure 3", 13, 3)#
+fig3 <- ggplot(data=clean, aes(x=abbreviation, y=sgMax, fill=abbreviation)) + geom_boxplot() + geom_jitter() #
+fig3 + facet_grid(cols = vars(locality), scales = "free_x", switch = "x", space = "free")  + ylab("Lambda max (nm)") + xlab("Species") + scale_fill_manual(values=c("green", "green","blue", "blue", "blue", "green","green", "blue","blue", "blue","blue", "green","green", "blue","blue", "blue","blue", "blue", "blue","blue", "green","blue", "blue"))
+clean <- subset(alldata, error < 0.02 | replicate=="Vhil_tsuji" | replicate=="Cnoc_ohmiya" | replicate=="Pgra_huvard")#
+quartz("Figure 3", 13, 3)#
+fig3 <- ggplot(data=clean, aes(x=abbreviation, y=sgMax, fill=abbreviation)) + geom_boxplot() + geom_jitter() #
+fig3 + facet_grid(cols = vars(locality), scales = "free_x", switch = "x", space = "free")  + ylab("Lambda max (nm)") + xlab("Species") + scale_fill_manual(values=c("green", "green","blue", "blue", "blue", "green","green", "blue","blue", "blue","blue", "green","green", "blue","blue", "blue","blue", "blue", "blue","blue", "green","blue", "blue"))
+clean <- subset(alldata, error < 0.02 | replicate=="Vhil_tsuji" | replicate=="Cnoc_ohmiya" | replicate=="Pgra_huvard")#
+quartz("Figure 3", 13, 3)#
+fig3 <- ggplot(data=clean, aes(x=abbreviation, y=sgMax, fill=abbreviation)) + geom_boxplot() + geom_jitter() #
+fig3 + facet_grid(cols = vars(locality), scales = "free_x", switch = "x", space = "free")  + ylab("Lambda max (nm)") + xlab("Species") + scale_fill_manual(values=c("green", "green","blue", "blue", "blue", "green","green", "blue","blue", "blue","blue", "green","green", "blue","blue", "blue","blue", "blue", "blue","blue", "green","blue", "blue")) + theme(legend.position = "none")
+fig3 + facet_grid(cols = vars(locality), scales = "free_x", switch = "x", space = "free")  + ylab("Lambda max (nm)") + xlab("Species") + scale_fill_manual(values=c("green", "green","#0092ff", "blue", "blue", "green","green", "blue","blue", "blue","blue", "green","green", "blue","blue", "blue","blue", "blue", "blue","blue", "green","blue", "blue")) + theme(legend.position = "none")
+clean <- subset(alldata, error < 0.02 | replicate=="Vhil_tsuji" | replicate=="Cnoc_ohmiya" | replicate=="Pgra_huvard")#
+quartz("Figure 3", 13, 3)#
+fig3 <- ggplot(data=clean, aes(x=abbreviation, y=sgMax, fill=abbreviation)) + geom_boxplot() + geom_jitter() #
+fig3 + facet_grid(cols = vars(locality), scales = "free_x", switch = "x", space = "free")  + ylab("Lambda max (nm)") + xlab("Species") + scale_fill_manual(values=c("green", "green","#0092ff", "blue", "blue", "green","green", "blue","blue", "blue","blue", "green","green", "blue","blue", "blue","blue", "blue", "blue","blue", "green","blue", "blue")) + theme(legend.position = "none")
+Figure2a <- ggplot(data=maxluc, aes(x=construct, y=log10(light), fill=construct)) + scale_fill_manual(values=c("white","white","#0092ff","#0092ff","#0092ff")) + geom_boxplot() + geom_jitter() + xlab("Species") + ylab(expression('log'[10]*' (Counts Per Second)')) +#
+  scale_x_discrete(labels = c("Blank", "HEK", "P_mor", "M_SVU", "V_tsu")) +#
+  theme(legend.position = "none")#
+#
+grid.arrange(Figure2a, Figure2b, nrow = 1)
+clean <- subset(alldata, error < 0.02 | replicate=="Vhil_tsuji" | replicate=="Cnoc_ohmiya" | replicate=="Pgra_huvard")#
+quartz("Figure 3", 13, 3)#
+fig3 <- ggplot(data=clean, aes(x=abbreviation, y=sgMax, fill=abbreviation)) + geom_boxplot() + geom_jitter() #
+fig3 + facet_grid(cols = vars(locality), scales = "free_x", switch = "x", space = "free")  + ylab("Lambda max (nm)") + xlab("Species") + scale_fill_manual(values=c("green", "green","#0092ff", "#0092ff", "#0092ff", "green","green", "#0092ff","#0092ff", "#0092ff","#0092ff", "green","green", "#0092ff","#0092ff", "#0092ff","#0092ff", "#0092ff", "#0092ff","#0092ff", "green","#0092ff", "#0092ff")) + theme(legend.position = "none")
