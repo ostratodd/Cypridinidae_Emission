@@ -36,11 +36,11 @@ displaysites <- function(al_sites){
 }
 displaycodon <- function(al_sites){
     ntalignment <- read.csv("LuciferaseTree_dNds/results/combined_codonaligned.csv",header=FALSE, stringsAsFactors=FALSE, colClasses = c("character"))
-	ntalignment %>% arrange(V1) -> alignment #sort by species name 
+	ntalignment %>% arrange(V1) -> ntalignment #sort by species name 
 	
 	colnames(ntalignment)[2:ncol(ntalignment)] <- paste("n",seq(1,(ncol(ntalignment)-1)),sep=""); colnames(ntalignment)[1] <- "sp"
 
-	view <- ntalignment[,c("sp",paste("n",c(al_sites*3, al_sites*3+1, al_sites*3+2), sep=""))]
+	view <- ntalignment[,c("sp",paste("n",c((al_sites*3)-2, (al_sites*3)-1, (al_sites*3)), sep=""))]
 	data.frame(view[-1]) -> view_df; view_df->view_df_named;
 	rownames(view_df_named) <- view$sp
 	view	
