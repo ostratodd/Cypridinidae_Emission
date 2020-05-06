@@ -5,13 +5,13 @@
 #64  71 103 107 115 154 196 199 207 220 226 252 287 307 311 403 406 434 435 436 437 438 512
 #38  45  75  79  87 126 167 170 178 191 197 223 258 276 280 372 375 403 404 405 406 407 479
 
-anova(lm(lmax ~ c38 * c178 * c375 * c404 * c405, data=all_col_mut)) -> table3
-write.table(table3, file = "Table3.txt", sep="\t")
-table3_mutagenesis
+#anova(lm(lmax ~ c38 * c178 * c375 * c404 * c405, data=all_col_mut)) -> table3
+#write.table(table3, file = "Table3.txt", sep="\t")
+#table3_mutagenesis
 
 #Model selection does not choose c38
 anova(lm(lmax ~ c178 * c280 * c372 * c375 * c404 * c405, data=all_col_mut)) -> table3
-
+write.table(table3, file = "Table3.txt", sep="\t")
 
 
 
