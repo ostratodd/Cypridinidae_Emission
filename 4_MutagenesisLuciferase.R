@@ -74,7 +74,10 @@ meme_table <- read.csv("LuciferaseTree_dNds/results/hyphy/lucclade.meme.csv",hea
 al_meme <- meme_table$Codon
   meme <- aligned2cyp(al_meme)
 
+all_meme_table <- read.csv("LuciferaseTree_dNds/results/hyphy/lucclade.meme.allsites.csv",header=TRUE)
+
 fel_table <- read.csv("LuciferaseTree_dNds/results/hyphy/lucclade.fel.csv",header=TRUE)
+all_fel_table <- read.csv("LuciferaseTree_dNds/results/hyphy/lucclade.fel.allsites.csv",header=TRUE)
 
 #******************Create data frame for mutations (only lmax for mutations). data frame called mutated
 #csv file containing mutants and lmax data
