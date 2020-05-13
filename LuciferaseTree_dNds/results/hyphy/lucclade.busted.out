@@ -1,0 +1,99 @@
+Analysis Description
+--------------------
+BUSTED (branch-site unrestricted statistical test of episodic
+diversification) uses a random effects branch-site model fitted jointly
+to all or a subset of tree branches in order to test for alignment-wide
+evidence of episodic diversifying selection. Assuming there is evidence
+of positive selection (i.e. there is an omega > 1), BUSTED will also
+perform a quick evidence-ratio style analysis to explore which
+individual sites may have been subject to selection. v2.0 adds support
+for synonymous rate variation, and relaxes the test statistic to 0.5
+(chi^2_0 + chi^2_2). Version 2.1 adds a grid search for the initial
+starting point. Version 2.2 changes the grid search to LHC, and adds an
+initial search phase to use adaptive Nedler-Mead. 
+
+- __Requirements__: in-frame codon alignment and a phylogenetic tree (optionally annotated
+with {})
+
+- __Citation__: *Gene-wide identification of episodic selection*, Mol Biol Evol.
+32(5):1365-71
+
+- __Written by__: Sergei L Kosakovsky Pond
+
+- __Contact Information__: spond@temple.edu
+
+- __Analysis Version__: 2.2
+
+
+>code –> Universal
+
+>Loaded a multiple sequence alignment with **15** sequences, **610** codons, and **1** partitions from `/home/oakley/projects/Cypridinidae_Emission/LuciferaseTree_dNds/results/combined_codonaligned.fa`
+
+>branches –> All
+
+>srv –> Yes
+The number omega rate classes to include in the model (permissible range = [1,10], default value = 3, integer): 
+>rates –> 3
+The number omega rate classes to include in the model (permissible range = [1,10], default value = 3, integer): 
+>syn-rates –> 3
+The number of points in the initial distributional guess for likelihood fitting (permissible range = [1,10000], default value = 250, integer): 
+>grid-size –> 250
+The number of initial random guesses to 'seed' rate values optimization (permissible range = [1,25], default value = 1, integer): 
+>starting-points –> 1
+
+
+### Branches to test for selection in the BUSTED analysis
+* Selected 27 branches to test in the BUSTED analysis: `Vargula_tsujii_sequenced, Maristella_chicoi_cap3, Maristella_sp_SVD_cap3, Maristella_sp_VAD_DN92476_c5_g4_i1, Node10, Maristella_sp_ODH_DN60908_c36_g8_i1, Node9, Node7, Maristella_sp_AG_DN382219_c2_g1_i4, Maristella_sp_IR_DN50846_c6_g1_i1, Node14, Node6, Maristella_sp_SVU_cap3, Node5, Node3, Photeros_morini_cap3, Photeros_annecohenae_DN96747_c10_g3_i3, Node20, Photeros_macelroyi_DN131343_c2_g2_i4, Node19, Photeros_sp_WLU_DN218316_c2_g1_i3, Node18, Node2, Kornickeria_hastingsi_cap3, Node1, Vargula_hilgendorfii_AAA30332, Cypridina_noctiluca_BAD08210`
+
+
+### Obtaining branch lengths and nucleotide substitution biases under the nucleotide GTR model
+* Log(L) = -10086.00, AIC-c = 20242.10 (35 estimated parameters)
+
+### Obtaining the global omega estimate based on relative GTR branch lengths and nucleotide substitution biases
+* Log(L) = -9557.41, AIC-c = 19199.22 (42 estimated parameters)
+* non-synonymous/synonymous rate ratio for *test* =   0.2353
+
+### Improving branch lengths, nucleotide substitution biases, and global dN/dS ratios under a full codon model
+* Log(L) = -9494.76, AIC-c = 19073.92 (42 estimated parameters)
+* non-synonymous/synonymous rate ratio for *test* =   0.1735
+
+### Performing the full (dN/dS > 1 allowed) branch-site model fit
+* Log(L) = -9338.29, AIC-c = 18779.16 (51 estimated parameters)
+* For *test* branches, the following rate distribution for branch-site combinations was inferred
+
+|          Selection mode           |     dN/dS     |Proportion, %|               Notes               |
+|-----------------------------------|---------------|-------------|-----------------------------------|
+|        Negative selection         |     0.000     |   34.824    |                                   |
+|        Negative selection         |     0.161     |   63.727    |                                   |
+|      Diversifying selection       |    11.936     |    1.448    |                                   |
+
+* The following rate distribution for site-to-site **synonymous** rate variation was inferred
+
+|               Rate                | Proportion, % |               Notes               |
+|-----------------------------------|---------------|-----------------------------------|
+|               0.202               |    14.088     |                                   |
+|               0.755               |    65.873     |                                   |
+|               2.365               |    20.039     |                                   |
+
+
+### Performing the constrained (dN/dS > 1 not allowed) model fit
+* Log(L) = -9355.31, AIC-c = 18811.18 (50 estimated parameters)
+* For *test* branches under the null (no dN/dS > 1 model), the following rate distribution for branch-site combinations was inferred
+
+|          Selection mode           |     dN/dS     |Proportion, %|               Notes               |
+|-----------------------------------|---------------|-------------|-----------------------------------|
+|        Negative selection         |     0.000     |   24.356    |                                   |
+|        Negative selection         |     0.082     |   64.667    |                                   |
+|         Neutral evolution         |     1.000     |   10.978    |                                   |
+
+* The following rate distribution for site-to-site **synonymous** rate variation was inferred
+
+|               Rate                | Proportion, % |               Notes               |
+|-----------------------------------|---------------|-----------------------------------|
+|               0.175               |    12.565     |                                   |
+|               0.740               |    70.515     |                                   |
+|               2.695               |    16.920     |                                   |
+
+----
+## Branch-site unrestricted statistical test of episodic diversification [BUSTED]
+Likelihood ratio test for episodic diversifying positive selection, **p =   0.0000**.
