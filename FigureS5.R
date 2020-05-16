@@ -6,16 +6,16 @@ plot(data=all_fel_table, (1-p.value)~Site, ylab="(1-p value)", xlab='Aligned Cod
 par(new=TRUE)
 plot(data=all_meme_table, (1-p.value)~Site, ylab="(1-p value)",xlab='Aligned Codon Site', ylim=c(0,1), cex=0.3, col="blue", type="h", pch=19)
 
-all_meme_table <- read.csv("~/Documents/GitHub/Cypridinidae_Emission/LuciferaseTree_dNds/results/hyphy/lucclade.meme.allsites.csv")
+all_meme_table <- read.csv("LuciferaseTree_dNds/results/hyphy/lucclade.meme.allsites.csv")
 colnames(all_meme_table) <- c("site","partition","alpha_0","beta_0","p_val_minus","beta_1","p_val_plus","LRT","p_value_MEME","branches","b_length")
 
 #read in fel analyses
-all_fel_table <- read.csv("~/Documents/GitHub/Cypridinidae_Emission/LuciferaseTree_dNds/results/hyphy/lucclade.fel.allsites.csv")
+all_fel_table <- read.csv("LuciferaseTree_dNds/results/hyphy/lucclade.fel.allsites.csv")
 colnames(all_fel_table)[1] <- "site"
 colnames(all_fel_table)[8] <- "p_value_FEL"
 
 #read in Multihit table
-multihit <- read.csv("~/Desktop/hyphy_more/datamonkey-table-nultihit.csv",col.names = c("site","three","three_island_two","three_v_three","two"))
+multihit <- read.csv("LuciferaseTree_dNds/results/hyphy/datamonkey-table-nultihit.csv",col.names = c("site","three","three_island_two","three_v_three","two"))
 
 #combine hyphy MEME and FEL results into one table
 sel_dat <- merge(all_meme_table,all_fel_table,by= "site")
@@ -57,7 +57,7 @@ cyp2aligned(c(78,231,317,466))
 #106-260 & 348-498
 
 #CnL conserved cysteine are sites:
-alignment <- read.csv("~/Documents/GitHub/Cypridinidae_Emission/LuciferaseTree_dNds/results/combined_aa.csv",header=FALSE, stringsAsFactors=FALSE, colClasses = c("character"))
+alignment <- read.csv("LuciferaseTree_dNds/results/combined_aa.csv",header=FALSE, stringsAsFactors=FALSE, colClasses = c("character"))
 cnl_seq <- alignment[alignment$V1 == "Cypridina_noctiluca_BAD08210",]
 cnl_cys <- which(cnl_seq == "C") - 1
 #
@@ -68,6 +68,6 @@ cnl_cys[which(cnl_cys %in% fel_sites)] #cysteine residues under purifying select
 #CnL glycosylation sites are:
 cyp2aligned(c(182,404))
 #182 -> 311
-#404 _> 435
+#404 -> 435
 displaysites(435)
 
