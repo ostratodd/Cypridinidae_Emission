@@ -21,9 +21,6 @@ Figure3
 #Figure 4 Phylophenospace with reconstructed ancestors
 source("Figure4.R")
 
-#Figure XX - dn:ds across the gene -- decide if main or SUPP
-source("FigureXX.R")
-
 #*************************************************Main Tables
 #Table 1 - Stats table for in vitro expression
 
@@ -52,6 +49,9 @@ FigureS2
 #Figure S3 - No correlation between lambda max and decay
 source("FigureS3.R")
 FigureS3
+
+#Figure S5 - dn:ds across the gene -- decide if main or SUPP
+source("FigureS5.R")
 
 #**********************************Supplemental Tables
 #Supplemental Table S1 is previously published emission spectra (constructed manually outside R)
