@@ -25,7 +25,7 @@ col_mdl_ML <- gls(lmax ~ c178 + c280 + c375 * c404,data=dt2,correlation = bm.mod
 col_mdl_no <- gls(lmax ~ c178 + c280 + c375 * c404,data=dt2,method="ML",control = list(singular.ok = TRUE))
 AICc(col_mdl_ML); AICc(col_mdl_no)
 summary(col_mdl_no)
-anova(col_mdl_no)
+f <- anova(col_mdl_no)
 
 #this analysis is for Table4.R that restricts to the last three color sites
 tree_seq <- luc_tree$tip.label
