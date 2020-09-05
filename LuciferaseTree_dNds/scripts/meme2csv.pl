@@ -1,4 +1,5 @@
 #!/usr/bin/perl
+#This converts hyphy meme output to csv
 use strict;
 
 my $filename = $ARGV[0];
