@@ -1,0 +1,44 @@
+
+Analysis Description
+--------------------
+Examine whether or not a codon alignment is better fit by models which
+permit multiple instantaneous substitutions. v0.2 adds a separate rate
+for codon-island triple-hit rates
+
+- __Requirements__: in-frame codon alignment and a phylogenetic tree
+
+- __Written by__: Sergei L Kosakovsky Pond, Sadie Wisotsky and Alexander Lucaci
+
+- __Contact Information__: spond@temple.edu
+
+- __Analysis Version__: 0.2
+
+
+>code –> Universal
+
+>Loaded a multiple sequence alignment with **15** sequences, **610** codons, and **1** partitions from `/home/datamonkey/datamonkey-js-server/production/app/multihit/output/5eb328124f869d08f96d009d`
+The number of omega rate classes to include in the model (permissible range = [1,10], default value = 3, integer): 
+>rates –> 1
+
+>triple-islands –> Yes
+
+
+### Obtaining branch lengths and nucleotide substitution biases under the nucleotide GTR model
+
+>kill-zero-lengths –> Yes
+* Log(L) = -10085.04, AIC-c = 20240.16 (35 estimated parameters)
+
+### Obtaining the global omega estimate based on relative GTR branch lengths and nucleotide substitution biases
+* Log(L) = -9554.71, AIC-c = 19193.81 (42 estimated parameters)
+* non-synonymous/synonymous rate ratio for *test* =   0.2332
+
+### Fitting Standard MG94
+* Log(L) = -9492.34, AIC-c = 19069.07 (42 estimated parameters)
+* non-synonymous/synonymous rate ratio =   0.1740
+
+### Fitting MG94 with double instantaneous substitutions
+* Log(L) = -9382.64, AIC-c = 18851.69 (43 estimated parameters)
+* non-synonymous/synonymous rate ratio =   0.1114
+* rate at which 2 nucleotides are changed instantly within a single codon =   0.6194
+
+### Fitting MG94 with double and triple instantaneous substitutions

@@ -50,6 +50,9 @@ FigureS2
 source("FigureS3.R")
 FigureS3
 
+#Figure S5 - dn:ds across the gene -- decide if main or SUPP
+source("FigureS5.R")
+
 #**********************************Supplemental Tables
 #Supplemental Table S1 is previously published emission spectra (constructed manually outside R)
 

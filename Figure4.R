@@ -17,6 +17,65 @@ plotASRsite <- function(site, title) {
 	tiplabels(pie=to.matrix(cursite[luc_tree_root$tip.label],
     		levels(cursite)),piecol=cols,cex=0.3)	
 } 
+plotASRcodon <- function(site, title) {
+   position=1
+   par(mfrow=c(1,3))
+
+
+	x <- ntalignment[, site*3-(position-2)]
+	data.frame(x, row.names=alignment$sp) -> x
+
+	cursite <- setNames(x[,1], rownames(x))
+	fitER<-ace(cursite,luc_tree_root,model="ER",type="discrete")
+	fitER
+	fitER$lik.anc
+	cols<-setNames(c("red","blue", "green", "orange", "yellow", "black"),levels(cursite))
+	#quartz(title, 8, 5)
+	plotTree(luc_tree_root,fsize=.6,ftype="i",lwd=1)
+
+	nodelabels(node=1:luc_tree_root$Nnode+Ntip(luc_tree_root),
+    		pie=fitER$lik.anc,piecol=cols,cex=0.4)
+	tiplabels(pie=to.matrix(cursite[luc_tree_root$tip.label],
+    		levels(cursite)),piecol=cols,cex=0.3)	
+    		
+    x <- ntalignment[, site*3-(position-1)]
+	data.frame(x, row.names=alignment$sp) -> x
+
+	cursite <- setNames(x[,1], rownames(x))
+	fitER<-ace(cursite,luc_tree_root,model="ER",type="discrete")
+	fitER
+	fitER$lik.anc
+	cols<-setNames(c("red","blue", "green", "orange", "yellow", "black"),levels(cursite))
+	#quartz(title, 8, 5)
+	plotTree(luc_tree_root,fsize=.6,ftype="i",lwd=1)
+
+	nodelabels(node=1:luc_tree_root$Nnode+Ntip(luc_tree_root),
+    		pie=fitER$lik.anc,piecol=cols,cex=0.4)
+	tiplabels(pie=to.matrix(cursite[luc_tree_root$tip.label],
+    		levels(cursite)),piecol=cols,cex=0.3)	
+
+
+	x <- ntalignment[, site*3-(position)]
+	data.frame(x, row.names=alignment$sp) -> x
+
+	cursite <- setNames(x[,1], rownames(x))
+	fitER<-ace(cursite,luc_tree_root,model="ER",type="discrete")
+	fitER
+	fitER$lik.anc
+	cols<-setNames(c("red","blue", "green", "orange", "yellow", "black"),levels(cursite))
+	#quartz(title, 8, 5)
+	plotTree(luc_tree_root,fsize=.6,ftype="i",lwd=1)
+
+	nodelabels(node=1:luc_tree_root$Nnode+Ntip(luc_tree_root),
+    		pie=fitER$lik.anc,piecol=cols,cex=0.4)
+	tiplabels(pie=to.matrix(cursite[luc_tree_root$tip.label],
+    		levels(cursite)),piecol=cols,cex=0.3)	
+
+} 
+
+
+
+
 #******************* are all the ancestral state reconstructions, which were moved by hand to phylophenospace
 ladderize(luc_tree, right=TRUE) -> luc_tree
 reroot(luc_tree, 17, resolve.root=TRUE, .5) -> luc_tree_root #root tree at midpoint of branch, which ape does not like to do
@@ -32,6 +91,7 @@ plotASRsite(102, "Site 74 - Correlated with color and under positive selection")
 
 
 plotASRsite(189, "Site 160 - Correlated with color and decay and under positive selection")
+	#plotASRcodon(189)
 
 plotASRsite(41, "Site 19 - Correlated with decay and under positive selection")
 plotASRsite(142, "Site 114 - Correlated with decay and under positive selection")
