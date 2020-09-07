@@ -13,7 +13,7 @@ Figure2b <- ggplot(data=light_data2, aes(x = Species, y = log10(mean_cps),fill=c
   geom_point(position = position_jitterdodge()) + scale_discrete_manual(aes(x=sp)) +
   xlab("Species") + ylab(expression('log'[10]*'(CPS / Total Protein Conc. )')) +
   scale_fill_manual(values = c("white","#0092ff"),name="Measures",labels=c("After + luciferin","Before")) +
-  scale_x_discrete(labels=c("Pichia","C_noc","K_has","M_SVU","V_tsu")) +
+  scale_x_discrete(labels=c("Pichia","C. noctiluca (Jp)","K. hastingsi (Bz)","M. sp. SVU (Bz)","V. tsujii (US)")) +
   theme(legend.position = "none")
 
 	##############
@@ -35,8 +35,10 @@ mam_data <- mam_data2
 
 quartz("Figure 2", 9, 3)
 
-Figure2a <- ggplot(data=maxluc, aes(x=construct, y=log10(light), fill=construct)) + scale_fill_manual(values=c("white","white","#0092ff","#0092ff","#0092ff")) + geom_boxplot() + geom_jitter() + xlab("Species") + ylab(expression('log'[10]*' (Counts Per Second)')) +
-  scale_x_discrete(labels = c("Blank", "HEK", "P_mor", "M_SVU", "V_tsu")) +
+Figure2a <- ggplot(data=maxluc, aes(x=construct, y=log10(light), fill=construct)) +
+  scale_fill_manual(values=c("white","white","#0092ff","#0092ff","#0092ff")) + geom_boxplot() + geom_jitter() +
+  xlab("Species") + ylab(expression('log'[10]*' (Counts Per Second)')) +
+  scale_x_discrete(labels = c("Blank", "HEK", "P. morini (Bz)", "M. sp. SVU (Bz)", "V. tsujii (US)")) +
   theme(legend.position = "none")
 
 grid.arrange(Figure2a, Figure2b, nrow = 1)
